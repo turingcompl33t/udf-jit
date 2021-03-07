@@ -193,7 +193,15 @@ While still falling under the umbrella of UDF inlining, Duta et al. pursue a sli
 
 \section{System Functionality}
 
-TODO
+As described in the Vision Document, we propose a novel approach to improving the execution performance of user-defined functions via JIT-compilation. In order to perform a robust evaluation of this technique with existing solutions (i.e. query inlining) we require a database system with a sufficient level of support for all techniques under consideration.
+
+Therefore, we require the following features of the database system under test prior to beginning our evaluation: 
+
+\begin{itemize}
+    \item Support for compiled query execution
+    \item Support for UDF execution with JIT compilation 
+    \item Support for UDF inlining 
+\end{itemize}
 
 %% ==================================================================
 %% NON-FUNCTIONAL REQUIREMENTS
@@ -209,15 +217,11 @@ As described in the preceding section, this project is an experimental evaluatio
 
 \section{Resource Requirements}
 
-The resource requirements for this project can be partitioned into two categories: data requirements and hardware requirements.
+There are no external data requirements for this project; all of the data that we intend to consider in our evaluation will be collected during our own experimentation.
 
-\subsection{Data Requirements}
+Hardware requirements will play an important role in the experimental evaluation we intend to undertake. The quality and diversity of the hardware environments on which we perform our evaluations will necessarily have an impact on the strength of the conclusions we are able to offer. With that said, the hardware requirements for this project will be met by the computer systems currently available to the Carnegie Mellon Database Group. [Should I not say this here, and potentially try to get funding for cloud resources?]
 
-Because this project is an experimental evaluation of software systems, reliable data collection is among our primary concerns.
-
-\subsection{Hardware Requirements}
-
-In order to conduct our evaluation of UDF execution strategies, various hardware will be required.
+As it stands, we are not aware of any non-development human effort required to complete this project.
 
 %% ==================================================================
 %% PROJECT SCOPE
@@ -233,7 +237,7 @@ In order to conduct our evaluation of UDF execution strategies, various hardware
 \newcommand{\newblock}{}
 
 \newpage
-% \balance
+\balance
 \bibliographystyle{abbrv}
 \bibliography{requirements}
 
