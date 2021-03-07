@@ -181,7 +181,11 @@ Carnegie Mellon Database Group's NoisePage system \cite{noisepage} pursues an ap
 
 \subsection{UDF Inlining}
 
-TODO
+Until now, the most popular approach to addressing the performance limitations of user-defined functions in main-memory database systems has not involved native compilation. Instead, most of the attention in this space has been devoted to the technique of UDF inlining. In general, inlining entails translating a UDF into a relational algebraic expression that can then be embedded directly into the calling SQL query. This allows the DBMS's existing query optimization pipeline to optimize the logic of a UDF in the same way it optimizes relational SQL.
+
+Ramachandra et al. implement the first example of this technique in their Froid system \cite{froid}. Froid's approach relies on Microsoft SQL Server's \cite{sqlserver} \dbCode{APPLY} operator to compose the potentially-many relational expressions that result from the input UDF into a single relational expression that encodes the entirety of the UDF's logic. Gupta et al. later extended this work on Froid with their Aggify framework, adding support for cursor loops \cite{aggify}. 
+
+While still falling under the umbrella of UDF inlining, Duta et al. pursue a slightly different approach in their Apfel framework \cite{apfel}. Whereas the Froid system described above is implemented as an integrated component of the Microsoft SQL Server DBMS, the Apfel framework is a standalone system that compiles imperative UDFs written in PL/pgSQL \cite{plpgsql} to relational SQL. The resulting SQL query may then be processed by any database system as normal. Where Froid relies on SQL Server's \dbCode{APPLY} operator to compose relational expressions, Apfel relies on recursive common table expressions (SQL's \dbCode{WITH RECURSIVE} syntax) to reproduce arbitrary imperative loop logic in SQL.
 
 %% ==================================================================
 %% SYSTEM FUNCTIONALITY
