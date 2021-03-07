@@ -78,7 +78,6 @@
 %% MACROS
 %% ==================================================================
 
-\def\code#1{\texttt{#1}}
 \newcommand{\subparagraph}{}
 
 \newcommand{\sysname}{NoisePage\xspace}
@@ -114,6 +113,7 @@
 \newcommand{\tplType}[1]{\texttt{#1}\xspace}
 \newcommand{\tpl}{\texttt{TPL}\xspace}
 \newcommand{\tbc}{\texttt{TBC}\xspace}
+\newcommand{\dbCode}[1]{{\sffamily\small \textbf{#1}}\xspace}
 
 \newcommand{\tidlist}{\texttt{TupleIdList}\xspace}
 \newcommand{\tidlists}{\texttt{TupleIdLists}\xspace}
@@ -141,15 +141,33 @@
 %% INTRODUCTION
 %% ==================================================================
 
-\section*{Introduction}
+\section{Introduction}
 
-TODO
+This document describes the high-level requirements for our research regarding just-in-time (JIT) compilation for user-defined functions (UDFs) in database management systems (DBMS). 
+
+The remainder of this document is structured as follows. Section 2 begins with a discussion of the intended users of our system. Next, in Section 3 we provide an overview of prior work in this area relevant to our requirements specification in the following sections. Sections 4 through 6 describe the high-level requirements of our research and the evaluations that we intend to perform. Finally, in Section 7 we conclude by addressing project scope as it relates to limitations posed by the MCDS Capstone structure.
 
 %% ==================================================================
 %% INTENDED USERS
 %% ==================================================================
 
-\section*{Intended Users}
+\section{Intended Users}
+
+Cite Tanuj \cite{tanuj}.
+
+%% ==================================================================
+%% BACKGROUND AND PRIOR WORK
+%% ==================================================================
+
+\section{Background and Prior Work}
+
+Our goal in this project is to compare the performance of and UDF constructs supported by JIT compilation with those enabled by other state of the art techniques. In the following subsections we survey the prior work in two relevant areas: query compilation and UDF inlining.
+
+\subsection{Query Compilation}
+
+In traditional disk-oriented DBMSs, query execution is implemented entirely in software. In the canonical `Volcano' (or `Iterator') model of query execution \cite{volcano}, the abstract syntax tree produced by parsing the query text is converted into a query plan tree by the optimizer. Each node in the internal representation of this plan tree effectively implements a \dbCode{next()} function.
+
+\subsection{UDF Inlining}
 
 TODO
 
@@ -157,7 +175,7 @@ TODO
 %% SYSTEM FUNCTIONALITY
 %% ==================================================================
 
-\section*{System Functionality}
+\section{System Functionality}
 
 TODO
 
@@ -165,7 +183,7 @@ TODO
 %% NON-FUNCTIONAL REQUIREMENTS
 %% ==================================================================
 
-\section*{Non-Functional Requirements}
+\section{Non-Functional Requirements}
 
 TODO
 
@@ -173,13 +191,13 @@ TODO
 %% RESOURCE REQUIREMENTS
 %% ==================================================================
 
-\section*{Resource Requirements}
+\section{Resource Requirements}
 
 %% ==================================================================
 %% PROJECT SCOPE
 %% ==================================================================
 
-\section*{Project Scope}
+\section{Project Scope}
 
 %% ==================================================================
 %% BIBLIOGRAPHY
