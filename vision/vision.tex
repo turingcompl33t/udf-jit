@@ -1,0 +1,216 @@
+% MCDS Capstone Vision Document
+% Kyle Dotterrer
+% 20 February, 2021
+
+%% ==================================================================
+%% BOILERPLATE
+%% ==================================================================
+
+\documentclass{vldb}
+
+\newcommand{\paperTitle}{JIT Compilation for User-Defined Functions\\ 
+    \large Capstone Vision Document}
+\newcommand{\paperKeywords}{}
+\newcommand{\paperAuthors}{}
+
+\setlength{\paperheight}{11in}
+\setlength{\paperwidth}{8.5in}
+
+\usepackage[
+            bookmarks=true,
+            bookmarksopen=true,
+            pdfhighlight=/I,
+            pdfpagemode=UseOutlines,
+            linkcolor=blue,
+            pdfborder={ 0 0 0 },
+            pageanchor=false]{hyperref}
+\hypersetup{
+    pdfauthor = {\paperAuthors},
+    pdftitle = {\paperTitle},
+    pdfkeywords = {\paperKeywords},
+    pdfborder={ 0 0 0 }
+}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{times}
+\usepackage{boxedminipage}
+\usepackage{xspace}
+\usepackage{array}
+\usepackage{epsfig}
+\usepackage{calc}
+\usepackage{multirow}
+\usepackage{rotating}
+\usepackage{enumitem}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{tabularx}
+\usepackage{tikz}
+\usepackage{wasysym }
+\usepackage[hyphenbreaks]{breakurl}
+\usepackage{xcolor}
+\usepackage[font={small}]{caption}
+\usepackage{alltt}
+\usepackage{setspace}
+\usepackage{wrapfig}
+\newcommand{\subparagraph}{} % for titlesec + sig-alternate
+\usepackage{etoolbox}
+
+% Font selection
+\usepackage[final]{microtype}
+\usepackage[scaled]{inconsolata}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{soul}
+\usepackage{pifont}
+
+\usepackage{float}
+\usepackage{bookmark}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{latexsym}
+\usepackage{multirow}
+\usepackage{emptypage}
+\usepackage{booktabs}
+\usepackage{enumerate}
+\usepackage{braket}
+\usepackage{balance}
+
+%% ==================================================================
+%% MACROS
+%% ==================================================================
+
+\def\code#1{\texttt{#1}}
+
+\newcommand{\sysname}{NoisePage\xspace}
+
+% Framework Components
+\newcommand{\dbTranslator}{Translator\xspace}
+\newcommand{\dbCompiler}{Compiler\xspace}
+\newcommand{\dbPlanner}{planner\xspace}
+\newcommand{\dbInterpreter}{interpreter\xspace}
+\newcommand{\dbAnalyzer}{analyzer\xspace}
+\newcommand{\dbPCQ}{PCQ\xspace}
+\newcommand{\dbAQP}{AQP\xspace}
+\newcommand{\dbHook}{hook\xspace}
+\newcommand{\dbHooks}{hooks\xspace}
+
+\newcommand{\dbSQL}[1]{\texttt{\textbf{#1}}\xspace}
+\newcommand{\dbTable}[1]{\texttt{\MakeUppercase{#1}}\xspace}
+\newcommand{\dbColumn}[1]{\texttt{col#1}\xspace}
+\newcommand{\dbRawColumn}[1]{\texttt{#1}\xspace}
+\newcommand{\dbConfig}[1]{\textsf{#1}\xspace}
+
+\newcommand{\dbmsOracle}{Oracle\xspace}
+\newcommand{\dbmsDBTwo}{DB2\xspace}
+\newcommand{\dbmsTeradata}{Teradata\xspace}
+\newcommand{\dbmsHANA}{HANA\xspace}
+\newcommand{\dbmsMSSQL}{SQL Server\xspace}
+\newcommand{\dbmsMySQL}{MySQL\xspace}
+\newcommand{\dbmsPostgres}{PostgreSQL\xspace}
+\newcommand{\dbmsMemSQL}{MemSQL\xspace}
+\newcommand{\dbmsHyper}{HyPer\xspace}
+\newcommand{\dbmsVector}{Vector\xspace}
+
+\newcommand{\tplType}[1]{\texttt{#1}\xspace}
+\newcommand{\tpl}{\texttt{TPL}\xspace}
+\newcommand{\tbc}{\texttt{TBC}\xspace}
+
+\newcommand{\tidlist}{\texttt{TupleIdList}\xspace}
+\newcommand{\tidlists}{\texttt{TupleIdLists}\xspace}
+
+%% ==================================================================
+%% PAPER CONTENT
+%% ==================================================================
+
+\begin{document}
+
+\title{\paperTitle}
+
+\numberofauthors{2}
+\author{
+    \alignauthor Kyle Dotterrer, Andrew Pavlo\\
+    \affaddr{Carnegie Mellon University}\\
+    \email 
+        \{\href{mailto:kdottere@cs.cmu.edu}{kdottere},
+        \href{mailto:pavlo@cs.cmu.edu}{pavlo}\}@cs.cmu.edu
+}
+
+\maketitle
+
+%% ==================================================================
+%% INTRODUCTION
+%% ==================================================================
+
+\section*{Introduction}
+
+Modern database management systems (DBMSs) are heavily-optimized for the task of executing queries expressed in SQL. SQL is a powerful language, and its declarative nature makes it both concise and amenable to optimization. However, there are situations in which it falls short of our data processing needs, such as when we would like to express complex application logic. To address such shortcomings, nearly all DBMSs support some extension to the SQL language that allows users to write programs in an imperative manner - with the aid of traditional programming constructs such as variables, conditional branches, and loops - in the form of user-defined functions (UDFs). Such extensions are beneficial for a variety of reasons, including increased code reuse across queries, improved expressiveness for certain classes of queries that are more amenable to an imperative style, and a lower barrier to entry for database administrators (DBAs) \cite{froid}.
+
+Despite their obvious benefits, use of UDFs often comes at a significant runtime cost because of the inefficient manner in which they are executed within the DBMS. The underlying reason for their poor performance is the mismatch between the two programming models at work - imperative UDFs are fundamentally different from declarative SQL, and thus often require a distinct execution mechanism. This project aims to unify these two execution models by integrating just-in-time (JIT) compilation for UDFs into a DBMS that already utilizes native compilation during query execution (NoisePage \cite{noisepage}). By leveraging NoisePage's existing compilation framework, we hope to achieve state-of-the-art performance for UDF execution.
+
+%% ==================================================================
+%% PROBLEM DESCRIPTION
+%% ==================================================================
+
+\section*{Problem Description}
+
+The performance of UDF execution in modern DBMSs lags far behind that of execution of SQL queries. This disparity is largely a result of the fact that maintaining distinct execution engines within a single DBMS in order to execute both SQL queries and imperative programs imposes prohibitive engineering overhead. Further, such segregation entails that improvements to one execution component do not necessarily entail benefits for the other.
+
+%% ==================================================================
+%% PROPOSED SOLUTION
+%% ==================================================================
+
+\section*{Proposed Solution}
+
+We propose to address the poor performance of UDFs by unifying the internal execution models for declarative SQL and imperative programs, allowing UDFs to take advantage of existing infrastructure for SQL execution, namely JIT compilation to native machine code.
+
+%% ==================================================================
+%% SCIENTIFIC HYPOTHESES
+%% ==================================================================
+
+\section*{Scientific Hypotheses}
+
+The scientific hypotheses evaluated in this project include the following:
+
+\begin{itemize}
+    \item Integrating JIT compilation of UDFs into an existing DBMS with a mature execution engine based on both interpretation and native execution is feasible; prior work by Nayak \cite{tanuj} provides strong evidence that this is the case. In this context, success will be measured by the ability to merge the implementation of UDF JIT compilation with future releases of NoisePage, observing the existing robustness and coding standards of the project.
+    \item The engineering effort involved in implementing a translation layer between an imperative UDF and the NoisePage internal DSL will prove lower than implementing and maintaining distinct engines for declarative and imperative execution. In this context, success will be measured by the ability to execute UDFs in NoisePage.
+    \item JIT compilation of UDFs to native machine code will yield performance that surpasses that achieved by traditional approaches such as UDF interpretation. Furthermore, the performance of UDF compilation will match or exceed that demonstrated by alternative, state-of-the-art approaches such as UDF inlining \cite{apfel, froid, aggify}. In this context, success may be measured quantitatively: query execution time will be the primary metric of interest for analytical workloads while throughput (transactions per second) will be the analog for transactional workloads.
+\end{itemize}
+
+%% ==================================================================
+%% MAJOR FEATURES
+%% ==================================================================
+
+\section*{Major Features}
+
+This project builds upon prior work by Nyak \cite{tanuj} in which the author implements an early prototype for JIT compilation of UDFs, including:
+
+\begin{itemize}
+    \item High-level integration with the DBMS (e.g, adding support for the \code{CREATE FUNCTION} syntax necessary to define a new UDF).
+    \item Extension of NoisePage's domain-specific language (DSL) for query compilation (TPL \cite{pcq}) with support for lambda functions
+    \item Support for invoking the TPL generated for a UDF from the encompassing bytecode for the query in which the UDF is embedded.
+\end{itemize}
+
+Despite these contributions, much work remains to be done to complete integration of support for JIT-compiled UDFs into NoisePage, including:
+
+\begin{itemize}
+    \item Add support for dynamic execution of SQL statements.
+    \item Add support for additional PL/pgSQL constructs, such as \code{RAISE} and \code{EXCEPTION} semantics.
+    \item Add support for vectorization / parallelization of TPL lambda execution.
+    \item Unify the abstract syntax tree (AST) of the compiled UDF and the query in which it is embedded, potentially by precompiling the entire UDF to a dynamically-loaded LLVM function.
+\end{itemize}
+
+Beyond these features, there are additional questions that we seek to address regarding the most effective way to integrate imperative programs with DBMSs. The most important of these is a holistic comparison between the approach pursued in this project - JIT compilation - with the UDF inling approach explored by prior works including \cite{apfel}, \cite{froid}, and \cite{aggify}. Nayak \cite{tanuj} performed an initial evaluation of the performance distinctions between these two approaches, but his analysis included several qualifications that we aim to address in this project. Furthermore, we also endeavor to explore whether it might be possible to dynamically select the more appropriate of these two mechanisms at runtime based on the nature of the query being executed, under the assumption that NoisePage achieves support for both UDF compilation and UDF inlining.
+
+%% ==================================================================
+%% BIBLIOGRAPHY
+%% ==================================================================
+
+% TODO: Had to add this mysterious command to compile...
+\newcommand{\newblock}{}
+
+\newpage
+\balance
+\bibliographystyle{abbrv}
+\bibliography{vision}
+
+\end{document}
