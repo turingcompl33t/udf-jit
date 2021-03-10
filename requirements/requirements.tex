@@ -209,7 +209,41 @@ Therefore, we require the following features of the database system under test b
     \item Support for UDF inlining 
 \end{itemize}
 
-The degree of support for these various features may vary. For instance, there are disadvantages to each of the UDF inlining techniques described above that limit the imperative UDF constructs they can express.
+We discuss the requirements implied by each of these features in the following sections.
+
+\subsection{Compiled Query Execution}
+
+Carnegie Mellon Database Group's NoisePage system implements mature support for query compilation \cite{pcq}. Therefore, this requirement is already met.
+
+\subsection{UDF Execution}
+
+This project builds upon prior work by Nyak \cite{tanuj} in which the author implements an early prototype for UDF JIT-compilation. Major contributions of Nayak's work include the following:
+
+\begin{itemize}
+    \item Support for UDF syntactic constructs at the Parser and Binder layers of the DBMS (e.g, adding support for the \dbCode{CREATE FUNCTION} syntax necessary to define a new UDF)
+    \item Extension of NoisePage's domain-specific language (DSL) for query compilation (TPL \cite{pcq}) with support for lambda functions
+    \item Support for invoking the TPL generated for a UDF from the encompassing bytecode for the query in which the UDF is embedded
+\end{itemize}
+
+The early stages of this project will involve integrating the features implemented by Nayak with the NoisePage DBMS on which we will perform our evaluation. Beyond these, further features of UDFs require implementation, including:
+
+\begin{itemize}
+    \item Support for dynamic execution of SQL statements
+    \item Support for additional PL/pgSQL constructs, such as \dbCode{RAISE} and \dbCode{EXCEPTION} semantics
+    \item Support for vectorization / parallelization of TPL lambda execution
+    \item Unification of the abstract syntax tree (AST) of the compiled UDF and the query in which it is embedded, potentially by precompiling the entire UDF to a dynamically-loaded LLVM function
+\end{itemize}
+
+\subsection{UDF Inlining}
+
+The NoisePage DBMS currently lacks support for two features required to implement UDF-inlining:
+
+\begin{itemize}
+    \item Common Table Expressions (SQL's \dbCode{WITH RECURSIVE} and \dbCode{WITH ITERATIVE} syntax)
+    \item Lateral Joins (SQL's \dbCode{LATERAL} syntax)
+\end{itemize}
+
+We will implement these features in the NoisePage DBMS prior to beginning our evaluation.
 
 %% ==================================================================
 %% NON-FUNCTIONAL REQUIREMENTS
@@ -247,7 +281,6 @@ This project's scope will not be negatively affected by the time constraints imp
 \newcommand{\newblock}{}
 
 \newpage
-\balance
 \bibliographystyle{abbrv}
 \bibliography{requirements}
 
