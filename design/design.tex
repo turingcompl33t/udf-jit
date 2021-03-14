@@ -149,7 +149,10 @@
 
 \section{Introduction}
 
-TODO
+
+User-defined functions (UDFs) are a powerful tool for encapsulating complex application logic that may subsequently be embedded into SQL queries. Although they offer a practical complement to SQL, their use in production database environments is often limited because of their associated performance costs \cite{froid, apfel}. In this project, we aim to address the performance limitations of UDFs in the context of main-memory database management systems (DBMSs). We approach this issue by implementing a novel UDF execution technique via JIT-compilation and evaluating this implementation's performance against existing solutions. This document describes the high-level design for our project. 
+
+The remainder of this document is structured as follows. Section 2 begins with a discussion of the design of our experimental procedure. This section provides the high-level description of the evaluation we intend to perform to answer our research question. Next, in Section 3, we provide and overview of the system requirements necessary to perform this evaluation. In Section 4 we identify some of the risks and challenges that we foresee encountering in the course of our project. Finally, in Section 5, we enumerate the tools and dependencies we will use to perform our evaluation.
 
 %% ==================================================================
 %% EXPERIMENT OVERVIEW
@@ -157,7 +160,17 @@ TODO
 
 \section{Experiment Overview}
 
-TODO
+We partition our experimental evaluation into two high-level components: targeted performance evaluation and representative performance evaluation. We describe the features of each of these components in the subsections below. Note that the ordering of the two parts of our experiment is immaterial - they are independent.
+
+\subsection{Computational Overhead Evaluation}
+
+In the first part of our evaluation, we will investigate the degree of computational overhead imposed by each of the UDF execution methods that we consider. This entails constructing targeted benchmarks that exercise one or more aspects of the imperative programming model provided by UDFs and observing the resulting performance distinctions.
+
+These benchmarks will consist primarily of constructs that are well-suited to imperative formulation. Nayak \cite{tanuj} provides an example of one such benchmark in the form of a PL/pgSQL \cite{plpgsql} function that evaluates an L2 norm.
+
+\subsection{Production Workload Evaluation}
+
+In the second component of our evaluation, we will investigate the performance of UDF execution techniques in the context of inputs that are representative of those found in production environments. This evaluation implies that we require the ability to identify the types of UDFs that are typically used in these environments. Prior work by Nayak \cite{tanuj} will prove useful here.
 
 %% ==================================================================
 %% SYSTEM DESIGN OVERVIEW
@@ -165,7 +178,21 @@ TODO
 
 \section{System Design Overview}
 
+Performing the experimental evaluation described above requires the existence of a system on which the evaluation may be performed. To the best of our knowledge, there is no system in existence that supports UDF execution via JIT-compilation and UDF inlining. For this reason, the initial stages of our project will involve software design and implementation work wherein we add support for both of these features to the NoisePage database system. An overview of our plan for achieving this goal follows below.
+
+\subsection{UDF JIT-Compilation}
+
 TODO
+
+\subsection{UDF Inlining}
+
+Prior work on UDF inlining has taken different approaches to implementing the technique.
+
+Ramachandra et al. implement inlining by first decomposing an individual UDF into distinct \textit{regions} that are then translated into equivalent relational expressions. Their Froid framework then relies on SQL Server's \dbCode{APPLY} operator to compose these relational expressions into a single relational expression that encodes the entirety of the UDF's logic \cite{froid}. Gupta et al. extend this work on Froid with their Aggify framework to add support for cursor loops. Aggify realizes its support for cursor loops by translating them to equivalent custom aggregations \cite{aggify}. 
+
+However, Duta et al. pursue a differnt approach to UDF inlining in their Apfel framework \cite{apfel}. Where Ramachandra et al. implement Froid as an integrated component of the Microsoft SQL Server DBMS, Duta et al. design their Apfel framework as a standalone system that compiles imperative UDFs written in PL/pgSQL to standard SQL. Any database system may then process the resulting SQL query in the usual manner. The Apfel framework's defining feature is its use of recursive common table expressions (SQL's \dbCode{WITH RECURSIVE} syntax) to reproduce arbitrary imperative loop logic in SQL.
+
+The salient point here is that UDF inlining may be implemented in terms of different lower-level SQL constructs, such as the lateral \dbCode{JOIN}s (\dbCode{APPLY} in SQL Server) or recursive common table expressions. The performance differences imposed by different underlying implementations may be of interest, but it is not the primary target of our evaluation, so we leave this for future work.
 
 %% ==================================================================
 %% RISKS AND CHALLENGES
@@ -173,7 +200,15 @@ TODO
 
 \section{Risks and Challenges}
 
-TODO 
+In the subsections below we describe some of the risks and challenges that we foresee encountering on the path to completing this project.
+
+\subsection{Identification of Appropriate Scope}
+
+Database systems research is a deceptively broad field. Even within the subfield of execution engine design and implementation, there is both a large volume of prior work as well as a potentially-vast space of unrealized research. In light of these considerations, one of the problems we foresee is identifying an appropriate scope for the particular project we propose here. For instance, in our requirements document we listed several features of user-defined functions that are technically part of the particular PL/SQL dialect upon which we focus (PL/pgSQL \cite{plpgsql}). These features include imperative constructs such as \dbCode{EXCEPTION} and \dbCode{RAISE} statements. While the implementation of these features is ostensibly necessary to provide a comprehensive engine for UDF execution, they are not strictly necessary for the evaluation that we intend to conduct. For this reason, it may be prudent to forgo the implementation of such features in order to focus on the experimental component of our project. With that said, in adopting this view, we enter into conflict with the practical consideration that we plan to conduct our evaluation in the context of an extant database system (NoisePage) for which the incomplete implementation of a feature like UDFs is not typically considered appropriate. We will have to weight these competing concerns, along with the current state of the project timeline, as we progress into the implementation phase of our project.
+
+\subsection{Identification of Feature Parity}
+
+Evaluation of the optimal mechanism for UDF execution in main-memory database systems is the primary goal of our project. As described in the \textit{Experiment Overview} and \textit{System Design Overview} sections above, this requires that we implement a number of new features in the context of the NoisePage DBMS. Isolating the evaluation to a single system instead of attempting to perform the evaluation across different systems that may already provide support for one or more of the features we require is the primary control that we implement to ensure that our evaluation is fair and meaningful. However, even with this control in place, challenges to an effective comparison remain. While they serve the same ultimate goal, UDF JIT-compilation and UDF inlining are disparate features from the perspective of the database system. For this reason, it is possible that our implementation of one feature does not achieve parity with the other in terms. It will be a challenge to isolate the aspects of the performance differences between the two techniques that arise from algorithmic differences (the meaningful differences from the perspective of our evaluation) and which are an artifact of differences in the sophistication applied to their implementation.
 
 %% ==================================================================
 %% TOOLS AND DEPENDENCIES
@@ -181,7 +216,7 @@ TODO
 
 \section{TOOLS AND DEPENDENCIES}
 
-TODO 
+Our project is largely self-contained. 
 
 %% ==================================================================
 %% BIBLIOGRAPHY
