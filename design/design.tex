@@ -182,7 +182,7 @@ Performing the experimental evaluation described above requires the existence of
 
 \subsection{UDF JIT-Compilation}
 
-TODO
+Here we provide an overview of the design of the UDF execution subsystem within NoisePage.
 
 \subsection{UDF Inlining}
 
@@ -193,6 +193,8 @@ Ramachandra et al. implement inlining by first decomposing an individual UDF int
 However, Duta et al. pursue a differnt approach to UDF inlining in their Apfel framework \cite{apfel}. Where Ramachandra et al. implement Froid as an integrated component of the Microsoft SQL Server DBMS, Duta et al. design their Apfel framework as a standalone system that compiles imperative UDFs written in PL/pgSQL to standard SQL. Any database system may then process the resulting SQL query in the usual manner. The Apfel framework's defining feature is its use of recursive common table expressions (SQL's \dbCode{WITH RECURSIVE} syntax) to reproduce arbitrary imperative loop logic in SQL.
 
 The salient point here is that UDF inlining may be implemented in terms of different lower-level SQL constructs, such as the lateral \dbCode{JOIN}s (\dbCode{APPLY} in SQL Server) or recursive common table expressions. The performance differences imposed by different underlying implementations may be of interest, but it is not the primary target of our evaluation, so we leave this for future work.
+
+The design of the UDF inlining module is far from complete.
 
 %% ==================================================================
 %% RISKS AND CHALLENGES

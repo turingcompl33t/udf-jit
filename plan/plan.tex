@@ -149,7 +149,49 @@
 
 \section{Introduction}
 
-TODO
+User-defined functions (UDFs) are a powerful tool for encapsulating complex application logic that may subsequently be embedded into SQL queries. Although they offer a practical complement to SQL, their use in production database environments is often limited because of their associated performance costs \cite{froid, apfel}. In this project, we aim to address the performance limitations of UDFs in the context of main-memory database management systems (DBMSs). We approach this issue by implementing a novel UDF execution technique via JIT-compilation and evaluating this implementation's performance against existing solutions. This document describes our high-level plan for meeting our project's goals.
+
+Our project is naturally partitioned into three distinct components or phases. The first two of these phases consist of system design and implementation tasks, while the third consists of experimental evaluation. We provide additional details regarding each of these tasks in the sections that follow.
+
+%% ==================================================================
+%% TASKS
+%% ==================================================================
+
+\section{Task: Implement UDF JIT-Compilation}
+
+The first task in our project is the design and implementation of a subsystem for UDF execution via JIT-compilation in NoisePage \cite{noisepage}.
+
+\textbf{Task Description}. TODO.
+
+\textbf{Start Date and End Date}. TODO.
+
+\textbf{Required Resources}. TODO.
+
+\textbf{Task Dependencies}. This task is not dependent on the completion of other tasks.
+
+\section{Task: Implement UDF Inlining}
+
+The second task in our project is the design and implementation of a subsystem for UDF execution via UDF inlining in NoisePage \cite{noisepage}.
+
+\textbf{Task Description}. TODO.
+
+\textbf{Start Date and End Date}. TODO.
+
+\textbf{Required Resources}. TODO.
+
+\textbf{Task Dependencies}. This task is not dependent on the completion of other tasks.
+
+\section{Task: Experimental Evaluation}
+
+The final task required to meet our project's objectives is an experimental evaluation of the features implemented in the prior two tasks.
+
+\textbf{Task Description}. TODO.
+
+\textbf{Start Date and End Date}. TODO.
+
+\textbf{Required Resources}. TODO.
+
+\textbf{Task Dependencies}. This task is dependent on both the UDF JIT-compilation task as well as the UDF inlining task.
 
 %% ==================================================================
 %% MILESTONE PLAN
@@ -157,7 +199,7 @@ TODO
 
 \section{Milestone Plan}
 
-TODO
+The project milestones that we have identified are enumerated in the table below.
 
 %% ==================================================================
 %% BIBLIOGRAPHY
