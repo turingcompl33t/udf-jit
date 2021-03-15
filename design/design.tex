@@ -160,17 +160,36 @@ The remainder of this document is structured as follows. Section 2 begins with a
 
 \section{Experiment Overview}
 
-We partition our experimental evaluation into two high-level components: targeted performance evaluation and representative performance evaluation. We describe the features of each of these components in the subsections below. Note that the ordering of the two parts of our experiment is immaterial - they are independent.
+We partition our experimental evaluation into two high-level components: targeted performance evaluation and representative performance evaluation. We describe the features of each of these components in the subsections below. Note that the ordering of the two parts of our experiment is immaterial - they are independent. Following this, we provide an overview of the metrics of interest in our experiment.
 
 \subsection{Computational Overhead Evaluation}
 
-In the first part of our evaluation, we will investigate the degree of computational overhead imposed by each of the UDF execution methods that we consider. This entails constructing targeted benchmarks that exercise one or more aspects of the imperative programming model provided by UDFs and observing the resulting performance distinctions.
-
-These benchmarks will consist primarily of constructs that are well-suited to imperative formulation. Nayak \cite{tanuj} provides an example of one such benchmark in the form of a PL/pgSQL \cite{plpgsql} function that evaluates an L2 norm.
+In the first part of our evaluation, we will investigate the degree of computational overhead imposed by each of the UDF execution methods that we consider. This entails constructing targeted benchmarks that exercise one or more aspects of the imperative programming model provided by UDFs and observing the resulting performance distinctions. These benchmarks will consist primarily of constructs that are well-suited to imperative formulation. This aspect of our evaluation is important because it isolates the algorithmic costs associated with each execution technique and allows us to make inferences regarding their future potential for improvement.
 
 \subsection{Production Workload Evaluation}
 
-In the second component of our evaluation, we will investigate the performance of UDF execution techniques in the context of inputs that are representative of those found in production environments. This evaluation implies that we require the ability to identify the types of UDFs that are typically used in these environments. Prior work by Nayak \cite{tanuj} will prove useful here.
+In the second component of our evaluation, we will investigate the performance of UDF execution techniques in the context of inputs that are representative of those found in production environments. This evaluation implies that we require the ability to identify the types of UDFs that are typically used in these environments. Prior work in this area suggests various approaches to constructing such benchmarks \cite{tanuj, froid}. We discuss this issue further in the \textit{Risks and Challenges} section below. This aspect of our evaluation is important because it answers questions regarding the current applicability of the techniques under evaluation.
+
+\subsection{Evaluation Metrics}
+
+We are interested in two high-level classes of metrics in our evaluation of UDF execution techniques: performance improvements and resource consumption. These classes of metrics are in line with those evaluated in prior work on this topic \cite{froid, apfel}.
+
+In the context of performance improvements, we are interested in the following metrics:
+
+\begin{itemize}
+    \item Compile Time Overhead
+    \item Runtime Overhead
+    \item Combined Compilation and Execution Time 
+\end{itemize}
+
+In the context of resource consumption, we are interested in the following metrics:
+
+\begin{itemize}
+    \item CPU Time
+    \item IO Cost
+\end{itemize}
+
+For both of these classes of metrics, we will evaluate each of the UDF execution techniques of interest on benchmarks designed according to the two classes described above.
 
 %% ==================================================================
 %% SYSTEM DESIGN OVERVIEW
@@ -182,7 +201,16 @@ Performing the experimental evaluation described above requires the existence of
 
 \subsection{UDF JIT-Compilation}
 
-Here we provide an overview of the design of the UDF execution subsystem within NoisePage.
+Here we provide an overview of the design of the UDF execution subsystem within NoisePage. The description below assumes that the user has already created a UDF via a subsequent \dbCode{CREATE FUNCTION} call. At a module level, the procedure for UDF execution proceeds as follows:
+
+\begin{itemize}
+    \item \textit{Parser}: The parser parses the incoming query in the standard fashion.
+    \item \textit{Binder}: During binding, the \textit{Binder} recognizes a UDF invocation embedded in the surrounding SQL query. The \textit{Binder} identifies the appropriate UDF with the help of the system \textit{Catalog} and constructs a new node in the query's abstract syntax tree (AST) for the UDF invocation.
+    \item \textit{Optimizer}: The \textit{Optimizer} treats the UDF invocation as a block box; the UDF is left unmodified.
+    \item \textit{Execution Engine} The \textit{Execution Engine} begins by inserting the AST for the UDF (generated at the time the UDF was defined via \dbCode{CREATE FUNCTION}) into the calling query. The \textit{Execution Engine} proceeds to generate, TPL \cite{pcq} bytecode for the query as normal, inserting a call to the UDF. The body of the UDF itself is compiled to bytecode as a separate module. Once the code generation process is complete, the \textit{Execution Engine} proceeds to translate the entire query, including the embedded UDF, to TBC bitcode \cite{pcq}. After translation to bitcode, the \textit{Execution Engine} passes the complete bitcode module to the LLVM \cite{llvm} subsystem which handles translation to LLVM intermediate representation and subsequent native code generation. Once the query with embedded UDF is compiled to native code, it is indistinguishable from standard queries (those without embedded UDF invocations) to the rest of the system.  
+\end{itemize}
+
+The above description highlights the fact that our system design and implementation work in the first part of this project will require us to make changes throughout the existing architecture of NosiePage.
 
 \subsection{UDF Inlining}
 
@@ -192,9 +220,7 @@ Ramachandra et al. implement inlining by first decomposing an individual UDF int
 
 However, Duta et al. pursue a differnt approach to UDF inlining in their Apfel framework \cite{apfel}. Where Ramachandra et al. implement Froid as an integrated component of the Microsoft SQL Server DBMS, Duta et al. design their Apfel framework as a standalone system that compiles imperative UDFs written in PL/pgSQL to standard SQL. Any database system may then process the resulting SQL query in the usual manner. The Apfel framework's defining feature is its use of recursive common table expressions (SQL's \dbCode{WITH RECURSIVE} syntax) to reproduce arbitrary imperative loop logic in SQL.
 
-The salient point here is that UDF inlining may be implemented in terms of different lower-level SQL constructs, such as the lateral \dbCode{JOIN}s (\dbCode{APPLY} in SQL Server) or recursive common table expressions. The performance differences imposed by different underlying implementations may be of interest, but it is not the primary target of our evaluation, so we leave this for future work.
-
-The design of the UDF inlining module is far from complete.
+The salient point here is that UDF inlining may be implemented in terms of different lower-level SQL constructs, such as the lateral \dbCode{JOIN}s (\dbCode{APPLY} in SQL Server) or recursive common table expressions. The performance differences imposed by different underlying implementations may be of interest, but it is not the primary target of our evaluation, so we leave this for future work. Design and planning work remains to be done to determine the precise manner in which UDF inlining will be integrated into NoisePage.
 
 %% ==================================================================
 %% RISKS AND CHALLENGES
@@ -203,6 +229,10 @@ The design of the UDF inlining module is far from complete.
 \section{Risks and Challenges}
 
 In the subsections below we describe some of the risks and challenges that we foresee encountering on the path to completing this project.
+
+\subsection{Identification of Relevant Workload Data}
+
+As described in the \textit{Experimental Overview} section above, one component of our experimental procedure will consist of evaluation of UDF execution performance on benchmarks that are representative of production workloads. In practice, however, identifying the appropriate benchmarks to use for this part of the evaluation is not straightforward. For many database workloads, many industry-standard benchmarks exist to measure the performance of a particular system. For instance, the Transaction Processing Council publishes both the TPC-C \cite{tpcc} and TPC-H \cite{tpch} benchmarks, and these benchmarks are widely accepted within the database systems communities as effective measures of online transaction processing and analytical workload performance, respectively. To our knowledge, no such standardized benchmarks exist that emphasize the use of user-defined functions. For this reason, prior work in this area has typically involved auxiliary efforts to construct benchmarks appropriate for user-defined functions. For instance, Ramachandra et al. analyze customer workloads from Microsoft's Azure SQL Database \cite{azure} and rank the workloads in descending order of UDF-prevalence in their evaluation of Froid \cite{froid}. Nayak pursues an open-source solution to the same problem by analyzing queries scraped from public GitHub \cite{github} repositories \cite{tanuj}. We will need to determine our own solution to this issue in order to successfully conduct our evaluation. 
 
 \subsection{Identification of Appropriate Scope}
 
@@ -218,7 +248,7 @@ Evaluation of the optimal mechanism for UDF execution in main-memory database sy
 
 \section{TOOLS AND DEPENDENCIES}
 
-Our project is largely self-contained. 
+Our project is largely self-contained. We will not require any external libraries or services in order to perform either our system development tasks or experimental evaluation task. As identified in the \textit{Risks and Challenges} section above, we may require the use of external data sources in the form of workloads characteristics and their associated queries in order to perform out evaluation.
 
 %% ==================================================================
 %% BIBLIOGRAPHY
