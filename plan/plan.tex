@@ -157,27 +157,27 @@ Our project is naturally partitioned into three distinct components or phases. T
 %% TASKS
 %% ==================================================================
 
-\section{Task: Implement UDF JIT-Compilation}
+\section{Task: UDF JIT-Compilation}
 
 The first task in our project is the design and implementation of a subsystem for UDF execution via JIT-compilation in NoisePage \cite{noisepage}.
 
-\textbf{Task Description}. TODO.
+\textbf{Task Description}. In this task, we implement a novel execution strategy for user-defined functions in the research database management system NoisePage. This is a system design and implementation task.
 
-\textbf{Start Date and End Date}. TODO.
+\textbf{Start Date and End Date}. This task is ongoing. Our goal is to complete this task by 1 May 2021.
 
-\textbf{Required Resources}. TODO.
+\textbf{Required Resources}. There are no resources required for this task other than the development effort involved.
 
 \textbf{Task Dependencies}. This task is not dependent on the completion of other tasks.
 
-\section{Task: Implement UDF Inlining}
+\section{Task: UDF Inlining}
 
 The second task in our project is the design and implementation of a subsystem for UDF execution via UDF inlining in NoisePage \cite{noisepage}.
 
-\textbf{Task Description}. TODO.
+\textbf{Task Description}. In this task, we implement support for inlining of user-defined functions in the research database management system NoisePage. This is a system design and implementation task.
 
-\textbf{Start Date and End Date}. TODO.
+\textbf{Start Date and End Date}. This task will begin once the UDF JIT-compilation implementation task is complete. Our goal is to begin this task by 1 May 2021. Our goal is to complete this task by 1 June 2021.
 
-\textbf{Required Resources}. TODO.
+\textbf{Required Resources}. There are no resources required for this task other than the development effort involved.
 
 \textbf{Task Dependencies}. This task is not dependent on the completion of other tasks.
 
@@ -185,11 +185,11 @@ The second task in our project is the design and implementation of a subsystem f
 
 The final task required to meet our project's objectives is an experimental evaluation of the features implemented in the prior two tasks.
 
-\textbf{Task Description}. TODO.
+\textbf{Task Description}. In this task, we perform an evaluation of performance and resource consumption characteristics of various execution techniques for user-defined functions. This is an experimentation task.
 
-\textbf{Start Date and End Date}. TODO.
+\textbf{Start Date and End Date}. This task will begin once both the UDF JIT-compilation and UDF inlining implementation tasks are complete. Our goal is to begin this task by 1 June 2021. Our goal is to complete this task by 1 August 2021.
 
-\textbf{Required Resources}. TODO.
+\textbf{Required Resources}. This task requires access to workload characteristic data and the associated queries in order to construct benchmarks for evaluation.
 
 \textbf{Task Dependencies}. This task is dependent on both the UDF JIT-compilation task as well as the UDF inlining task.
 
@@ -199,7 +199,83 @@ The final task required to meet our project's objectives is an experimental eval
 
 \section{Milestone Plan}
 
-The project milestones that we have identified are enumerated in the table below.
+The project milestones that we have identified are enumerated in the table below. The dates listed are estimates at best; it is likely that the project timeline will shift as we encounter advances and setbacks. It is possible that we underestimate the difficulty of the system design and implementation tasks identified above.
+
+\subsection{UDF JIT Compilation}
+
+\begin{center}
+\begin{tabular}{ |c|l| } 
+    \hline
+    \textbf{Date} & \textbf{Milestone} \\ 
+    \hline
+    1 March 2021 & Begin System Design \\
+    \hline
+    21 March 2021 & All tests for feature designed \\
+    \hline
+    28 March 2021 & \textit{Parser} support implemented; tests passing \\
+    \hline
+    4 April 2021 & \textit{Binder} support implemented; tests passing \\
+    \hline
+    11 April 2021 & \textit{Execution Engine} codegen implemented; tests passing \\
+    \hline
+    18 April 2021 & \textit{Execution Engine} LLVM implemented; tests passing \\
+    \hline
+    25 April 2021 & Integration tests implemented and passing \\
+    \hline
+    1 May 2021 & Feature Complete \\
+    \hline
+\end{tabular}
+\end{center}
+
+\subsection{UDF Inlining}
+
+\begin{center}
+\begin{tabular}{ |c|l| } 
+    \hline
+    \textbf{Date} & \textbf{Milestone} \\ 
+    \hline
+    1 May 2021 & Begin system design \\
+    \hline
+    9 May 2021 & System design complete; integration plan \\
+    \hline
+    16 May 2021 & \textit{Binder} support implemented; tests passing \\
+    \hline
+    23 May 2021 & \textit{Optimizer} support implemented; tests passing \\
+    \hline  
+    1 June 2021 & Feature Complete \\
+    \hline
+\end{tabular}
+\end{center}
+
+\subsection{Experimental Evaluation}
+
+\begin{center}
+\begin{tabular}{ |c|l| } 
+    \hline
+    \textbf{Date} & \textbf{Milestone} \\ 
+    \hline
+    1 June 2021 & Begin Experimental Setup \\
+    \hline
+    6 June 2021 & Complete experimental design for all cases \\
+    \hline
+    13 June 2021 & All workload data collected \\
+    \hline
+    20 June 2021 & All targeted benchmarks implemented \\
+    \hline
+    27 June 2021 & All production benchmarks implemented \\
+    \hline
+    4 July 2021 & Targeted benchmarks complete \\
+    \hline
+    11 July 2021 & Production benchmarks complete \\
+    \hline
+    18 July 2021 & Benchmark results organized into tables \\
+    \hline
+    25 July 2021 & Initial evaluation of results complete \\
+    \hline
+    1 August 2021 & Experimentation Complete \\
+    \hline
+\end{tabular}
+\end{center}
 
 %% ==================================================================
 %% BIBLIOGRAPHY
