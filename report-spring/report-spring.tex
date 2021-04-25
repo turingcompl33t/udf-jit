@@ -144,21 +144,37 @@
 \maketitle
 
 %% ==================================================================
+%% ABSTRACT
+%% ==================================================================
+
+\section*{Abstract}
+
+User-defined functions (UDFs) are a powerful tool for encapsulating complex application logic that may subsequently be embedded into SQL queries. Although they offer a practical complement to SQL, their use in production database environments is often limited because of their associated performance costs \cite{froid, apfel}. In this project, we evaluate the efficacy of methods intended to address the performance limitations of UDFs in the context of main-memory database management systems (DBMSs). We compare the performance of an existing, state-of-the-art technique, UDF inlining, with our own novel strategy that executes UDFs as native code via JIT-compilation. Our evaluation efforts are ongoing.
+
+%% ==================================================================
 %% INTRODUCTION
 %% ==================================================================
 
 \section{Introduction}
 
-User-defined functions (UDFs) are a powerful tool for encapsulating complex application logic that may subsequently be embedded into SQL queries. Although they offer a practical complement to SQL, their use in production database environments is often limited because of their associated performance costs \cite{froid, apfel}. In this project, we aim to address the performance limitations of UDFs in the context of main-memory database management systems (DBMSs). We approach this issue by implementing a novel UDF execution technique via JIT-compilation and evaluating this implementation's performance against existing solutions. This document describes the high-level requirements for our project. 
+TODO
 
-The remainder of this document is structured as follows. Section 2 begins with a discussion of the intended users of our system. Next, in Section 3, we provide an overview of prior work in this area relevant to our requirements specification in the following sections. Sections 4 through 6 describe our research's high-level requirements and the evaluations that we intend to perform. Finally, in Section 7, we conclude by addressing project scope related to limitations imposed by the MCDS Capstone structure.
-
+The remainder of this document is structured as follows. Section 2 begins with a discussion of our project goals and hypotheses. Next, in Section 3, we provide an overview of relevant prior work and its relationship with our project. Section 4 outlines our project goals for the Spring term and discusses the degree to which we have met them. Sections 5 and 6 provide overviews of our system and experimental designs, respectively. In sections 7 and 8 we present the results and error analysis for the results we have achieved thus far. Section 9 discusses the entirety of our design, implementation, and evaluation process, to the extent currently possible. In Section 10 we present some of the lessons we have learned thus far in the course of our project. Section 11 presents our current plan for the work that remains to be done in our project. Finally, we conclude in Section 12.
 
 %% ==================================================================
 %% PROJECT GOAL
 %% ==================================================================
 
-\section{Project Goal}
+\section{Project Goal and Hypotheses}
+
+Our goal in this project is to evaluate methods for improving UDF execution performance in database systems. We compare the performance of the existing state-of-the-art (\cite{froid, apfel, aggify}) with our own novel implementation of UDF JIT-compilation.
+
+We evaluate the following hypotheses through our implementation efforts and subsequent evaluation:
+
+\begin{itemize}
+    \item Integrating JIT compilation of UDFs into an existing DBMS with a mature execution engine based on both interpretation and native execution is feasible; prior work by Nayak \cite{tanuj} provides strong evidence that this is the case. In this context, success will be measured by the ability to merge the implementation of UDF JIT compilation with future releases of NoisePage, observing the existing robustness and coding standards of the project.
+    \item JIT compilation of UDFs to native machine code will yield performance that surpasses that achieved by traditional approaches such as UDF interpretation. Furthermore, the performance of UDF compilation will match or exceed that demonstrated by alternative, state-of-the-art approaches such as UDF inlining \cite{apfel, froid, aggify}. In this context, success may be measured quantitatively: query execution time will be the primary metric of interest for analytical workloads while throughput (transactions per second) will be the analog for transactional workloads.
+\end{itemize}
 
 %% ==================================================================
 %% RELATIONSHIP TO PRIOR WORK
@@ -166,7 +182,7 @@ The remainder of this document is structured as follows. Section 2 begins with a
 
 \section{Relationship to Prior Work}
 
-Our goal in this project is to compare various UDF execution methods, namely JIT compilation and UDF inlining. Our comparison's primary target is system performance, which we will measure by the metrics appropriate for specific workload characteristics. Our metric of interest will be throughput for transactional workloads, while for analytical workloads, our metric of interest will be total query processing time (latency). In the following subsections, we survey the prior work in two relevant areas of ongoing research. First, we provide an introduction to query compilation techniques in database systems. We follow this with a discussion of existing methods for improving UDF execution performance via UDF inlining.
+Our goal in this project is to compare various UDF execution methods, namely JIT compilation and UDF inlining. Our comparison's primary target is system performance, which we will measure by the metrics appropriate for specific workload characteristics. Our metric of interest will be throughput for transactional workloads, while for analytical workloads, our metric of interest will be total query processing time (latency). In the following subsections, we survey the prior work in two relevant areas of ongoing research. First, we provide an introduction to query compilation techniques in database systems. We follow this with a discussion of existing methods for improving UDF execution performance via inlining.
 
 \subsection{Query Compilation}
 
@@ -197,6 +213,8 @@ Duta et al. pursue a distinct approach to UDF inlining in their Apfel framework 
 %% ==================================================================
 
 \section{Spring Development Goals}
+
+At the outset of this project, we set the goal to complete implementation of our UDF JIT compilation technique by the conclusion of the Spring semester. This goal was not amended at the semester midterm because we observed that we were progressing at approximately the expected rate. Now, at the conclusion of the semester, we can happily report that we did meet our stated goal: we successfully merged support for UDF JIT compilation into the NoisePage DBMS project codebase, implying that the system now supports our novel UDF execution strategy. Obviously, this constitutes just one step towards our ultimate goal of an experimental evaluation, but we believe that this represents the majority of the engineering effort presented by the project in its totality.
 
 %% ==================================================================
 %% SYSTEM DESIGN
@@ -256,11 +274,48 @@ We will implement these features in the NoisePage DBMS prior to beginning our ev
 
 \section{Experimental Design}
 
+In this section we discuss relevant aspects of our experimental design. As mentioned in previous sections, the majority of our time this semester was spent on design and implementation work for UDF JIT compilation, rather than the conduct of our evaluation. Accordingly, the setup described below merely represents the proposed design of our evaluation, rather than the setup which we have actually used. See the \textit{Future Work} section for further details regarding our plans for the remainder of the project.
+
+We partition our experimental evaluation into two components: targeted performance evaluation and representative performance evaluation. We describe the features of each of these components in the subsections below. Note that the ordering of the two parts of our experiment is immaterial - they are independent. Following this, we provide an overview of the metrics of interest in our experiment.
+
+\subsection{Computational Overhead Evaluation}
+
+In the first part of our evaluation, we will investigate the degree of computational overhead imposed by each of the UDF execution methods that we consider. This entails constructing targeted benchmarks that exercise one or more aspects of the imperative programming model provided by UDFs and observing the resulting performance distinctions. These benchmarks will consist primarily of constructs that are well-suited to imperative formulation. This aspect of our evaluation is important because it isolates the algorithmic costs associated with each execution technique and allows us to make inferences regarding their future potential for improvement.
+
+\subsection{Production Workload Evaluation}
+
+In the second component of our evaluation, we will investigate the performance of UDF execution techniques in the context of inputs that are representative of those found in production environments. This aspect of our evaluation is important because it answers questions regarding the current applicability of the techniques under evaluation.
+
+The nature of this evaluation implies that we require the ability to identify the types of UDFs that are typically used in production environments. In practice, identifying the appropriate benchmarks to use for this part of the evaluation is not straightforward. For many database workloads, industry-standard benchmarks exist to measure the performance of a particular system. For instance, the Transaction Processing Council publishes both the TPC-C \cite{tpcc} and TPC-H \cite{tpch} benchmarks. These benchmarks are widely accepted within the database systems community as effective measures of online transaction processing and analytical workload performance, respectively. To our knowledge, no such standardized benchmarks exist that emphasize the use of user-defined functions. For this reason, prior work in this area has typically involved auxiliary efforts to construct benchmarks appropriate for user-defined functions. For instance, Ramachandra et al. analyze customer workloads from Microsoft's Azure SQL Database \cite{azure} and rank the workloads in descending order of UDF-prevalence in their evaluation of Froid \cite{froid}. Nayak pursues an open-source solution to the same problem by analyzing queries scraped from public GitHub \cite{github} repositories \cite{tanuj}. Our evaluation will likely involve a combination of both approaches.
+
+\subsection{Evaluation Metrics}
+
+We are interested in two classes of metrics in our evaluation of UDF execution techniques: performance improvements and resource consumption. These classes of metrics are in line with those evaluated in prior work on this topic \cite{froid, apfel}.
+
+In the context of performance improvements, we are interested in the following metrics:
+
+\begin{itemize}
+    \item \textit{Compilation Time}: The total time taken to compile the query from a physical plan to native machine code. We hypothesis that the different techniques under evaluation introducing differing degrees of compile-time overhead to the system. This metric is measured in milliseconds.
+    \item \textit{Execution Time}: The total time taken to execute the compiled query. Again, we hypothesize that the different techniques under evaluation will result in measurably different execution time even though both result solely in native code execution. This metric is measured in milliseconds.
+    \item \textit{Combined Compilation and Execution Time}: The total time taken to compile and execute the query within the DBMS execution engine. Ultimately, it is the end-to-end time taken by the execution engine that determines the overall effectiveness of the technique under evaluation. This metric is measured in milliseconds.
+\end{itemize}
+
+In the context of resource consumption, we are interested in the following metrics:
+
+\begin{itemize}
+    \item \textit{CPU Utilization}: During compilation and execution, what percentage of available compute are we able to saturate? This metric will measured as a percentage.
+    \item \textit{Memory Consumption}: During compilation and execution, what is the total volume of memory consumed by the DBMS execution engine? This metric is measured in megabytes (MB).
+\end{itemize}
+
+For both of these classes of metrics, we will evaluate each of the UDF execution techniques of interest on benchmarks designed according to the two classes described above.
+
 %% ==================================================================
 %% RESULTS
 %% ==================================================================
 
 \section{Results}
+
+As discussed in previous sections, the entirety of our time this term was spent on design and implementation effort for our novel UDF execution technique - UDF JIT compilation. Accordingly, we have not yet conducted our proposed evaluation and therefore do not currently have any experimental results to present.
 
 %% ==================================================================
 %% ERROR ANALYSIS
@@ -268,11 +323,15 @@ We will implement these features in the NoisePage DBMS prior to beginning our ev
 
 \section{Error Analysis}
 
+As discussed in previous sections, the entirety of our time this term was spent on design and implementation effort for our novel UDF execution technique - UDF JIT compilation. Accordingly, we have not yet conducted our proposed evaluation and therefore do not currently have any error analysis to present.
+
 %% ==================================================================
 %% DISCUSSION
 %% ==================================================================
 
 \section{Discussion}
+
+As discussed in previous sections, the entirety of our time this term was spent on design and implementation effort for our novel UDF execution technique - UDF JIT compilation. Accordingly, we have not yet conducted our proposed evaluation and therefore do not currently have any discussion of our experimental process, results, or error analysis to present.
 
 %% ==================================================================
 %% LESSONS LEARNED
@@ -280,17 +339,85 @@ We will implement these features in the NoisePage DBMS prior to beginning our ev
 
 \section{Lessons Learned}
 
+The following subsections summarize the lessons we learned during our system design and implementation work this semester.
+
+\subsection{Working in a Mature Codebase}
+
+Here
+
+\subsection{World}
+
+Here
+
 %% ==================================================================
 %% FUTURE WORK
 %% ==================================================================
 
 \section{Future Work}
 
+Because our original project plan and timeline remain intact, our direction for future work is straightforward. Now that we have completed implementation of support for UDF JIT compilation, we turn our attention to implementation of UDF inlining support in the NoisePage DBMS. While this no doubt represents a non-trivial engineering effort, many of the system design issues in this space have been resolved by prior work (e.g. \cite{froid, apfel}).
+
+\begin{center}
+\begin{tabular}{ |c|l| } 
+    \hline
+    \textbf{Date} & \textbf{Milestone} \\ 
+    \hline
+    1 May 2021 & Begin system design \\
+    \hline
+    9 May 2021 & System design complete; integration plan \\
+    \hline
+    16 May 2021 & \textit{Binder} support implemented; tests passing \\
+    \hline
+    23 May 2021 & \textit{Optimizer} support implemented; tests passing \\
+    \hline  
+    1 June 2021 & Feature Complete \\
+    \hline
+\end{tabular}
+\end{center}
+
+\subsection{Experimental Evaluation}
+
+\begin{center}
+\begin{tabular}{ |c|l| } 
+    \hline
+    \textbf{Date} & \textbf{Milestone} \\ 
+    \hline
+    1 June 2021 & Begin Experimental Setup \\
+    \hline
+    6 June 2021 & Complete experimental design for all cases \\
+    \hline
+    13 June 2021 & All workload data collected \\
+    \hline
+    20 June 2021 & All targeted benchmarks implemented \\
+    \hline
+    27 June 2021 & All production benchmarks implemented \\
+    \hline
+    4 July 2021 & Targeted benchmarks complete \\
+    \hline
+    11 July 2021 & Production benchmarks complete \\
+    \hline
+    18 July 2021 & Benchmark results organized into tables \\
+    \hline
+    25 July 2021 & Initial evaluation of results complete \\
+    \hline
+    1 August 2021 & Experimentation Complete \\
+    \hline
+\end{tabular}
+\end{center}
+
 %% ==================================================================
 %% CONCLUSION
 %% ==================================================================
 
 \section{Conclusion}
+
+%% ==================================================================
+%% ACKNOWLEDGEMENTS
+%% ==================================================================
+
+\section*{Acknowledgements}
+
+I would like to thank my mentor Professor Andy Pavlo for his continued support and guidance throughout this project. Professor Pavlo was remarkably receptive to my proposed involvement in this project from the very beginning, and his passion for databases systems consistently serves as a bulwark against the discouragement posed by technical setbacks. In addition, I must acknowledge the prior work by former CMU student Tanuj Nayak, upon whose pioneering work with PL/pgSQL compilation this project is based. Finally, I would like to thank all of my colleagues in the CMU Database Group for their continued, groundbreaking work on the NoisePage DBMS and the inspiration this provides for my own development efforts.
 
 %% ==================================================================
 %% BIBLIOGRAPHY
