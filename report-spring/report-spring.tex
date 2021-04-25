@@ -1,0 +1,307 @@
+% MCDS Capstone Spring Report Document
+% Kyle Dotterrer
+% 26 April, 2021
+
+%% ==================================================================
+%% BOILERPLATE
+%% ==================================================================
+
+\documentclass{vldb}
+
+\newcommand{\paperTitle}{JIT Compilation for User-Defined Functions\\ 
+    \large Capstone Requirements Document\\
+    \today}
+\newcommand{\paperKeywords}{}
+\newcommand{\paperAuthors}{}
+
+\setlength{\paperheight}{11in}
+\setlength{\paperwidth}{8.5in}
+
+\usepackage[
+            bookmarks=true,
+            bookmarksopen=true,
+            pdfhighlight=/I,
+            pdfpagemode=UseOutlines,
+            linkcolor=blue,
+            pdfborder={ 0 0 0 },
+            pageanchor=false]{hyperref}
+\hypersetup{
+    pdfauthor = {\paperAuthors},
+    pdftitle = {\paperTitle},
+    pdfkeywords = {\paperKeywords},
+    pdfborder={ 0 0 0 }
+}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{times}
+\usepackage{boxedminipage}
+\usepackage{xspace}
+\usepackage{array}
+\usepackage{epsfig}
+\usepackage{calc}
+\usepackage{multirow}
+\usepackage{rotating}
+\usepackage{enumitem}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{tabularx}
+\usepackage{tikz}
+\usepackage{wasysym }
+\usepackage[hyphenbreaks]{breakurl}
+\usepackage{xcolor}
+\usepackage[font={small}]{caption}
+\usepackage{alltt}
+\usepackage{setspace}
+\usepackage{wrapfig}
+\usepackage{etoolbox}
+
+% Font selection
+\usepackage[final]{microtype}
+\usepackage[scaled]{inconsolata}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{soul}
+\usepackage{pifont}
+
+% Other misc. things
+\usepackage{float}
+\usepackage{bookmark}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{latexsym}
+\usepackage{multirow}
+\usepackage{emptypage}
+\usepackage{booktabs}
+\usepackage{enumerate}
+\usepackage{braket}
+\usepackage{balance}
+
+%% ==================================================================
+%% MACROS
+%% ==================================================================
+
+\newcommand{\subparagraph}{}
+
+\newcommand{\sysname}{NoisePage\xspace}
+
+% Framework Components
+\newcommand{\dbTranslator}{Translator\xspace}
+\newcommand{\dbCompiler}{Compiler\xspace}
+\newcommand{\dbPlanner}{planner\xspace}
+\newcommand{\dbInterpreter}{interpreter\xspace}
+\newcommand{\dbAnalyzer}{analyzer\xspace}
+\newcommand{\dbPCQ}{PCQ\xspace}
+\newcommand{\dbAQP}{AQP\xspace}
+\newcommand{\dbHook}{hook\xspace}
+\newcommand{\dbHooks}{hooks\xspace}
+
+\newcommand{\dbSQL}[1]{\texttt{\textbf{#1}}\xspace}
+\newcommand{\dbTable}[1]{\texttt{\MakeUppercase{#1}}\xspace}
+\newcommand{\dbColumn}[1]{\texttt{col#1}\xspace}
+\newcommand{\dbRawColumn}[1]{\texttt{#1}\xspace}
+\newcommand{\dbConfig}[1]{\textsf{#1}\xspace}
+
+\newcommand{\dbmsOracle}{Oracle\xspace}
+\newcommand{\dbmsDBTwo}{DB2\xspace}
+\newcommand{\dbmsTeradata}{Teradata\xspace}
+\newcommand{\dbmsHANA}{HANA\xspace}
+\newcommand{\dbmsMSSQL}{SQL Server\xspace}
+\newcommand{\dbmsMySQL}{MySQL\xspace}
+\newcommand{\dbmsPostgres}{PostgreSQL\xspace}
+\newcommand{\dbmsMemSQL}{MemSQL\xspace}
+\newcommand{\dbmsHyper}{HyPer\xspace}
+\newcommand{\dbmsVector}{Vector\xspace}
+
+\newcommand{\tplType}[1]{\texttt{#1}\xspace}
+\newcommand{\tpl}{\texttt{TPL}\xspace}
+\newcommand{\tbc}{\texttt{TBC}\xspace}
+\newcommand{\dbCode}[1]{{\sffamily\small \textbf{#1}}\xspace}
+
+\newcommand{\tidlist}{\texttt{TupleIdList}\xspace}
+\newcommand{\tidlists}{\texttt{TupleIdLists}\xspace}
+
+%% ==================================================================
+%% PAPER CONTENT
+%% ==================================================================
+
+\begin{document}
+
+\title{\paperTitle}
+
+\numberofauthors{2}
+\author{
+    \alignauthor Kyle Dotterrer, Andrew Pavlo\\
+    \affaddr{Carnegie Mellon University}\\
+    \email 
+        \{\href{mailto:kdottere@cs.cmu.edu}{kdottere},
+        \href{mailto:pavlo@cs.cmu.edu}{pavlo}\}@cs.cmu.edu\\
+}
+
+% Remove the space for the copyright box for VLDB
+\makeatletter
+\def\@copyrightspace{\relax}
+\makeatother
+
+\maketitle
+
+%% ==================================================================
+%% INTRODUCTION
+%% ==================================================================
+
+\section{Introduction}
+
+User-defined functions (UDFs) are a powerful tool for encapsulating complex application logic that may subsequently be embedded into SQL queries. Although they offer a practical complement to SQL, their use in production database environments is often limited because of their associated performance costs \cite{froid, apfel}. In this project, we aim to address the performance limitations of UDFs in the context of main-memory database management systems (DBMSs). We approach this issue by implementing a novel UDF execution technique via JIT-compilation and evaluating this implementation's performance against existing solutions. This document describes the high-level requirements for our project. 
+
+The remainder of this document is structured as follows. Section 2 begins with a discussion of the intended users of our system. Next, in Section 3, we provide an overview of prior work in this area relevant to our requirements specification in the following sections. Sections 4 through 6 describe our research's high-level requirements and the evaluations that we intend to perform. Finally, in Section 7, we conclude by addressing project scope related to limitations imposed by the MCDS Capstone structure.
+
+
+%% ==================================================================
+%% PROJECT GOAL
+%% ==================================================================
+
+\section{Project Goal}
+
+%% ==================================================================
+%% RELATIONSHIP TO PRIOR WORK
+%% ==================================================================
+
+\section{Relationship to Prior Work}
+
+Our goal in this project is to compare various UDF execution methods, namely JIT compilation and UDF inlining. Our comparison's primary target is system performance, which we will measure by the metrics appropriate for specific workload characteristics. Our metric of interest will be throughput for transactional workloads, while for analytical workloads, our metric of interest will be total query processing time (latency). In the following subsections, we survey the prior work in two relevant areas of ongoing research. First, we provide an introduction to query compilation techniques in database systems. We follow this with a discussion of existing methods for improving UDF execution performance via UDF inlining.
+
+\subsection{Query Compilation}
+
+In traditional disk-oriented systems, the DBMS implements query execution entirely in software. The canonical execution strategy employed by many database systems begins as the optimizer converts the abstract syntax tree produced by parsing the query text into a physical plan tree. Each node in this plan tree represents a physical operator that implements one or more logical operations specified in the input query, such as a \dbCode{SELECT} operation, application of a filter (\dbCode{WHERE}), or a \dbCode{JOIN}. With the plan tree constructed, the DBMS executes the query by evaluating each operator in the physical plan \cite{graefe93, graefe94, dbconcepts}. 
+
+In this strategy, the DBMS implements its execution engine in terms of high-level, general-purpose code. This degree of generality is excellent from a software engineering perspective because it makes query execution easy to reason about. However, this comprehensibility comes at the cost of runtime performance. The generality of the code in this execution technique imposes runtime overhead by way of the many levels of indirection that it introduces, resulting in a large number of native instructions being executed \cite{freedman14}. The number of executed instructions is often not a limiting factor in disk-oriented systems' performance because disk IO operations dominate the total query processing time. For in-memory systems where persistent storage no longer imposes this bottleneck, several strategies are available to reduce the number of instructions executed in query processing.
+
+Query compilation is one such query execution strategy that is growing in popularity. At a high level, query compilation aims to reduce the number of instructions executed by generating specialized code for each query that the system encounters. 
+
+There are many approaches to implementing query compilation, and the techniques for doing so have evolved rapidly in the last decade. One of the earliest implementations of query compilation in the modern era was accomplished by the HIQUE system \cite{systemr}. In HIQUE, the execution engine first translates an input query to C++ code. It subsequently compiles this C++ code to native code by spawning an external process (GCC \cite{gcc}) \cite{krikellas10}. It is important to note here, however, that HIQUE does not implement translation for arbitrary SQL queries but instead relies on pre-defined C++ templates that it applies to a limited subset of input queries.
+
+More advanced systems eschew using an external compiler to avoid the high costs associated with compilation under this model. Spawning an external compilation process introduces the latency associated with operating system process management into the critical path of query execution. Furthermore, utilizing an external compiler like GCC to compile specialized query code discards much of the information that the DBMS has already `learned' about the query while constructing its query plan and forces the compiler's frontend to repeat much of this work. The HyPer main memory DBMS \cite{hyper} is one example of a system that avoids these issues by implementing query compilation without using an external compiler. HyPer generates LLVM \cite{LLVM} intermediate representation from the input query and subsequently utilizes the existing LLVM infrastructure to JIT-compile the IR to native machine code that implements the query \cite{neumann11, kemper11}.
+
+The SingleStore \cite{singlestore} execution engine represents a more advanced approach to compilation. It first translates SQL queries to an internal domain-specific language (DSL) that then undergoes a second stage of translation to LLVM intermediate representation. The execution engine then JIT-compiles this intermediate representation to native code \cite{paroski16}. This additional step in the query compilation process facilitates greater developer productivity by making it easier to reason about the code generated by the execution engine's upper layers.
+
+Carnegie Mellon Database Group's NoisePage system \cite{noisepage} implements an approach to query compilation that is similar to SingleStore's. The first step in NoisePage's query processing pipeline is translation of the input query to an internal domain-specific language. The execution engine then compiles this DSL to a lower-level bytecode representation. Once this bytecode is generated, the NoisePage execution engine can either run the bytecode directly on an interpreter or translate this bytecode to LLVM IR that is then JIT-compiled to efficient machine code \cite{pcq}.
+
+\subsection{UDF Inlining}
+
+Despite recent advances in compilation techniques, the most popular current approach to addressing the performance limitations of user-defined functions does not involve native compilation. Instead, most of the attention in this space is currently devoted to the technique of UDF inlining. In general, inlining entails translating a UDF into a relational algebraic expression that can then be embedded directly into the calling SQL query. Inlining a UDF allows the DBMS's existing query optimization component to optimize the logic of an imperative UDF in the same way it optimizes declarative SQL.
+
+Ramachandra et al. implement this technique's archetype in their Froid system within Microsoft SQL Server \cite{sqlserver}. Froid executes UDF inlining by first decomposing an individual UDF into distinct \textit{regions} that it then translates into equivalent relational expressions. The Froid framework then relies on SQL Server's \dbCode{APPLY} operator to compose these relational expressions into a single relational expression that encodes the entirety of the UDF's logic \cite{froid}. Gupta et al. extend this work on Froid with their Aggify framework to add support for cursor loops. Aggify realizes its support for cursor loops by translating them to equivalent custom aggregations \cite{aggify}. 
+
+Duta et al. pursue a distinct approach to UDF inlining in their Apfel framework \cite{apfel}. Where Ramachandra et al. implement Froid as an integrated component of the Microsoft SQL Server DBMS, Duta et al. design their Apfel framework as a standalone system that compiles imperative UDFs written in PL/pgSQL \cite{plpgsql} to standard SQL. Any database system may then process the resulting SQL query in the usual manner. The Apfel framework's defining feature is its use of recursive common table expressions (SQL's \dbCode{WITH RECURSIVE} syntax) to reproduce arbitrary imperative loop logic in SQL.
+
+%% ==================================================================
+%% SPRING DEVELOPMENT GOALS
+%% ==================================================================
+
+\section{Spring Development Goals}
+
+%% ==================================================================
+%% SYSTEM DESIGN
+%% ==================================================================
+
+\section{System Design}
+
+As described in the Vision Document, we propose to investigate how to improve the execution performance of user-defined functions via JIT-compilation. To perform a robust evaluation of this technique with existing solutions (i.e., query inlining), we require a database system with a sufficient level of support for all methods under consideration.
+
+Therefore, we require the following features of the database system under test before beginning our evaluation: 
+
+\begin{itemize}
+    \item Support for compiled query execution
+    \item Support for UDF execution with JIT compilation 
+    \item Support for UDF inlining 
+\end{itemize}
+
+We discuss the requirements implied by each of these features in the following sections.
+
+\subsection{Compiled Query Execution}
+
+Carnegie Mellon Database Group's NoisePage system implements mature support for query compilation \cite{pcq}. Therefore, this requirement is already met.
+
+\subsection{UDF Execution}
+
+This project builds upon prior work by Nyak \cite{tanuj} in which the author implements an early prototype for UDF JIT-compilation. Major contributions of Nayak's work include the following:
+
+\begin{itemize}
+    \item Support for UDF syntactic constructs at the Parser and Binder layers of the DBMS (e.g, adding support for the \dbCode{CREATE FUNCTION} syntax necessary to define a new UDF)
+    \item Extension of NoisePage's domain-specific language (DSL) for query compilation (TPL \cite{pcq}) with support for lambda functions
+    \item Support for invoking the TPL generated for a UDF from the encompassing bytecode for the query in which the UDF is embedded
+\end{itemize}
+
+The early stages of this project will involve integrating the features implemented by Nayak with the NoisePage DBMS on which we will perform our evaluation. Beyond these, further features of UDFs require implementation, including:
+
+\begin{itemize}
+    \item Support for dynamic execution of SQL statements
+    \item Support for additional PL/pgSQL constructs, such as \dbCode{RAISE} and \dbCode{EXCEPTION} semantics
+    \item Support for vectorization / parallelization of TPL lambda execution
+    \item Unification of the abstract syntax tree (AST) of the compiled UDF and the query in which it is embedded, potentially by precompiling the entire UDF to a dynamically-loaded LLVM function
+\end{itemize}
+
+\subsection{UDF Inlining}
+
+The NoisePage DBMS currently lacks support for two features required to implement UDF-inlining:
+
+\begin{itemize}
+    \item Common Table Expressions (SQL's \dbCode{WITH RECURSIVE} and \dbCode{WITH ITERATIVE} syntax)
+    \item Lateral Joins (SQL's \dbCode{LATERAL} syntax)
+\end{itemize}
+
+We will implement these features in the NoisePage DBMS prior to beginning our evaluation.
+
+%% ==================================================================
+%% EXPERIMENTAL DESIGN
+%% ==================================================================
+
+\section{Experimental Design}
+
+%% ==================================================================
+%% RESULTS
+%% ==================================================================
+
+\section{Results}
+
+%% ==================================================================
+%% ERROR ANALYSIS
+%% ==================================================================
+
+\section{Error Analysis}
+
+%% ==================================================================
+%% DISCUSSION
+%% ==================================================================
+
+\section{Discussion}
+
+%% ==================================================================
+%% LESSONS LEARNED
+%% ==================================================================
+
+\section{Lessons Learned}
+
+%% ==================================================================
+%% FUTURE WORK
+%% ==================================================================
+
+\section{Future Work}
+
+%% ==================================================================
+%% CONCLUSION
+%% ==================================================================
+
+\section{Conclusion}
+
+%% ==================================================================
+%% BIBLIOGRAPHY
+%% ==================================================================
+
+% NOTE: Had to add this mysterious command to compile...
+\newcommand{\newblock}{}
+
+\newpage
+\balance
+\bibliographystyle{abbrv}
+\bibliography{report-spring}
+
+\end{document}
