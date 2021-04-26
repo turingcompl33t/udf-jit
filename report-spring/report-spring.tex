@@ -222,51 +222,30 @@ At the outset of this project, we set the goal to complete implementation of our
 
 \section{System Design}
 
-As described in the Vision Document, we propose to investigate how to improve the execution performance of user-defined functions via JIT-compilation. To perform a robust evaluation of this technique with existing solutions (i.e., query inlining), we require a database system with a sufficient level of support for all methods under consideration.
-
-Therefore, we require the following features of the database system under test before beginning our evaluation: 
-
-\begin{itemize}
-    \item Support for compiled query execution
-    \item Support for UDF execution with JIT compilation 
-    \item Support for UDF inlining 
-\end{itemize}
-
-We discuss the requirements implied by each of these features in the following sections.
+To perform a robust evaluation of UDF execution strategies, we require the existence of a system that implements both techniques under test - UDF inlining and UDF JIT compilation. To meet this requirement, we implement both of these techniques in the NoisePage DBMS. One system feature that is common to both UDF inlining and UDF JIT compilation is the existence of an \textit{Execution engine} with support for compiled query execution. In the subsections that follow, we provide details of NoisePage's \textit{Execution Engine} subsystem, followed by the specifics of how inlining and JIT compilation interact with this subsystem to execute user-defined functions.
 
 \subsection{Compiled Query Execution}
 
-Carnegie Mellon Database Group's NoisePage system implements mature support for query compilation \cite{pcq}. Therefore, this requirement is already met.
+Carnegie Mellon Database Group's NoisePage system implements compiled query execution via a data-centric code-generation engine. The query compilation process accepts as input a physical query plan (produced by the \textit{Optimizer}) and is responsible for implementing the logic that executes it. The high-level steps that take place during query compilation and execution with the NoisePage \textit{Execution Engine} are as follows:
+
+\begin{itemize}
+    \item Translate the input physical query plan to an internal domain specific language, TPL \cite{pcq}. This domain-specific language resembles the C programming language in its syntax, but introduces many database-specific features such as native support for database operators and parallelization. It is also during this stage of query processing that the operators in the physical query plan are grouped into \textit{pipelines} \cite{rof}. Each pipeline is further partitioned into \textit{functions} that implement various aspects of the pipeline, such as setup, teardown, and serial or parallel execution. The \textit{functions} form the unit of work for later stages of the compilation process as well as the atomic unit of execution.
+    \item Once the physical query plan has been translated to TPL, the \textit{Execution Engine} performs a further translation step, lowering the TPL DSL to a domain-specific bytecode, TBC \cite{pcq}. The translation from TPL to TBC resembles the compilation of a source language like C to a machine assembly language. We perform transformations such as rewriting loop constructs in terms of conditional tests and branch instructions, and insert bytecode instructions for explicit management of automatic (local) variables.
+    \item Now that query is expressed in TBC, the NoisePage \textit{Execution Engine} may proceed in one of two ways, depending on the current configuration of the system. The first option is to \textit{Interpret} the bytecode directly on a custom interpreter. In this execution mode, the TBC is never lowered to native machine code, and instead the remaining stages of query execution take place entirely in software. The other option is to continue the lowering process and ultimately \textit{Compile} the query to native machine code via the LLVM JIT infrastructure. This latter option is the path of interest for the purposes of our project, so we will assume that the system proceeds in this configuration for the remainder of this discussion.
+    \item The NoisePage \textit{Execution Engine} does not translate directly from the bytecode representation of the query to native machine code, and instead relies on the LLVM compiler infrastructure to assist in this process. For this reason, the next step in query compilation is translation of the TBC bytecode to the LLVM intermediate representation (IR).
+    \item Now that the input query is expressed in LLVM IR, the NoisePage \textit{Execution Engine} utilizes the LLVM JIT API to compile each function in the query to native machine code, completing the compilation process.
+    \item Once each \textit{function} is compiled to native machine code, the \textit{Execution Engine} executes the query by invoking each function in the proper order. In this context, function invocation refers to native function invocation, implying that the overhead of each invocation is minimal.
+\end{itemize}
+
+This completes the enumeration of the stages of query compilation in the NoisePage \textit{Execution Engine}. 
 
 \subsection{UDF Execution}
 
-This project builds upon prior work by Nyak \cite{tanuj} in which the author implements an early prototype for UDF JIT-compilation. Major contributions of Nayak's work include the following:
-
-\begin{itemize}
-    \item Support for UDF syntactic constructs at the Parser and Binder layers of the DBMS (e.g, adding support for the \dbCode{CREATE FUNCTION} syntax necessary to define a new UDF)
-    \item Extension of NoisePage's domain-specific language (DSL) for query compilation (TPL \cite{pcq}) with support for lambda functions
-    \item Support for invoking the TPL generated for a UDF from the encompassing bytecode for the query in which the UDF is embedded
-\end{itemize}
-
-The early stages of this project will involve integrating the features implemented by Nayak with the NoisePage DBMS on which we will perform our evaluation. Beyond these, further features of UDFs require implementation, including:
-
-\begin{itemize}
-    \item Support for dynamic execution of SQL statements
-    \item Support for additional PL/pgSQL constructs, such as \dbCode{RAISE} and \dbCode{EXCEPTION} semantics
-    \item Support for vectorization / parallelization of TPL lambda execution
-    \item Unification of the abstract syntax tree (AST) of the compiled UDF and the query in which it is embedded, potentially by precompiling the entire UDF to a dynamically-loaded LLVM function
-\end{itemize}
+Next we turn our attention to the specifics of how we implement UDF JIT compilation feature on top of this subsystem.
 
 \subsection{UDF Inlining}
 
-The NoisePage DBMS currently lacks support for two features required to implement UDF-inlining:
-
-\begin{itemize}
-    \item Common Table Expressions (SQL's \dbCode{WITH RECURSIVE} and \dbCode{WITH ITERATIVE} syntax)
-    \item Lateral Joins (SQL's \dbCode{LATERAL} syntax)
-\end{itemize}
-
-We will implement these features in the NoisePage DBMS prior to beginning our evaluation.
+Finally, in this subsection we briefly describe how we implement UDF inlining on top of the existing query compilation infrastructure in NoisePage. It should be noted that system design work for this feature is still in its early phases, and that the following description may be subject to substantial revision.
 
 %% ==================================================================
 %% EXPERIMENTAL DESIGN
