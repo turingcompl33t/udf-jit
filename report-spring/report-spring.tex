@@ -174,7 +174,40 @@ User-defined functions (UDFs) are a powerful tool for encapsulating complex appl
 
 \section{Introduction}
 
-Various approaches to addressing this problem have been proposed. The most promising existing strategies for improving UDF execution performance may be approximately grouped under the term \textit{UDF inlining}. In UDF inlining, the imperative code that implements the UDF is translated to SQL, and the resulting SQL is then inserted into the calling query at the invocation site of the UDF. In this project, we propose a new approach to UDF execution that operates by leveraging an existing code generation system to JIT compile the UDF to native machine code and subsequently execute it.
+Structured query language (SQL) is a cornerstone of data storage and retrieval. The language, despite being developed nearly fifty years ago, represents one of the last remaining commonalities among most modern database management systems (DBMS) \cite{codd1970}. There are a number of reasons for SQL's continued popularity, the most salient being its high-level declarative syntax that makes it both easy to learn and amenable to optimization.
+
+Despite its success, however, SQL is not without its drawbacks. One of the primary issues one encounters when working with SQL in production environments is its lack of support for composition. Unlike most programming languages which have first-class support for \textit{module} systems, SQL queries are merely a textual representation of data definition or manipulation logic - the language provides no mechanism to use data or code defined externally to the query itself. Another limitation of the SQL language is the difficulty it introduces in expressing imperative computation. While SQL's declarative syntax makes the DBMS query optimizer's job easier, this often comes at the cost of the additional development time required to express fundamentally imperative logic (e.g. loops, conditionals, etc.) in terms of SQL's limited set of declarative operators.
+
+To address some of these limitations, most database systems support the concept of user-defined functions (UDFs). A user-defined function is a function written by an application developer that extends the system's functionality beyond its built-in operations. These UDFs may accept scalar input arguments, perform arbitrary computation, and finally produce output values in the form of either scalars or temporary tables. User-defined functions solve the problem of composition by making it easy to abstract the logic shared by multiple queries out of the body of the query itself into the definition of the UDF. Furthermore, they address the issue of SQL's declarative syntax by allowing developers to write code with familiar imperative constructs. Both of these features are demonstrated in the example provided below.
+
+Suppose, for instance, that we want to write a query that computes the "reward level" for each customer in a table of retail transactions based on the total amount spent by each customer. Expressing such a query in pure SQL is certainly possible, but non-trivial. In contrast, the definition of a UDF that implements this logic should appear intuitive to anyone with even a modest programming background:
+
+\begin{lstlisting}
+CREATE FUNCTION cust_level(@ckey int)
+RETURNS char(10) AS
+BEGIN
+    DECLARE @total float;
+    DECLARE @level char(10);
+    SELECT @total = SUM(o_totalprice)
+        FROM orders WHERE o_custkey=@ckey;
+    IF (@total > 1000000)
+        SET @level = 'Platinum';
+    ELSE
+        SET @level = 'Regular';
+    RETURN @level;
+END    
+\end{lstlisting}
+
+Once the UDF is defined, we can then use the UDF in subsequent queries to efficiently express high-level application logic:
+
+\begin{lstlisting}
+SELECT c_custkey, cust_level(c_custkey)
+    FROM customer
+\end{lstlisting}
+
+We see that user-defined functions can help us express SQL queries more efficiently and in a manner that encourages modularization and reuse. However, UDFs present one major limitation that often precludes their use in production systems: they introduce an intolerable amount of runtime overhead. One study from Microsoft Research found that introducing UDFs to express portions of query logic can increase total execution time by over 46,000x its baseline value when expressed in pure SQL \cite{froid}. The underlying reason for this massive performance degradation is the fundamental mismatch between declarative SQL and the imperative language of UDFs. Because the source languages are so different, most database systems rely on a distinct subsystem to implement UDF execution, and the context switching between these subsystems combined with the lack of optimization applied within the UDF engine produces this impressively-poor performance \cite{froid}.
+
+Various approaches to addressing this problem have been proposed. The most promising existing strategies for improving UDF execution performance may be approximately grouped under the term \textit{UDF inlining}. In UDF inlining, the imperative code that implements the UDF is translated to SQL, and the resulting SQL is then inserted into the calling query at the invocation site of the UDF. In this project, we propose a new approach to UDF execution that operates by leveraging an existing code generation system to JIT compile the UDF to native machine code and subsequently execute it. Furthermore, we conduct an evaluation of these two strategies in an attempt to determine which of the approaches holds the most promise for improving the performance of UDFs.
 
 The remainder of this document is structured as follows. Section 2 begins with a discussion of our project goals and hypotheses. Next, in Section 3, we provide an overview of relevant prior work and its relationship with our project. Section 4 outlines our project goals for the Spring term and discusses the degree to which we have met them. Sections 5 and 6 provide overviews of our system and experimental designs, respectively. In sections 7 and 8 we present the results and error analysis for the results we have achieved thus far. Section 9 discusses the entirety of our design, implementation, and evaluation process, to the extent currently possible. In Section 10 we present some of the lessons we have learned thus far in the course of our project. Section 11 presents our current plan for the work that remains to be done in our project. Finally, we conclude in Section 12.
 
