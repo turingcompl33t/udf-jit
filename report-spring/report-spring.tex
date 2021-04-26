@@ -343,11 +343,11 @@ The following subsections summarize the lessons we learned during our system des
 
 \subsection{Working in a Mature Codebase}
 
-Here
+Working in the context of a mature codebase presents challenges beyond those that might be expected for a standalone or "from scratch" systems design implementation project. The NoisePage project implements a fully-functional SQL-compliant in-memory database system, and accordingly it possesses many components that are distinct from yet dependent upon the query execution engine with which this project is concerned. Because of this, one must be careful when making any modification to the execution engine to ensure that the high-level semantics of the system are preserved. Additionally, verifying the correctness of the implementation through testing is made more difficult by the surrounding system; unless one thinks carefully about how each component of the new functionality interacts with the rest of the system and the interface it presents, it is altogether to easy to introduce hidden dependencies that make testing the new functionality in isolation impossible.
 
-\subsection{World}
+\subsection{Design versus Implementation}
 
-Here
+This lesson perhaps should have been obvious from the outset, but it nevertheless proved to be something that we learned along the way. During the design phase of the project, it frequently felt like system design would represent the more arduous component of the first project task - once we had the design for UDF JIT compilation complete, implementation would be a simple matter of executing on our plan. Needless to say we were incorrect in this assumption. Implementation presented many subtle challenges that we failed to consider during our initial design process. Attempting to address such issues "on the fly" often led to low-quality solutions that introduced incidental complexity. For this reason, we often found it more productive to take additional time to deliberately revise our plan (with our hands off the keyboard) whenever such an issue arose.
 
 %% ==================================================================
 %% FUTURE WORK
@@ -355,55 +355,56 @@ Here
 
 \section{Future Work}
 
-Because our original project plan and timeline remain intact, our direction for future work is straightforward. Now that we have completed implementation of support for UDF JIT compilation, we turn our attention to implementation of UDF inlining support in the NoisePage DBMS. While this no doubt represents a non-trivial engineering effort, many of the system design issues in this space have been resolved by prior work (e.g. \cite{froid, apfel}).
+Because our original project plan and timeline remain intact, our direction for future work is straightforward. Now that we have completed implementation of support for UDF JIT compilation, we turn our attention to implementation of UDF inlining support in the NoisePage DBMS. While this no doubt represents a non-trivial engineering effort, many of the system design issues in this space have been resolved by prior work (e.g. \cite{froid, apfel}). For this reason, we are confident that we can complete the implementation of UDF inlining support by the beginning of July, 2021, according to the schedule outline below.
 
 \begin{center}
 \begin{tabular}{ |c|l| } 
     \hline
     \textbf{Date} & \textbf{Milestone} \\ 
     \hline
-    1 May 2021 & Begin system design \\
+    31 May 2021 & Begin system design \\
     \hline
-    9 May 2021 & System design complete; integration plan \\
+    7 June 2021 & System design complete; integration plan \\
     \hline
-    16 May 2021 & \textit{Binder} support implemented; tests passing \\
+    14 June 2021 & \textit{Binder} support implemented; tests passing \\
     \hline
-    23 May 2021 & \textit{Optimizer} support implemented; tests passing \\
+    21 June 2021 & \textit{Optimizer} support implemented; tests passing \\
     \hline  
-    1 June 2021 & Feature Complete \\
+    28 June 2021 & Feature Complete \\
     \hline
 \end{tabular}
 \end{center}
 
-\subsection{Experimental Evaluation}
+With the completion of the system implementation work associated with UDF inlining, we will finally turn our attention to evaluation of UDF performance under each of the supported execution strategies. While this task constitutes the ultimate goal of the project, we hypothesize that it will require the less time and effort to complete than either of the two previous tasks. Our goal is to have results suitable for publication by the beginning of August, 2021. Therefore, we propose the following tentative timeline for the conduct of our evaluation.
 
 \begin{center}
 \begin{tabular}{ |c|l| } 
     \hline
     \textbf{Date} & \textbf{Milestone} \\ 
     \hline
-    1 June 2021 & Begin Experimental Setup \\
+    5 July 2021 & Complete experimental design for all cases \\
     \hline
-    6 June 2021 & Complete experimental design for all cases \\
+    12 July 2021 &  All workload data collected \\
     \hline
-    13 June 2021 & All workload data collected \\
+    19 July 2021 & All benchmarks implemented \\
     \hline
-    20 June 2021 & All targeted benchmarks implemented \\
+    26 July 2021 & Benchmarks complete \\
     \hline
-    27 June 2021 & All production benchmarks implemented \\
-    \hline
-    4 July 2021 & Targeted benchmarks complete \\
-    \hline
-    11 July 2021 & Production benchmarks complete \\
-    \hline
-    18 July 2021 & Benchmark results organized into tables \\
-    \hline
-    25 July 2021 & Initial evaluation of results complete \\
-    \hline
-    1 August 2021 & Experimentation Complete \\
+    2 August 2021 & Organization and Communication of Results \\
     \hline
 \end{tabular}
 \end{center}
+
+Should we succeed in meeting the deadlines described above, we must address the question of what further work we plan to accomplish during the Fall semester. Fortunately, we foresee plenty of interesting work that remains to be done in the space of UDF execution strategies for database systems. Small, self-contained features related to UDF JIT compilation that might be of interest include the following:
+
+\begin{itemize}
+    \item Add support for dynamic execution of SQL statements
+    \item Add support for additional PL/pgSQL constructs, such as \dbCode{RAISE} and \dbCode{EXCEPTION} semantics
+    \item Add Support for vectorization / parallelization of TPL lambda execution
+    \item Modify the implementation to unify the abstract syntax tree (AST) of the compiled UDF and the query in which it is embedded, potentially by precompiling the entire UDF to a dynamically-loaded LLVM function. Such a modification might enable significant performance gains as the LLVM optimizer would gain the ability to perform inter-procedural optimizations across the UDF call boundary.
+\end{itemize}
+
+Beyond these features, there are additional questions that we seek to address regarding the most effective way to integrate imperative programs with relational database systems in a more general sense. For instance, should our evaluation reveal that neither UDF JIT compilation nor UDF inlining represent a totally dominant execution strategy, is it possible for the DBMS query optimizer to select the more effective execution technique based solely on the information that is available at the time optimization is performed? We hypothesize that such a heterogenous execution strategy for UDFs will ultimately prove to offer the highest performance.
 
 %% ==================================================================
 %% CONCLUSION
