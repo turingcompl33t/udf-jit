@@ -174,7 +174,7 @@ User-defined functions (UDFs) are a powerful tool for encapsulating complex appl
 
 \section{Introduction}
 
-TODO
+Various approaches to addressing this problem have been proposed. The most promising existing strategies for improving UDF execution performance may be approximately grouped under the term \textit{UDF inlining}. In UDF inlining, the imperative code that implements the UDF is translated to SQL, and the resulting SQL is then inserted into the calling query at the invocation site of the UDF. In this project, we propose a new approach to UDF execution that operates by leveraging an existing code generation system to JIT compile the UDF to native machine code and subsequently execute it.
 
 The remainder of this document is structured as follows. Section 2 begins with a discussion of our project goals and hypotheses. Next, in Section 3, we provide an overview of relevant prior work and its relationship with our project. Section 4 outlines our project goals for the Spring term and discusses the degree to which we have met them. Sections 5 and 6 provide overviews of our system and experimental designs, respectively. In sections 7 and 8 we present the results and error analysis for the results we have achieved thus far. Section 9 discusses the entirety of our design, implementation, and evaluation process, to the extent currently possible. In Section 10 we present some of the lessons we have learned thus far in the course of our project. Section 11 presents our current plan for the work that remains to be done in our project. Finally, we conclude in Section 12.
 
