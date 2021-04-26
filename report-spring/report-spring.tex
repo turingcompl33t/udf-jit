@@ -75,6 +75,23 @@
 \usepackage{braket}
 \usepackage{balance}
 
+\definecolor{commentgray}{rgb}{0.2,0.2,0.2}
+\definecolor{bggray}{rgb}{0.98,0.98,0.98}
+\usepackage{listings}
+\lstset{ %
+  language=C++,
+  backgroundcolor=\color{bggray}, % \color{white},
+  commentstyle={\color{commentgray}\bfseries},
+  morekeywords={oid},
+  basicstyle=\ttfamily\small,
+  numberblanklines=false,
+  frame=single,
+  numbers=left,
+  tabsize=2,
+  xleftmargin=1.8em,
+  xrightmargin=0.5em
+}
+
 %% ==================================================================
 %% MACROS
 %% ==================================================================
@@ -241,11 +258,45 @@ This completes the enumeration of the stages of query compilation in the NoisePa
 
 \subsection{UDF Execution}
 
-Next we turn our attention to the specifics of how we implement UDF JIT compilation feature on top of this subsystem.
+Next we turn our attention to the specifics of how we implement UDF JIT compilation feature on top of this subsystem. To add support for user-defined functions to the existing NoisePage \textit{Execution Engine}, we insert additional logic at two distinct points: \textit{UDF definition} and \textit{UDF invocation}.
+
+UDF definition refers to an instance in which a user defines the implementation of a UDF via SQL's \dbCode{CREATE FUNCTION} syntax. During UDF definition, we perform the steps enumerated in the list below. Each item in the list is identified with the logical \textit{layer} of the DBMS at which the step is performed.
+
+\begin{itemize}
+    \item \textit{Network} The Network layer reads the SQL query text from an IO interface, such as a network socket or a local UNIX domain socket.
+    \item \textit{Parser} The Parser parses the incoming SQL query text to a generic abstract syntax tree (AST) representation.
+    \item \textit{Binder} The Binder binds internal database system identifiers (e.g. table names and column names) to raw identifiers in the AST produced by the Parser, generating an enriched AST.
+    \item \textit{Traffic Cop} Logic in the Traffic Cop recognizes the incoming query as a UDF definition and invokes the appropriate DDL Executor logic. The entirety of UDF execution is hereafter handled by a single DDL executor, the \dbCode{CreateFunctionExecutor}.
+    \item \textit{Execution Engine} The Execution Engine accepts the enriched AST produced by the Binder and identifies the text of the UDF within the body of the AST; we implement a second-level or parsing here that parses the raw text of the UDF to an AST that represents the UDF itself
+    \item \textit{Execution Engine} The Execution Engine proceeds with the first stages of code generation for the UDF, first converting the source language of the UDF (in our case, imperative PL/pgSQL) to our domain-specific DSL, TPL, and subsequently lowering this to a bytecode representation.
+    \item \textit{Catalog} Once compilation to bytecode is complete, the Execution Engine hands off the bytecode representation of the UDF to the system catalog for storage such that it may be later invoked by submitted queries.
+\end{itemize}
+
+This completes the lifecycle of a UDF-definition query. The second stage at which we implement new logic to add support for UDF execution is during UDF invocation. For instance, suppose a user of the system has defined a UDF \dbCode{some\_function(arg INTEGER)} via a previous \dbCode{CREATE FUNCTION} invocation. Now the user invokes the UDF via a SQL query such as the following:
+
+\begin{lstlisting}
+SELECT some_function(some_integer_attribute)
+    FROM some_table;
+\end{lstlisting}
+
+We perform the following steps in order to execute this query.
+
+\begin{itemize}
+    \item \textit{Network} The Network layer reads the SQL query text from an IO interface, such as a network socket or a local UNIX domain socket.
+    \item \textit{Parser} The Parser parses the incoming SQL query text to a generic abstract syntax tree (AST) representation.
+    \item \textit{Binder} The Binder binds internal database system identifiers (e.g. table names and column names) to raw identifiers in the AST produced by the Parser, generating an enriched AST.
+    \item \textit{Traffic Cop} Logic in the Traffic Cop recognizes the query as a data manipulation language (DML) query and hands off control to the Optimizer.
+    \item \textit{Optimizer} The Optimizer translates the AST for the incoming query to an optimized physical query plan. The Traffic Cop serves as an intermediary between the Optimizer and the Execution Engine, accepting the physical plan from the Optimizer and handing it off to the Execution Engine for compilation and execution.
+    \item \textit{Execution Engine} The Execution Engine compiles the physical plan first to our internal DSL, TPL, and subsequently lowers this to a bytecode representation.
+    \item \textit{Execution Engine} The Execution Engine recognizes the presence of a user-defined function in the body of the query and looks up the corresponding UDF in the system Catalog. The Execution Engine clones the bytecode that was previously compiled during UDF definition into the bytecode module for the invoking query.
+    \item \textit{Execution Engine} The Execution Engine proceeds with the final stages of query compilation and execution in the standard fashion, lowering to LLVM IR, utilizing the LLVM JIT to compile to native machine code, and executing the query by invoking each native function produced by the JIT.
+\end{itemize}
+
+This concludes our description of the implementation of UDF JIT compilation in NoisePage.
 
 \subsection{UDF Inlining}
 
-Finally, in this subsection we briefly describe how we implement UDF inlining on top of the existing query compilation infrastructure in NoisePage. It should be noted that system design work for this feature is still in its early phases, and that the following description may be subject to substantial revision.
+Finally, in this subsection we briefly describe how we implement UDF inlining on top of the existing query compilation infrastructure in NoisePage. UDF inlining is performed at the level of the input SQL query text, rather than at the level of the code generation engine or even at the level of the corresponding abstract syntax tree. We plan to adopt the strategy described by Ramachandra et al. to add support for UDF inlining to NoisePage \cite{froid}.
 
 %% ==================================================================
 %% EXPERIMENTAL DESIGN
@@ -390,6 +441,8 @@ Beyond these features, there are additional questions that we seek to address re
 %% ==================================================================
 
 \section{Conclusion}
+
+In this project we conduct an evaluation of execution strategies intended to improve the runtime performance of UDFs. We consider the current state-of-the-art technique of UDF inlining as well as our own novel approach to UDF execution via JIT compilation to native machine code. In order to complete our evaluation, we implement both of these techniques in the context of the research DBMS NoisePage. At the conclusion of the Spring term, we have successfully implemented support for UDF JIT compilation. Our plan for future work includes implementation of support for UDF inlining, followed by a comprehensive performance evaluation that will allow us to determine which of these strategies provides greater performance benefits.
 
 %% ==================================================================
 %% ACKNOWLEDGEMENTS
