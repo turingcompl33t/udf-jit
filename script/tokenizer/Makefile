@@ -2,10 +2,10 @@
 
 MAKE = make
 
-CC = gcc
+CC     = gcc
 CFLAGS = -Wall -pedantic -std=gnu11 -ggdb
 
-PGDIR = libpg_query
+PGDIR = ./libpg_query/
 PGLIB = libpg_query.a
 
 # ---------------------------------------------------------
@@ -23,13 +23,14 @@ $(PGLIB):
 # Command-Line Utility
 
 tokenizer: tokenizer.c $(PGLIB)
-	$(CC) $(CFLAGS) -o $@ -L $(PGDIR) -l $(PGDIR)/$(PGLIB) -I $(PGDIR) $^
+	$(CC) $(CFLAGS) -L$(PGDIR) -I$(PGDIR) -lpg_query $< -o $@
 
 # ---------------------------------------------------------
 # Clean
 
 clean:
-	rm -rf *.o
+	rm -f *.o
+	rm -f *.a
 	rm -f tokenizer
 	$(MAKE) -C $(PGDIR) clean
 
