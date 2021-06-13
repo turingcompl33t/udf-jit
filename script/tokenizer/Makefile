@@ -5,8 +5,8 @@ MAKE = make
 CC     = gcc
 CFLAGS = -Wall -pedantic -std=gnu11 -ggdb
 
-PGDIR = ./libpg_query/
-PGLIB = libpg_query.a
+PGDIR = libpg_query
+PGLIB = pg_query
 
 # ---------------------------------------------------------
 # Default Target
@@ -23,7 +23,7 @@ $(PGLIB):
 # Command-Line Utility
 
 tokenizer: tokenizer.c $(PGLIB)
-	$(CC) $(CFLAGS) -L$(PGDIR) -I$(PGDIR) -lpg_query $< -o $@
+	$(CC) $(CFLAGS) -o $@ -I$(PGDIR) -L$(PGDIR) -pthread $< -l$(PGLIB) 
 
 # ---------------------------------------------------------
 # Clean
