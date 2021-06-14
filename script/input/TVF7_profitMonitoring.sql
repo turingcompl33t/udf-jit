@@ -1,7 +1,3 @@
---analyse the profit of a store for a given duration.
-
-CREATE TYPE profitMonitoringRet AS (dt DATE, profit DECIMAL(15,2));
-
 CREATE OR REPLACE FUNCTION profitMonitoring(startDate DATE, endDate DATE, givenStore INT)
 RETURNS SETOF profitMonitoringRet AS
 $$

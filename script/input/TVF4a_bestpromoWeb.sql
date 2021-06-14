@@ -1,5 +1,3 @@
---highest profit earning promos on the web
-
 create or replace function bestPromoWeb()
 returns TABLE(promo_sk int, profit_store decimal)
 language plpgsql

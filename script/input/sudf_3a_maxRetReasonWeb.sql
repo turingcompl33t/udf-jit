@@ -1,5 +1,3 @@
---most frequent reason for returns on the web
-
 create or replace function maxReturnReasonWeb()
 returns char (100)
 language plpgsql
@@ -26,6 +24,3 @@ begin
 	return reason_desc;
 end;
 $$;
-
---invocation query
-select maxReturnReasonWeb() as ans;

@@ -1,7 +1,3 @@
---Total of high(>1000) return amounts for return reasons pertaining to price issues for all three channels. (the the current non-history cycle)
-
-CREATE TYPE highReturnReasonsRet AS (channel char(1), reason  varchar(10485760), totalAmount decimal(15, 2));
-
 create or replace function highReturnReasons()
 returns setof highReturnReasonsRet
 as $$

@@ -1,5 +1,3 @@
-----most frequent reason for returns through stores
-
 create or replace function maxReturnReasonStore()
 returns char(100) 
 language plpgsql
@@ -26,4 +24,3 @@ begin
 	return reason_desc;
 end;
 $$;
-

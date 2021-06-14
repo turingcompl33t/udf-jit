@@ -1,4 +1,3 @@
---through which channel was the ratio of promo vs non-promo items sold highest for a given year.
 CREATE OR REPLACE FUNCTION promoVsNoPromoItems(givenYear INT) 
 RETURNS TEXT AS
 $$
@@ -88,6 +87,3 @@ BEGIN
   RETURN maxRatio;
 END
 $$ LANGUAGE PLPGSQL;
-
---invocation
-SELECT promoVsNoPromoItems(2001);

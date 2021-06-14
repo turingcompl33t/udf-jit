@@ -1,5 +1,3 @@
---Class of items that is returned the most on catalog in the curent cycle (non-history).
-
 CREATE OR REPLACE FUNCTION maxReturnClass() RETURNS CHAR (50) AS
 $$
 DECLARE

@@ -1,15 +1,3 @@
---Output the late delivery statistics of each of the 2 delivery channels
-
-CREATE TYPE deliveryStatsType AS
-  ( warehouseName VARCHAR(20)
-  , shipMode CHAR(30)
-  , thirty_days INT8
-  , sixty_days INT8
-  , ninety_days INT8
-  , oneTwenty_days INT8
-  , veryLate INT8
-  );
-
 CREATE OR REPLACE FUNCTION ChannelWiseLateDeliveryStatistics(channel CHAR(1), year INT4)
 RETURNS SETOF deliveryStatsType AS
 $$

@@ -1,5 +1,3 @@
---check if multiple large stores(>250 employees) are managed by the same person.
-
 CREATE OR REPLACE FUNCTION sameManagerForLargeStores() RETURNS BOOL AS
 $$
 DECLARE

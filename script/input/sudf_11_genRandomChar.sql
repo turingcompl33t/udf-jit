@@ -1,5 +1,3 @@
---Pick a random character from a given list of characters. This is called from stored procedure proc_24_CreateRandomString
-
 CREATE or REPLACE FUNCTION genRandomChar(chars varchar, rand float )
 RETURNS CHAR
 language plpgsql

@@ -1,6 +1,3 @@
--- see if there is correlation betwen paying high shpping costs through web and 
---having a large number of high income inhabitants (at the state level))
-
 create or replace function wealth_shipCostCorrelation_web()
 returns varchar(40)
 language plpgsql
@@ -42,6 +39,3 @@ begin
 	end if;
 	return 'error';
 end; $$
-
-
-

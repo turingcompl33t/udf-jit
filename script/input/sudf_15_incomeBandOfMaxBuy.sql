@@ -1,5 +1,3 @@
---for each store, find the income band of the customer who does maximum purchases(quantity wise)
-
 create or replace function incomeBandOfMaxBuyCustomer(storeNumber int)
 returns varchar(50)
 language plpgsql
@@ -44,6 +42,3 @@ begin
 	return cLevel;
 end;
 $$;
-
---inovocation query
-select s_store_sk from store where incomeBandOfMaxBuyCustomer(s_store_sk)='lowerMiddle' order by s_store_sk;

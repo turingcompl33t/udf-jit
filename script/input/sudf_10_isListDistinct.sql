@@ -1,5 +1,3 @@
--- Check if a given list of varchars is distinct. Called from sudf_14_sameManager
-
 CREATE OR REPLACE FUNCTION isListDistinct(list TEXT, delim CHAR) RETURNS BOOL AS
 $$
 DECLARE

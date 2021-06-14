@@ -42,5 +42,3 @@ begin
 	return maxChannel;									
 end;
 $$;
-
-select c_customer_sk, maxPurchaseChannel(c_customer_sk, 2000, 2020) as channel from customer

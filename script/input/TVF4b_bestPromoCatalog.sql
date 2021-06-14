@@ -1,5 +1,3 @@
---highest profit earning promos on the catslog
-
 create or replace function bestPromoCatalog()
 returns TABLE(promo_sk int, profit_store decimal)
 language plpgsql

@@ -1,6 +1,3 @@
---Compute store sales net profit ranking by state and city for a given year 
---and determine the five most profitable states. 
-
 Create or replace Function maxProfitStates(givenYear int)
 RETURNS TABLE(state char(2), city varchar(60), profit decimal(15, 2))
 language plpgsql

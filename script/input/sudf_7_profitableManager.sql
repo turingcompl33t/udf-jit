@@ -1,5 +1,3 @@
---were the stores run by this manager profitable in the given year?
-
 CREATE OR REPLACE FUNCTION profitableManager(manager VARCHAR(40), yr INT)
 RETURNS INT AS
 $$
@@ -20,6 +18,3 @@ BEGIN
   END IF;
 END
 $$ LANGUAGE PLPGSQL;
-
---invocation query
-select s_manager from store where dbo.profitableManager(s_manager, 2001)<=0;

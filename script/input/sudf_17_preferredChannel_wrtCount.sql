@@ -1,5 +1,3 @@
---for all customers, find out the preferred channel wrt number of orders made.
-
 create or replace function preferredChannel_wrtCount(cust_key int)
 returns varchar(50)
 language plpgsql
@@ -28,6 +26,3 @@ begin
 	return 'Logical error';
 end;
 $$;
-
---inovocation query
-select c_customer_sk, preferredChannel_wrtCount(c_customer_sk) from customer;

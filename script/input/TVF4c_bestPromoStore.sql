@@ -1,5 +1,3 @@
---highest profit earning promos through stores
-
 create or replace function bestPromoStore()
 returns TABLE(promo_sk int, profit_store decimal)
 language plpgsql

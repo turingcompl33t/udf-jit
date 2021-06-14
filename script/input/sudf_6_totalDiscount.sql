@@ -1,6 +1,3 @@
---Compute the total discount on web sales of items from a given manufacturer for
---sales whose discount exceeded 30% over the average discount of items from that manufacturer.
-
 create or replace function totalDiscount (manufacture_id int)
 returns decimal 
 language plpgsql
@@ -19,5 +16,3 @@ begin
 	return addition;	
 end;
 $$;
-
-select distinct i_manufact_id, totalDiscount(i_manufact_id) as totalDisc from item;

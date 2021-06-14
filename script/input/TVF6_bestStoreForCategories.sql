@@ -1,7 +1,3 @@
---top stores for each category based on the number of items sold
-
-CREATE TYPE bestStoreForCatgoryRet AS (category char(50), store int);
-
 CREATE OR REPLACE FUNCTION bestStoreForCatgory()
 RETURNS SETOF bestStoreForCatgoryRet AS
 $$

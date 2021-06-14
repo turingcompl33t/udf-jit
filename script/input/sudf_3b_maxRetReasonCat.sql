@@ -1,5 +1,3 @@
---most frequent reason for returns on the catalog
-
 create or replace function maxReturnReasonCatalog()
 returns char(100)
 language plpgsql

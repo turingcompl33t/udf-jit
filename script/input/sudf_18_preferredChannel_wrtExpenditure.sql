@@ -1,4 +1,3 @@
---for all customers, find out the preferred channel wrt money spent.
 create or replace function preferredChannel_wrtExpenditure(cust_key int)
 returns varchar(50)
 language plpgsql
@@ -30,6 +29,3 @@ begin
 	end if;
 	return 'Logical error';
 end; $$
-
---invocation Query
-select c_customer_sk, preferredChannel_wrtExpenditure(c_customer_sk) from customer;
