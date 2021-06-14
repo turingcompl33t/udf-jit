@@ -151,7 +151,7 @@ int main() {
   }
 
   // Parse the input procedure
-  PgQueryPlpgsqlParseResult result = pg_query_parse_plpgsql(PROC);
+  PgQueryPlpgsqlParseResult result = pg_query_parse_plpgsql(proc);
   if (result.error) {
     fprintf(stderr, "error: %s at %d\n", result.error->message, result.error->cursorpos);
   }
