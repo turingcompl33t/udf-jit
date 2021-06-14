@@ -1,4 +1,4 @@
-# Build commands for simple commandline PL/pgSQL tokenizer.
+# Build commands for SQL commandline utilities.
 
 MAKE = make
 
@@ -11,7 +11,7 @@ PGLIB = pg_query
 # ---------------------------------------------------------
 # Default Target
 
-all: tokenizer
+all: proc_parser query_parser
 
 # ---------------------------------------------------------
 # Dependency: libpg_query
@@ -20,9 +20,12 @@ $(PGLIB):
 	$(MAKE) -C $(PGDIR) build
 
 # ---------------------------------------------------------
-# Command-Line Utility
+# Command-Line Utilities
 
-tokenizer: tokenizer.c $(PGLIB)
+proc_parser: proc_parser.c $(PGLIB)
+	$(CC) $(CFLAGS) -o $@ -I$(PGDIR) -L$(PGDIR) -pthread $< -l$(PGLIB) 
+
+query_parser: query_parser.c $(PGLIB)
 	$(CC) $(CFLAGS) -o $@ -I$(PGDIR) -L$(PGDIR) -pthread $< -l$(PGLIB) 
 
 # ---------------------------------------------------------
@@ -31,7 +34,8 @@ tokenizer: tokenizer.c $(PGLIB)
 clean:
 	rm -f *.o
 	rm -f *.a
-	rm -f tokenizer
+	rm -f proc_parser
+	rm -f query_parser
 	$(MAKE) -C $(PGDIR) clean
 
 .PHONY: clean

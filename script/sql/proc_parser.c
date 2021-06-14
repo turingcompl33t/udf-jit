@@ -1,6 +1,10 @@
 /**
- * @file tokenizer.c
- * @brief A UNIX-style PL/pgSQL function tokenizer.
+ * @file proc_parser.c
+ * @brief A UNIX-style PL/pgSQL function parser.
+ * 
+ * Reads a PL/pgSQL procedure definition from standard input, 
+ * parses the procedure with the Postgres parser (libpg_query)
+ * and writes the JSON-formatted parse tree to standard output.
  */
 
 #include <assert.h>
@@ -153,7 +157,7 @@ int main() {
   // Parse the input procedure
   PgQueryPlpgsqlParseResult result = pg_query_parse_plpgsql(proc);
   if (result.error) {
-    fprintf(stderr, "error: %s at %d\n", result.error->message, result.error->cursorpos);
+    fprintf(stderr, "[ERROR]: %s at %d\n", result.error->message, result.error->cursorpos);
   }
 
   // Write the parsed procedure
