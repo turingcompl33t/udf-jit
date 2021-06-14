@@ -1,0 +1,6 @@
+-- INSERT query
+CREATE FUNCTION test() LANGUAGE plpgsql AS $$
+BEGIN
+  INSERT INTO TestTable VALUES (1);
+END;
+$$

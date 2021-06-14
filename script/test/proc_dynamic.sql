@@ -1,0 +1,9 @@
+-- dynamic SQL query
+CREATE FUNCTION test(x INT) RETURNS INT LANGUAGE plpgsql AS $$
+DECLARE
+  c INT := 0;
+BEGIN
+  EXECUTE 'SELECT COUNT(*) FROM TestTable WHERE id = $1' INTO c USING x;
+  RETURN c;
+END;
+$$
