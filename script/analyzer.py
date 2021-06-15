@@ -280,6 +280,7 @@ def main():
 
     # Write the results to standard output
     sys.stdout.write(json.dumps(results))
+    sys.stdout.write("\n")
 
     return EXIT_SUCCESS
 

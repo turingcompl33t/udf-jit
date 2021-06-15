@@ -128,6 +128,7 @@ def parse_procedure(proc: str, bin_path: str) -> Dict:
     # Write the procedure and terminating EOF
     stdout, stderr = process.communicate(input=proc.encode())
     if len(stderr) != 0:
+        print(stderr)
         return None
 
     # Load the JSON output

@@ -2,6 +2,7 @@ CREATE OR REPLACE FUNCTION isListDistinct(list TEXT, delim CHAR) RETURNS BOOL AS
 $$
 DECLARE
   part TEXT;
+  list TEXT;
   pos  INT;
 BEGIN
   list := LTRIM(RTRIM(list)) || delim;
