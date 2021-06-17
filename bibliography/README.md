@@ -14,6 +14,7 @@ This documents serves as an organization for database systems research reference
 
 - How to Architect a Query Compiler (2016)
 - How to Architect a Query Compiler Revisited (2018)
+- Efficiently Compiling Efficient Query Plans for Modern Hardware (2011)
 
 ### Query Execution and Processing
 
