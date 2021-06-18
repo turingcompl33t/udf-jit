@@ -4,11 +4,16 @@ This documents serves as an organization for database systems research reference
 
 ### Contents
 
+- System Architecture
 - Query Compilation
 - Query Execution and Processing
 - Query Optimization
 - Programming Languages
 - Server-Side Logic
+
+### System Architecture
+
+- MonetDB: Two Decades of Research in Column-Oriented Database Architectures (2012)
 
 ### Query Compilation
 
