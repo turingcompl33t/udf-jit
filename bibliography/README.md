@@ -23,7 +23,7 @@ This documents serves as an organization for database systems research reference
 
 ### Query Execution and Processing
 
-TODO
+- MonetDB/X100: Hyper-Pipelining Query Execution (2005)
 
 ### Query Optimization 
 
