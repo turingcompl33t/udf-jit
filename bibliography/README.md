@@ -23,6 +23,7 @@ This documents serves as an organization for database systems research reference
 - Efficiently Compiling Efficient Query Plans for Modern Hardware (2011)
 - The SQLite Bytecode Engine
 - Adaptive Code Generation for Data-Intensive Analytics (2021)
+- Tuplex: Data Science in Python at Native Code Speed (2021)
 
 ### Query Execution and Processing
 
