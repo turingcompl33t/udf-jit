@@ -24,6 +24,7 @@ This documents serves as an organization for database systems research reference
 - The SQLite Bytecode Engine
 - Adaptive Code Generation for Data-Intensive Analytics (2021)
 - Tuplex: Data Science in Python at Native Code Speed (2021)
+- Froid: Optimization of Imperative Programs in a Relational Database (2018)
 
 ### Query Execution and Processing
 
