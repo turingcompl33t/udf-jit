@@ -9,7 +9,7 @@ This documents serves as an organization for database systems research reference
 - Query Execution and Processing
 - Query Optimization
 - Programming Languages
-- Server-Side Logic
+- Server-Side Logic (UDFs)
 
 ### System Architecture
 
@@ -24,7 +24,6 @@ This documents serves as an organization for database systems research reference
 - The SQLite Bytecode Engine
 - Adaptive Code Generation for Data-Intensive Analytics (2021)
 - Tuplex: Data Science in Python at Native Code Speed (2021)
-- Froid: Optimization of Imperative Programs in a Relational Database (2018)
 
 ### Query Execution and Processing
 
@@ -40,8 +39,11 @@ TODO
 
 ### Server-Side Logic (User Defined Functions)
 
-- Functional SQL-Style UDFs with a Capital 'F' (2020)
+- Froid: Optimization of Imperative Programs in a Relational Database (2018)
 - Compiling PL/SQL Away (2019)
+
+TODO
+- Functional SQL-Style UDFs with a Capital 'F' (2020)
 - One WITH RECURSIVE is Worth Many GOTOs (2021)
 - Optimizing Cursor Loops in Relational Databases (2020)
 - A (Not So) Brief but (Very) Accurate History of PL/SQL
