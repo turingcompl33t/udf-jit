@@ -10,6 +10,7 @@ This documents serves as an organization for database systems research reference
 - Query Optimization
 - Programming Languages
 - Server-Side Logic (UDFs)
+- Systems
 
 ### System Architecture
 
@@ -41,13 +42,14 @@ TODO
 
 - Froid: Optimization of Imperative Programs in a Relational Database (2018)
 - Compiling PL/SQL Away (2019)
+- PL/SQL Without the PL (2020)
+- Functional-Style SQL UDFs With a Capital 'F' (2020)
 
 TODO
-- Functional SQL-Style UDFs with a Capital 'F' (2020)
 - One WITH RECURSIVE is Worth Many GOTOs (2021)
 - Optimizing Cursor Loops in Relational Databases (2020)
 - A (Not So) Brief but (Very) Accurate History of PL/SQL
 
-### Vectorized Execution
+### Systems
 
-TODO
+- SingleStore
