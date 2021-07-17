@@ -25,6 +25,8 @@ This documents serves as an organization for database systems research reference
 - The SQLite Bytecode Engine
 - Adaptive Code Generation for Data-Intensive Analytics (2021)
 - Tuplex: Data Science in Python at Native Code Speed (2021)
+- Voodoo - A Vector Algebra for Portable Database Performance on Modern Hardware (2016)
+- Flare: Optimizing Apache Spark with Native Code Generation for Scale-Up Architectures and Medium-Size Data (2018)
 
 ### Query Execution and Processing
 
