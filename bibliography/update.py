@@ -32,6 +32,7 @@ SUBJECTS = {
 # -----------------------------------------------------------------------------
 # File Parsing
 
+
 def title_from_file(path: str) -> str:
     """
     Read a paper title from the specified file path.
@@ -43,6 +44,7 @@ def title_from_file(path: str) -> str:
             if line.startswith(TITLE_PREFIX):
                 return line.strip(TITLE_PREFIX).strip()
 
+
 def titles_for_directory(path: str) -> List[str]:
     """
     Get all paper titles in the directory specified by `path`.
@@ -50,6 +52,7 @@ def titles_for_directory(path: str) -> List[str]:
     :return A list of all paper titles in that directory
     """
     return [title_from_file(os.path.join(path, fn)) for fn in os.listdir(path)]
+
 
 def publication_date(title: str) -> int:
     """
@@ -62,8 +65,10 @@ def publication_date(title: str) -> int:
         return 0
     return int(match.group(0).lstrip("(").rstrip(")"))
 
+
 # -----------------------------------------------------------------------------
 # File I/O
+
 
 def write_line(file, line: str):
     """
@@ -74,6 +79,7 @@ def write_line(file, line: str):
     file.write(line)
     file.write("\n")
 
+
 def write_title(file):
     """
     Write the title.
@@ -81,6 +87,7 @@ def write_title(file):
     """
     write_line(file, f"{TITLE_PREFIX} Bibliography")
     write_line(file, "")
+
 
 def write_contents(file, papers):
     """
@@ -94,6 +101,7 @@ def write_contents(file, papers):
     write_line(file, "")
     write_line(file, sections)
 
+
 def write_section(file, section, paper_titles):
     """
     Write a single section.
@@ -101,7 +109,7 @@ def write_section(file, section, paper_titles):
     :param section The section title
     :param paper_titles The list of papers in this section
     """
-    titles = sorted(paper_titles, key = publication_date)
+    titles = sorted(paper_titles, key=publication_date)
     titles = [f"- {t}" for t in titles]
     titles = "\n".join(titles)
 
@@ -109,6 +117,7 @@ def write_section(file, section, paper_titles):
     write_line(file, f"{SECTION_PREFIX} {section}")
     write_line(file, "")
     write_line(file, titles)
+
 
 def write_sections(file, papers):
     """
@@ -119,15 +128,21 @@ def write_sections(file, papers):
     for section, paper_titles in papers.items():
         write_section(file, section, paper_titles)
 
+
 # -----------------------------------------------------------------------------
 # Main
 
+
 def main():
-    papers = {subject : titles_for_directory(os.path.join(os.getcwd(), directory)) for subject, directory in SUBJECTS.items()}
+    papers = {
+        subject: titles_for_directory(os.path.join(os.getcwd(), directory))
+        for subject, directory in SUBJECTS.items()
+    }
     with open(README, "w") as file:
         write_title(file)
         write_contents(file, papers)
         write_sections(file, papers)
+
 
 # -----------------------------------------------------------------------------
 # Script Entry
