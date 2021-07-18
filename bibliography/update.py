@@ -1,0 +1,136 @@
+# update.py
+# Update the Table of Contents in the top-level README.
+#
+# Usage: python update.py
+
+import os
+import re
+from typing import List
+
+# The name of the README file to overwrite
+README = "README.md"
+
+# The prefix that denotes a paper title in a file
+TITLE_PREFIX = "##"
+
+# The prefix that denotes a section header
+SECTION_PREFIX = "###"
+
+# The pattern to match a publication date in a paper title
+PUBLICATION_DATE_PATTERN = "\([0-9]+\)"
+
+# The mapping from subject name -> directory name
+SUBJECTS = {
+    "System Architecture": "architecture",
+    "Query Compilation": "compilation",
+    "Query Execution and Processing": "execution",
+    "Query Optimization": "optimization",
+    "Server-Side Logic": "serverside",
+    "System Overview": "systems",
+}
+
+# -----------------------------------------------------------------------------
+# File Parsing
+
+def title_from_file(path: str) -> str:
+    """
+    Read a paper title from the specified file path.
+    :param path The path to the file
+    :return The paper title parsed from this file
+    """
+    with open(path, "r") as f:
+        for line in f:
+            if line.startswith(TITLE_PREFIX):
+                return line.strip(TITLE_PREFIX).strip()
+
+def titles_for_directory(path: str) -> List[str]:
+    """
+    Get all paper titles in the directory specified by `path`.
+    :param path The directory path
+    :return A list of all paper titles in that directory
+    """
+    return [title_from_file(os.path.join(path, fn)) for fn in os.listdir(path)]
+
+def publication_date(title: str) -> int:
+    """
+    Parse the publication date from a paper title.
+    :param title The title string
+    :return The publication date
+    """
+    match = re.search(PUBLICATION_DATE_PATTERN, title)
+    if match is None:
+        return 0
+    return int(match.group(0).lstrip("(").rstrip(")"))
+
+# -----------------------------------------------------------------------------
+# File I/O
+
+def write_line(file, line: str):
+    """
+    Write a line to a file, with terminating newline.
+    :param file The file to which output is written
+    :param line The line to write
+    """
+    file.write(line)
+    file.write("\n")
+
+def write_title(file):
+    """
+    Write the title.
+    :param file The file to which output is written
+    """
+    write_line(file, f"{TITLE_PREFIX} Bibliography")
+    write_line(file, "")
+
+def write_contents(file, papers):
+    """
+    Write the table of contents.
+    :param file The file to which output is written
+    :param papers The map from section -> paper titles
+    """
+    sections = [f"- {k}" for k in sorted(papers.keys())]
+    sections = "\n".join(sections)
+    write_line(file, f"{SECTION_PREFIX} Contents")
+    write_line(file, "")
+    write_line(file, sections)
+
+def write_section(file, section, paper_titles):
+    """
+    Write a single section.
+    :param file The file to which output is written
+    :param section The section title
+    :param paper_titles The list of papers in this section
+    """
+    titles = sorted(paper_titles, key = publication_date)
+    titles = [f"- {t}" for t in titles]
+    titles = "\n".join(titles)
+
+    write_line(file, "")
+    write_line(file, f"{SECTION_PREFIX} {section}")
+    write_line(file, "")
+    write_line(file, titles)
+
+def write_sections(file, papers):
+    """
+    Write all sections.
+    :param file The file to which output is written
+    :param papers The dictionary of section title -> papers
+    """
+    for section, paper_titles in papers.items():
+        write_section(file, section, paper_titles)
+
+# -----------------------------------------------------------------------------
+# Main
+
+def main():
+    papers = {subject : titles_for_directory(os.path.join(os.getcwd(), directory)) for subject, directory in SUBJECTS.items()}
+    with open(README, "w") as file:
+        write_title(file)
+        write_contents(file, papers)
+        write_sections(file, papers)
+
+# -----------------------------------------------------------------------------
+# Script Entry
+
+if __name__ == "__main__":
+    main()

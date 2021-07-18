@@ -1,16 +1,13 @@
 ## Bibliography
 
-This documents serves as an organization for database systems research references. My specific area of interest is at the intersection of query processing, compilers, and programming languages. This is reflected in the list of references below.
-
 ### Contents
 
-- System Architecture
 - Query Compilation
 - Query Execution and Processing
 - Query Optimization
-- Programming Languages
-- Server-Side Logic (UDFs)
-- Systems
+- Server-Side Logic
+- System Architecture
+- System Overview
 
 ### System Architecture
 
@@ -20,10 +17,10 @@ This documents serves as an organization for database systems research reference
 ### Query Compilation
 
 - Efficiently Compiling Efficient Query Plans for Modern Hardware (2011)
-- Voodoo - A Vector Algebra for Portable Database Performance on Modern Hardware (2016)
 - How to Architect a Query Compiler (2016)
-- How to Architect a Query Compiler Revisited (2018)
-- Flare: Optimizing Apache Spark with Native Code Generation for Scale-Up Architectures and Medium-Size Data (2018)
+- Voodoo - A Vector Algebra for Portable Database Performance on Modern Hardware (2016)
+- Flare: Optimizing Apache Spark with Native Compilation for Scale-Up Architectures and Medium-Size Data (2018)
+- How to Architect A Query Compiler Revisited (2018)
 - Adaptive Code Generation for Data-Intensive Analytics (2021)
 - Tuplex: Data Science in Python at Native Code Speed (2021)
 
@@ -31,29 +28,21 @@ This documents serves as an organization for database systems research reference
 
 - MonetDB/X100: Hyper-Pipelining Query Execution (2005)
 
-### Query Optimization 
+### Query Optimization
 
-TODO
+- Spark SQL: Relational Data Processing in Spark (2015)
 
-### Programming Languages
-
-- Everything Old is New Again: Quoted Domain-Specific Languages (2016)
-
-### Server-Side Logic (User Defined Functions)
+### Server-Side Logic
 
 - Froid: Optimization of Imperative Programs in a Relational Database (2018)
 - Compiling PL/SQL Away (2019)
-- PL/SQL Without the PL (2020)
-- Functional-Style SQL UDFs With a Capital 'F' (2020)
+- Functional Style SQL UDFs With a Capital 'F' (2020)
 - Optimizing Cursor Loops in Relational Databases (2020)
+- PL/SQL Without the PL (2020)
 - One `WITH RECURSIVE` is Worth Many `GOTO`s (2021)
 
-TODO
+### System Overview
 
-- A (Not So) Brief but (Very) Accurate History of PL/SQL
-
-### Systems
-
-- MonetDB
-- SingleStore
-- SQLite3
+- System Design: MonetDB
+- System Design: SingleStore
+- System Design: SQLite
