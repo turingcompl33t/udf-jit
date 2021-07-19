@@ -18,6 +18,7 @@
 
 - Generating Code for Holistic Query Evaluation (2010)
 - Efficiently Compiling Efficient Query Plans for Modern Hardware (2011)
+- Compilation in the Microsoft Hekaton Engine (2014)
 - How to Architect a Query Compiler (2016)
 - Voodoo - A Vector Algebra for Portable Database Performance on Modern Hardware (2016)
 - Flare: Optimizing Apache Spark with Native Compilation for Scale-Up Architectures and Medium-Size Data (2018)
