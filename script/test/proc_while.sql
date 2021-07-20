@@ -4,7 +4,7 @@ DECLARE
   x INT := 0;
 BEGIN
   WHILE x < 10 LOOP
-    x = x - 1;
+    x = x + 1;
   END LOOP;
 END;
 $$
