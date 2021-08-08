@@ -25,6 +25,7 @@ SUBJECTS = {
     "Query Compilation": "compilation",
     "Query Execution and Processing": "execution",
     "Query Optimization": "optimization",
+    "Programming Languages": "pl", 
     "Server-Side Logic": "serverside",
     "System Overview": "systems",
 }
