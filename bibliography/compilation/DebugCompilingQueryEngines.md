@@ -1,4 +1,4 @@
-## On Another Level: How to Debug Compiling Query Engines
+## On Another Level: How to Debug Compiling Query Engines (2020)
 
 Timo Kersten and Thomas Neumann.
 
