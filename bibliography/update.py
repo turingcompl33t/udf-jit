@@ -8,7 +8,7 @@ import re
 from typing import List, Tuple
 
 # The name of the README file to overwrite
-README = "TEST.md"
+README = "README.md"
 
 # The prefix that denotes a paper title in a file
 TITLE_PREFIX = "##"
