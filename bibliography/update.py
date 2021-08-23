@@ -5,7 +5,7 @@
 
 import os
 import re
-from typing import List
+from typing import List, Tuple
 
 # The name of the README file to overwrite
 README = "README.md"
@@ -25,7 +25,8 @@ SUBJECTS = {
     "Query Compilation": "compilation",
     "Query Execution and Processing": "execution",
     "Query Optimization": "optimization",
-    "Programming Languages": "pl", 
+    "Programming Languages": "pl",
+    "Self-Driving Operation": "selfdriving",
     "Server-Side Logic": "serverside",
     "System Overview": "systems",
 }
@@ -46,13 +47,13 @@ def title_from_file(path: str) -> str:
                 return line.strip(TITLE_PREFIX).strip()
 
 
-def titles_for_directory(path: str) -> List[str]:
+def titles_for_directory(path: str) -> List[Tuple[str, str]]:
     """
     Get all paper titles in the directory specified by `path`.
     :param path The directory path
-    :return A list of all paper titles in that directory
+    :return A list of tuples (filename, title) for each paper in the directory.
     """
-    return [title_from_file(os.path.join(path, fn)) for fn in os.listdir(path)]
+    return [(fn, title_from_file(os.path.join(path, fn))) for fn in os.listdir(path)]
 
 
 def publication_date(title: str) -> int:
@@ -108,22 +109,25 @@ def write_contents(file, papers):
     write_line(file, sections)
 
 
-def write_section(file, section, paper_titles):
+def write_section(file, section, papers):
     """
     Write a single section.
     :param file The file to which output is written
     :param section The section title
-    :param paper_titles The list of papers in this section
+    :param papers The list of tuples (filename, title)
     """
-    # Sort by publication date (ascending), alphabetical (ascending)
-    titles = sorted(paper_titles, key=lambda x: (publication_date(x), x))
-    titles = [f"- {t}" for t in titles]
-    titles = "\n".join(titles)
+    # The prefix for the hyperlink
+    prefix = f"./{SUBJECTS[section]}"
+
+    # Sort by title publication date (ascending), alphabetical (ascending)
+    items = sorted(papers, key=lambda x: (publication_date(x[1]), x[1]))
+    items = [f"- [{title}]({prefix}/{filename})" for (filename, title) in items]
+    items = "\n".join(items)
 
     write_line(file, "")
     write_line(file, f"{SECTION_PREFIX} {section}")
     write_line(file, "")
-    write_line(file, titles)
+    write_line(file, items)
 
 
 def write_sections(file, papers):
