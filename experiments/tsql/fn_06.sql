@@ -9,6 +9,6 @@ BEGIN
 
 	SET @s = (SELECT sum(ws_ext_discount_amt) FROM web_sales_history, item 
 					WHERE ws_item_sk = i_item_sk AND i_manufact_id = @manufacture_id AND
-					ws_ext_discount_amt>1.3*@avg);
+					ws_ext_discount_amt > 1.3*@avg);
 	return @s;	
 END
