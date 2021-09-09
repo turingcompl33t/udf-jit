@@ -1,34 +1,32 @@
 -- SQL ProcBench Scalar UDF 12: "Increase in Web Spending"
 
-create or replace function increaseInWebSpending(cust_sk int) returns decimal as
-$$
-declare
-    spending1  decimal;
-	spending2  decimal;
-	increase  decimal;
-begin
-	spending1:=0;
-    spending2:=0;
-    increase:=0;
+CREATE OR REPLACE FUNCTION increaseInWebSpending(cust_sk INT) RETURNS DECIMAL AS $$
+DECLARE
+    spending1  DECIMAL;
+	spending2  DECIMAL;
+	increase  DECIMAL;
+BEGIN
+	spending1 := 0;
+    spending2 := 0;
+    increase := 0;
     
-	select sum(ws_net_paid_inc_ship_tax) into spending1 
-    from web_sales_history, date_dim
-    where d_date_sk = ws_sold_date_sk
-        and d_year = 2001
-        and ws_bill_customer_sk=cust_sk;
+	SELECT SUM(ws_net_paid_inc_ship_tax) INTO spending1 
+    FROM web_sales_history, date_dim
+    WHERE d_date_sk = ws_sold_date_sk
+        AND d_year = 2001
+        AND ws_bill_customer_sk = cust_sk;
         
-	select sum(ws_net_paid_inc_ship_tax)  into spending2
-    from web_sales_history, date_dim
-    where d_date_sk = ws_sold_date_sk
-        and d_year = 2000
-        and ws_bill_customer_sk=cust_sk;
+	SELECT SUM(ws_net_paid_inc_ship_tax) INTO spending2
+    FROM web_sales_history, date_dim
+    WHERE d_date_sk = ws_sold_date_sk
+        AND d_year = 2000
+        AND ws_bill_customer_sk = cust_sk;
         
-	if(spending1<spending2) then
-		return -1;
-	else
+	IF (spending1 < spending2) THEN
+	    RETURN -1;
+	ELSE
 		increase := spending1-spending2;
-    end if;
-	return increase;
-
-end;
+    END IF;
+	RETURN increase;
+END;
 $$ LANGUAGE PLPGSQL;
