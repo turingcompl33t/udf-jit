@@ -1,0 +1,70 @@
+<ShowPlanXML xmlns="http://schemas.microsoft.com/sqlserver/2004/07/showplan" Version="1.557" Build="15.0.2195.186">
+	<BatchSequence>
+		<Batch>
+			<Statements>
+				<StmtSimple StatementText="SELECT c_customer_sk, dbo.preferredChannel_wrtExpenditure(c_customer_sk) FROM customer" StatementId="1" StatementCompId="1" StatementType="SELECT" StatementSqlHandle="0x09004E869296DD5F8FE06B89EA59890D39F10000000000000000000000000000000000000000000000000000" DatabaseContextSettingsId="4" ParentObjectId="0" StatementParameterizationType="0" RetrievedFromCache="true" StatementSubTreeCost="0.0032832" StatementEstRows="1" SecurityPolicyApplied="false" StatementOptmLevel="TRIVIAL" QueryHash="0x172CE9C743563C47" QueryPlanHash="0xC685FA764708059F" CardinalityEstimationModelVersion="150">
+					<StatementSetOptions QUOTED_IDENTIFIER="true" ARITHABORT="true" CONCAT_NULL_YIELDS_NULL="true" ANSI_NULLS="true" ANSI_PADDING="true" ANSI_WARNINGS="true" NUMERIC_ROUNDABORT="false">
+					</StatementSetOptions>
+					<QueryPlan DegreeOfParallelism="0" NonParallelPlanReason="TSQLUserDefinedFunctionsNotParallelizable" CachedPlanSize="16" CompileTime="1" CompileCPU="1" CompileMemory="112">
+						<MemoryGrantInfo SerialRequiredMemory="0" SerialDesiredMemory="0" GrantedMemory="0" MaxUsedMemory="0">
+						</MemoryGrantInfo>
+						<OptimizerHardwareDependentProperties EstimatedAvailableMemoryGrant="136806" EstimatedPagesCached="17100" EstimatedAvailableDegreeOfParallelism="2" MaxCompileMemory="1580944">
+						</OptimizerHardwareDependentProperties>
+						<QueryTimeStats ElapsedTime="0" CpuTime="0">
+						</QueryTimeStats>
+						<RelOp NodeId="0" PhysicalOp="Compute Scalar" LogicalOp="Compute Scalar" EstimateRows="1" EstimateIO="0" EstimateCPU="1e-07" AvgRowSize="40" EstimatedTotalSubtreeCost="0.0032832" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+							<OutputList>
+								<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_customer_sk">
+								</ColumnReference>
+								<ColumnReference Column="Expr1003">
+								</ColumnReference>
+							</OutputList>
+							<RunTimeInformation>
+								<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="1" ActualExecutions="1" ActualExecutionMode="Row">
+								</RunTimeCountersPerThread>
+							</RunTimeInformation>
+							<ComputeScalar>
+								<DefinedValues>
+									<DefinedValue>
+										<ColumnReference Column="Expr1003">
+										</ColumnReference>
+										<ScalarOperator ScalarString="[test].[dbo].[preferredChannel_wrtExpenditure]([test].[dbo].[customer].[c_customer_sk])">
+											<UserDefinedFunction FunctionName="[test].[dbo].[preferredChannel_wrtExpenditure]">
+												<ScalarOperator>
+													<Identifier>
+														<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_customer_sk">
+														</ColumnReference>
+													</Identifier>
+												</ScalarOperator>
+											</UserDefinedFunction>
+										</ScalarOperator>
+									</DefinedValue>
+								</DefinedValues>
+								<RelOp NodeId="1" PhysicalOp="Table Scan" LogicalOp="Table Scan" EstimateRows="1" EstimatedRowsRead="1" EstimateIO="0.0032035" EstimateCPU="7.96e-05" AvgRowSize="11" EstimatedTotalSubtreeCost="0.0032831" TableCardinality="0" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+									<OutputList>
+										<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_customer_sk">
+										</ColumnReference>
+									</OutputList>
+									<RunTimeInformation>
+										<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="1" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="1" ActualExecutions="1" ActualExecutionMode="Row">
+										</RunTimeCountersPerThread>
+									</RunTimeInformation>
+									<TableScan Ordered="0" ForcedIndex="0" ForceScan="0" NoExpandHint="0" Storage="RowStore">
+										<DefinedValues>
+											<DefinedValue>
+												<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_customer_sk">
+												</ColumnReference>
+											</DefinedValue>
+										</DefinedValues>
+										<Object Database="[test]" Schema="[dbo]" Table="[customer]" IndexKind="Heap" Storage="RowStore">
+										</Object>
+									</TableScan>
+								</RelOp>
+							</ComputeScalar>
+						</RelOp>
+					</QueryPlan>
+				</StmtSimple>
+			</Statements>
+		</Batch>
+	</BatchSequence>
+</ShowPlanXML>

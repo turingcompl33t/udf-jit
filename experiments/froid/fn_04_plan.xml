@@ -1,0 +1,102 @@
+<ShowPlanXML xmlns="http://schemas.microsoft.com/sqlserver/2004/07/showplan" Version="1.557" Build="15.0.2195.186">
+	<BatchSequence>
+		<Batch>
+			<Statements>
+				<StmtSimple StatementText="SELECT dbo.genRandomInt(0, 100000, RAND())" StatementId="1" StatementCompId="1" StatementType="SELECT" StatementSqlHandle="0x090000242E64D604A3536983CD337607FE650000000000000000000000000000000000000000000000000000" DatabaseContextSettingsId="6" ParentObjectId="0" StatementParameterizationType="0" RetrievedFromCache="true" StatementSubTreeCost="1.157e-06" StatementEstRows="1" SecurityPolicyApplied="false" StatementOptmLevel="FULL" QueryHash="0x29B36C48D89D24FD" QueryPlanHash="0xD3F9F22C1BAD3015" StatementOptmEarlyAbortReason="GoodEnoughPlanFound" CardinalityEstimationModelVersion="150">
+					<StatementSetOptions QUOTED_IDENTIFIER="true" ARITHABORT="true" CONCAT_NULL_YIELDS_NULL="true" ANSI_NULLS="true" ANSI_PADDING="true" ANSI_WARNINGS="true" NUMERIC_ROUNDABORT="false">
+					</StatementSetOptions>
+					<QueryPlan DegreeOfParallelism="1" CachedPlanSize="16" CompileTime="1" CompileCPU="1" CompileMemory="248" ContainsInlineScalarTsqlUdfs="1">
+						<MemoryGrantInfo SerialRequiredMemory="0" SerialDesiredMemory="0" GrantedMemory="0" MaxUsedMemory="0">
+						</MemoryGrantInfo>
+						<OptimizerHardwareDependentProperties EstimatedAvailableMemoryGrant="136806" EstimatedPagesCached="17100" EstimatedAvailableDegreeOfParallelism="2" MaxCompileMemory="1578128">
+						</OptimizerHardwareDependentProperties>
+						<QueryTimeStats ElapsedTime="0" CpuTime="0">
+						</QueryTimeStats>
+						<RelOp NodeId="0" PhysicalOp="Constant Scan" LogicalOp="Constant Scan" EstimateRows="1" EstimateIO="0" EstimateCPU="1.157e-06" AvgRowSize="11" EstimatedTotalSubtreeCost="1.157e-06" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+							<OutputList>
+								<ColumnReference Column="Expr1007">
+								</ColumnReference>
+							</OutputList>
+							<RunTimeInformation>
+								<RunTimeCountersPerThread Thread="0" ActualRows="1" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="1" ActualExecutions="1" ActualExecutionMode="Row">
+								</RunTimeCountersPerThread>
+							</RunTimeInformation>
+							<ConstantScan>
+								<Values>
+									<Row>
+										<ScalarOperator ScalarString="CONVERT_IMPLICIT(int,CONVERT_IMPLICIT(int,floor(rand()*CONVERT_IMPLICIT(float(53),(100000)-(0)+(1),0)+CONVERT_IMPLICIT(float(53),(0),0)),0),0)">
+											<Convert DataType="int" Style="0" Implicit="1">
+												<ScalarOperator>
+													<Convert DataType="int" Style="0" Implicit="1">
+														<ScalarOperator>
+															<Intrinsic FunctionName="floor">
+																<ScalarOperator>
+																	<Arithmetic Operation="ADD">
+																		<ScalarOperator>
+																			<Arithmetic Operation="MULT">
+																				<ScalarOperator>
+																					<Identifier>
+																						<ColumnReference Column="ConstExpr1008">
+																							<ScalarOperator>
+																								<Intrinsic FunctionName="rand">
+																									<ScalarOperator>
+																										<Const ConstValue="">
+																										</Const>
+																									</ScalarOperator>
+																								</Intrinsic>
+																							</ScalarOperator>
+																						</ColumnReference>
+																					</Identifier>
+																				</ScalarOperator>
+																				<ScalarOperator>
+																					<Convert DataType="float" Precision="53" Style="0" Implicit="1">
+																						<ScalarOperator>
+																							<Arithmetic Operation="ADD">
+																								<ScalarOperator>
+																									<Arithmetic Operation="SUB">
+																										<ScalarOperator>
+																											<Const ConstValue="(100000)">
+																											</Const>
+																										</ScalarOperator>
+																										<ScalarOperator>
+																											<Const ConstValue="(0)">
+																											</Const>
+																										</ScalarOperator>
+																									</Arithmetic>
+																								</ScalarOperator>
+																								<ScalarOperator>
+																									<Const ConstValue="(1)">
+																									</Const>
+																								</ScalarOperator>
+																							</Arithmetic>
+																						</ScalarOperator>
+																					</Convert>
+																				</ScalarOperator>
+																			</Arithmetic>
+																		</ScalarOperator>
+																		<ScalarOperator>
+																			<Convert DataType="float" Precision="53" Style="0" Implicit="1">
+																				<ScalarOperator>
+																					<Const ConstValue="(0)">
+																					</Const>
+																				</ScalarOperator>
+																			</Convert>
+																		</ScalarOperator>
+																	</Arithmetic>
+																</ScalarOperator>
+															</Intrinsic>
+														</ScalarOperator>
+													</Convert>
+												</ScalarOperator>
+											</Convert>
+										</ScalarOperator>
+									</Row>
+								</Values>
+							</ConstantScan>
+						</RelOp>
+					</QueryPlan>
+				</StmtSimple>
+			</Statements>
+		</Batch>
+	</BatchSequence>
+</ShowPlanXML>

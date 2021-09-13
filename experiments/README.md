@@ -10,6 +10,23 @@ The functions on which we perform the evaluation are drawn from [SQL ProcBench](
 
 The complete schema for ProcBench is described by _schema.txt_. The first step in performing experiements on any system is to create the necessary tables by executing each of the DDL statements in this file.
 
+### Query Plans
+
+This section describes the status of generating query plans for UDF inlining techniques.
+
+**Froid**
+
+- Function 01: `totalLargePurchases` inlined
+- Function 04: `genRandomInt` inlined
+- Function 06: `totalDiscount` inlined
+- Function 11: `genRandomChar` inlined
+- Function 13: `maxPurchaseChannel` inined
+- Function 18: `preferredChannel_wrtExpenditure` not inlined
+
+**Apfel**
+
+TODO
+
 ### References
 
 - [SQL ProcBench](https://github.com/microsoft/SQL-ProcBench)

@@ -1,0 +1,1068 @@
+<ShowPlanXML xmlns="http://schemas.microsoft.com/sqlserver/2004/07/showplan" Version="1.557" Build="15.0.2195.186">
+	<BatchSequence>
+		<Batch>
+			<Statements>
+				<StmtSimple StatementText="SELECT c_customer_sk, dbo.maxPurchaseChannel(c_customer_sk, 2000, 2020) AS channel FROM customer" StatementId="1" StatementCompId="1" StatementType="SELECT" StatementSqlHandle="0x0900313D11F1CB207C302040423CC68E6B510000000000000000000000000000000000000000000000000000" DatabaseContextSettingsId="4" ParentObjectId="0" StatementParameterizationType="0" RetrievedFromCache="true" StatementSubTreeCost="0.0131947" StatementEstRows="1" SecurityPolicyApplied="false" StatementOptmLevel="FULL" QueryHash="0x3566B243DA588473" QueryPlanHash="0x55774D26039CE778" StatementOptmEarlyAbortReason="GoodEnoughPlanFound" CardinalityEstimationModelVersion="150">
+					<StatementSetOptions QUOTED_IDENTIFIER="true" ARITHABORT="true" CONCAT_NULL_YIELDS_NULL="true" ANSI_NULLS="true" ANSI_PADDING="true" ANSI_WARNINGS="true" NUMERIC_ROUNDABORT="false">
+					</StatementSetOptions>
+					<QueryPlan DegreeOfParallelism="1" CachedPlanSize="88" CompileTime="7" CompileCPU="7" CompileMemory="1064">
+						<MemoryGrantInfo SerialRequiredMemory="0" SerialDesiredMemory="0" GrantedMemory="0" MaxUsedMemory="0">
+						</MemoryGrantInfo>
+						<OptimizerHardwareDependentProperties EstimatedAvailableMemoryGrant="136806" EstimatedPagesCached="17100" EstimatedAvailableDegreeOfParallelism="2" MaxCompileMemory="1581048">
+						</OptimizerHardwareDependentProperties>
+						<QueryTimeStats ElapsedTime="0" CpuTime="0">
+						</QueryTimeStats>
+						<RelOp NodeId="0" PhysicalOp="Compute Scalar" LogicalOp="Compute Scalar" EstimateRows="1" EstimateIO="0" EstimateCPU="1e-07" AvgRowSize="40" EstimatedTotalSubtreeCost="0.0131947" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+							<OutputList>
+								<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_customer_sk">
+								</ColumnReference>
+								<ColumnReference Column="Expr1035">
+								</ColumnReference>
+							</OutputList>
+							<ComputeScalar>
+								<DefinedValues>
+									<DefinedValue>
+										<ColumnReference Column="Expr1035">
+										</ColumnReference>
+										<ScalarOperator ScalarString="CONVERT_IMPLICIT(varchar(50),[Expr1032],0)">
+											<Convert DataType="varchar" Length="50" Style="0" Implicit="1">
+												<ScalarOperator>
+													<Identifier>
+														<ColumnReference Column="Expr1032">
+														</ColumnReference>
+													</Identifier>
+												</ScalarOperator>
+											</Convert>
+										</ScalarOperator>
+									</DefinedValue>
+								</DefinedValues>
+								<RelOp NodeId="1" PhysicalOp="Nested Loops" LogicalOp="Inner Join" EstimateRows="1" EstimateIO="0" EstimateCPU="4.18e-06" AvgRowSize="40" EstimatedTotalSubtreeCost="0.0131946" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+									<OutputList>
+										<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_customer_sk">
+										</ColumnReference>
+										<ColumnReference Column="Expr1032">
+										</ColumnReference>
+									</OutputList>
+									<RunTimeInformation>
+										<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="1" ActualExecutions="1" ActualExecutionMode="Row">
+										</RunTimeCountersPerThread>
+									</RunTimeInformation>
+									<NestedLoops Optimized="0">
+										<OuterReferences>
+											<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_customer_sk">
+											</ColumnReference>
+										</OuterReferences>
+										<RelOp NodeId="2" PhysicalOp="Table Scan" LogicalOp="Table Scan" EstimateRows="1" EstimatedRowsRead="1" EstimateIO="0.003125" EstimateCPU="0.0001581" AvgRowSize="11" EstimatedTotalSubtreeCost="0.0032831" TableCardinality="0" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+											<OutputList>
+												<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_customer_sk">
+												</ColumnReference>
+											</OutputList>
+											<RunTimeInformation>
+												<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="1" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="1" ActualExecutions="1" ActualExecutionMode="Row">
+												</RunTimeCountersPerThread>
+											</RunTimeInformation>
+											<TableScan Ordered="0" ForcedIndex="0" ForceScan="0" NoExpandHint="0" Storage="RowStore">
+												<DefinedValues>
+													<DefinedValue>
+														<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_customer_sk">
+														</ColumnReference>
+													</DefinedValue>
+												</DefinedValues>
+												<Object Database="[test]" Schema="[dbo]" Table="[customer]" IndexKind="Heap" Storage="RowStore">
+												</Object>
+											</TableScan>
+										</RelOp>
+										<RelOp NodeId="3" PhysicalOp="Nested Loops" LogicalOp="Inner Join" EstimateRows="1" EstimateIO="0" EstimateCPU="4.18e-06" AvgRowSize="36" EstimatedTotalSubtreeCost="0.0099073" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+											<OutputList>
+												<ColumnReference Column="Expr1032">
+												</ColumnReference>
+											</OutputList>
+											<RunTimeInformation>
+												<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+												</RunTimeCountersPerThread>
+											</RunTimeInformation>
+											<NestedLoops Optimized="0">
+												<OuterReferences>
+													<ColumnReference Column="Expr1011">
+													</ColumnReference>
+													<ColumnReference Column="Expr1018">
+													</ColumnReference>
+													<ColumnReference Column="Expr1025">
+													</ColumnReference>
+												</OuterReferences>
+												<RelOp NodeId="4" PhysicalOp="Compute Scalar" LogicalOp="Compute Scalar" EstimateRows="1" EstimateIO="0" EstimateCPU="1e-07" AvgRowSize="19" EstimatedTotalSubtreeCost="0.00986994" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+													<OutputList>
+														<ColumnReference Column="Expr1011">
+														</ColumnReference>
+														<ColumnReference Column="Expr1018">
+														</ColumnReference>
+														<ColumnReference Column="Expr1025">
+														</ColumnReference>
+													</OutputList>
+													<ComputeScalar>
+														<DefinedValues>
+															<DefinedValue>
+																<ColumnReference Column="Expr1011">
+																</ColumnReference>
+																<ScalarOperator ScalarString="[Expr1008]">
+																	<Identifier>
+																		<ColumnReference Column="Expr1008">
+																		</ColumnReference>
+																	</Identifier>
+																</ScalarOperator>
+															</DefinedValue>
+															<DefinedValue>
+																<ColumnReference Column="Expr1018">
+																</ColumnReference>
+																<ScalarOperator ScalarString="[Expr1015]">
+																	<Identifier>
+																		<ColumnReference Column="Expr1015">
+																		</ColumnReference>
+																	</Identifier>
+																</ScalarOperator>
+															</DefinedValue>
+															<DefinedValue>
+																<ColumnReference Column="Expr1025">
+																</ColumnReference>
+																<ScalarOperator ScalarString="[Expr1022]">
+																	<Identifier>
+																		<ColumnReference Column="Expr1022">
+																		</ColumnReference>
+																	</Identifier>
+																</ScalarOperator>
+															</DefinedValue>
+														</DefinedValues>
+														<RelOp NodeId="5" PhysicalOp="Nested Loops" LogicalOp="Inner Join" EstimateRows="1" EstimateIO="0" EstimateCPU="4.18e-06" AvgRowSize="19" EstimatedTotalSubtreeCost="0.00986984" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+															<OutputList>
+																<ColumnReference Column="Expr1008">
+																</ColumnReference>
+																<ColumnReference Column="Expr1015">
+																</ColumnReference>
+																<ColumnReference Column="Expr1022">
+																</ColumnReference>
+															</OutputList>
+															<RunTimeInformation>
+																<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																</RunTimeCountersPerThread>
+															</RunTimeInformation>
+															<NestedLoops Optimized="0">
+																<OuterReferences>
+																	<ColumnReference Column="Expr1003">
+																	</ColumnReference>
+																	<ColumnReference Column="Expr1004">
+																	</ColumnReference>
+																</OuterReferences>
+																<RelOp NodeId="6" PhysicalOp="Nested Loops" LogicalOp="Inner Join" EstimateRows="1" EstimateIO="0" EstimateCPU="4.18e-06" AvgRowSize="23" EstimatedTotalSubtreeCost="0.00658028" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																	<OutputList>
+																		<ColumnReference Column="Expr1003">
+																		</ColumnReference>
+																		<ColumnReference Column="Expr1004">
+																		</ColumnReference>
+																		<ColumnReference Column="Expr1008">
+																		</ColumnReference>
+																		<ColumnReference Column="Expr1015">
+																		</ColumnReference>
+																	</OutputList>
+																	<RunTimeInformation>
+																		<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																		</RunTimeCountersPerThread>
+																	</RunTimeInformation>
+																	<NestedLoops Optimized="0">
+																		<OuterReferences>
+																			<ColumnReference Column="Expr1003">
+																			</ColumnReference>
+																			<ColumnReference Column="Expr1004">
+																			</ColumnReference>
+																		</OuterReferences>
+																		<RelOp NodeId="7" PhysicalOp="Nested Loops" LogicalOp="Inner Join" EstimateRows="1" EstimateIO="0" EstimateCPU="4.18e-06" AvgRowSize="19" EstimatedTotalSubtreeCost="0.00329072" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																			<OutputList>
+																				<ColumnReference Column="Expr1003">
+																				</ColumnReference>
+																				<ColumnReference Column="Expr1004">
+																				</ColumnReference>
+																				<ColumnReference Column="Expr1008">
+																				</ColumnReference>
+																			</OutputList>
+																			<RunTimeInformation>
+																				<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																				</RunTimeCountersPerThread>
+																			</RunTimeInformation>
+																			<NestedLoops Optimized="0">
+																				<OuterReferences>
+																					<ColumnReference Column="Expr1003">
+																					</ColumnReference>
+																					<ColumnReference Column="Expr1004">
+																					</ColumnReference>
+																				</OuterReferences>
+																				<RelOp NodeId="8" PhysicalOp="Constant Scan" LogicalOp="Constant Scan" EstimateRows="1" EstimateIO="0" EstimateCPU="1.157e-06" AvgRowSize="15" EstimatedTotalSubtreeCost="1.157e-06" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																					<OutputList>
+																						<ColumnReference Column="Expr1003">
+																						</ColumnReference>
+																						<ColumnReference Column="Expr1004">
+																						</ColumnReference>
+																					</OutputList>
+																					<RunTimeInformation>
+																						<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																						</RunTimeCountersPerThread>
+																					</RunTimeInformation>
+																					<ConstantScan>
+																						<Values>
+																							<Row>
+																								<ScalarOperator ScalarString="(2000)">
+																									<Const ConstValue="(2000)">
+																									</Const>
+																								</ScalarOperator>
+																								<ScalarOperator ScalarString="(2020)">
+																									<Const ConstValue="(2020)">
+																									</Const>
+																								</ScalarOperator>
+																							</Row>
+																						</Values>
+																					</ConstantScan>
+																				</RelOp>
+																				<RelOp NodeId="9" PhysicalOp="Compute Scalar" LogicalOp="Compute Scalar" EstimateRows="1" EstimateIO="0" EstimateCPU="0" AvgRowSize="11" EstimatedTotalSubtreeCost="0.00328538" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																					<OutputList>
+																						<ColumnReference Column="Expr1008">
+																						</ColumnReference>
+																					</OutputList>
+																					<ComputeScalar>
+																						<DefinedValues>
+																							<DefinedValue>
+																								<ColumnReference Column="Expr1008">
+																								</ColumnReference>
+																								<ScalarOperator ScalarString="CONVERT_IMPLICIT(int,[Expr1042],0)">
+																									<Convert DataType="int" Style="0" Implicit="1">
+																										<ScalarOperator>
+																											<Identifier>
+																												<ColumnReference Column="Expr1042">
+																												</ColumnReference>
+																											</Identifier>
+																										</ScalarOperator>
+																									</Convert>
+																								</ScalarOperator>
+																							</DefinedValue>
+																						</DefinedValues>
+																						<RelOp NodeId="10" PhysicalOp="Stream Aggregate" LogicalOp="Aggregate" EstimateRows="1" EstimateIO="0" EstimateCPU="1.1e-06" AvgRowSize="11" EstimatedTotalSubtreeCost="0.00328538" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																							<OutputList>
+																								<ColumnReference Column="Expr1042">
+																								</ColumnReference>
+																							</OutputList>
+																							<RunTimeInformation>
+																								<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																								</RunTimeCountersPerThread>
+																							</RunTimeInformation>
+																							<StreamAggregate>
+																								<DefinedValues>
+																									<DefinedValue>
+																										<ColumnReference Column="Expr1042">
+																										</ColumnReference>
+																										<ScalarOperator ScalarString="Count(*)">
+																											<Aggregate AggType="countstar" Distinct="0">
+																											</Aggregate>
+																										</ScalarOperator>
+																									</DefinedValue>
+																								</DefinedValues>
+																								<RelOp NodeId="11" PhysicalOp="Table Scan" LogicalOp="Table Scan" EstimateRows="1" EstimatedRowsRead="1" EstimateIO="0.003125" EstimateCPU="0.0001581" AvgRowSize="15" EstimatedTotalSubtreeCost="0.0032831" TableCardinality="0" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																									<OutputList>
+																									</OutputList>
+																									<RunTimeInformation>
+																										<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																										</RunTimeCountersPerThread>
+																									</RunTimeInformation>
+																									<TableScan Ordered="0" ForcedIndex="0" ForceScan="0" NoExpandHint="0" Storage="RowStore">
+																										<DefinedValues>
+																										</DefinedValues>
+																										<Object Database="[test]" Schema="[dbo]" Table="[store_sales_history]" IndexKind="Heap" Storage="RowStore">
+																										</Object>
+																										<Predicate>
+																											<ScalarOperator ScalarString="[test].[dbo].[store_sales_history].[ss_customer_sk]=[test].[dbo].[customer].[c_customer_sk] AND [test].[dbo].[store_sales_history].[ss_sold_date_sk]&gt;=[Expr1003] AND [test].[dbo].[store_sales_history].[ss_sold_date_sk]&lt;=[Expr1004]">
+																												<Logical Operation="AND">
+																													<ScalarOperator>
+																														<Compare CompareOp="EQ">
+																															<ScalarOperator>
+																																<Identifier>
+																																	<ColumnReference Database="[test]" Schema="[dbo]" Table="[store_sales_history]" Column="ss_customer_sk">
+																																	</ColumnReference>
+																																</Identifier>
+																															</ScalarOperator>
+																															<ScalarOperator>
+																																<Identifier>
+																																	<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_customer_sk">
+																																	</ColumnReference>
+																																</Identifier>
+																															</ScalarOperator>
+																														</Compare>
+																													</ScalarOperator>
+																													<ScalarOperator>
+																														<Compare CompareOp="GE">
+																															<ScalarOperator>
+																																<Identifier>
+																																	<ColumnReference Database="[test]" Schema="[dbo]" Table="[store_sales_history]" Column="ss_sold_date_sk">
+																																	</ColumnReference>
+																																</Identifier>
+																															</ScalarOperator>
+																															<ScalarOperator>
+																																<Identifier>
+																																	<ColumnReference Column="Expr1003">
+																																	</ColumnReference>
+																																</Identifier>
+																															</ScalarOperator>
+																														</Compare>
+																													</ScalarOperator>
+																													<ScalarOperator>
+																														<Compare CompareOp="LE">
+																															<ScalarOperator>
+																																<Identifier>
+																																	<ColumnReference Database="[test]" Schema="[dbo]" Table="[store_sales_history]" Column="ss_sold_date_sk">
+																																	</ColumnReference>
+																																</Identifier>
+																															</ScalarOperator>
+																															<ScalarOperator>
+																																<Identifier>
+																																	<ColumnReference Column="Expr1004">
+																																	</ColumnReference>
+																																</Identifier>
+																															</ScalarOperator>
+																														</Compare>
+																													</ScalarOperator>
+																												</Logical>
+																											</ScalarOperator>
+																										</Predicate>
+																									</TableScan>
+																								</RelOp>
+																							</StreamAggregate>
+																						</RelOp>
+																					</ComputeScalar>
+																				</RelOp>
+																			</NestedLoops>
+																		</RelOp>
+																		<RelOp NodeId="12" PhysicalOp="Compute Scalar" LogicalOp="Compute Scalar" EstimateRows="1" EstimateIO="0" EstimateCPU="0" AvgRowSize="11" EstimatedTotalSubtreeCost="0.00328538" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																			<OutputList>
+																				<ColumnReference Column="Expr1015">
+																				</ColumnReference>
+																			</OutputList>
+																			<ComputeScalar>
+																				<DefinedValues>
+																					<DefinedValue>
+																						<ColumnReference Column="Expr1015">
+																						</ColumnReference>
+																						<ScalarOperator ScalarString="CONVERT_IMPLICIT(int,[Expr1043],0)">
+																							<Convert DataType="int" Style="0" Implicit="1">
+																								<ScalarOperator>
+																									<Identifier>
+																										<ColumnReference Column="Expr1043">
+																										</ColumnReference>
+																									</Identifier>
+																								</ScalarOperator>
+																							</Convert>
+																						</ScalarOperator>
+																					</DefinedValue>
+																				</DefinedValues>
+																				<RelOp NodeId="13" PhysicalOp="Stream Aggregate" LogicalOp="Aggregate" EstimateRows="1" EstimateIO="0" EstimateCPU="1.1e-06" AvgRowSize="11" EstimatedTotalSubtreeCost="0.00328538" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																					<OutputList>
+																						<ColumnReference Column="Expr1043">
+																						</ColumnReference>
+																					</OutputList>
+																					<RunTimeInformation>
+																						<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																						</RunTimeCountersPerThread>
+																					</RunTimeInformation>
+																					<StreamAggregate>
+																						<DefinedValues>
+																							<DefinedValue>
+																								<ColumnReference Column="Expr1043">
+																								</ColumnReference>
+																								<ScalarOperator ScalarString="Count(*)">
+																									<Aggregate AggType="countstar" Distinct="0">
+																									</Aggregate>
+																								</ScalarOperator>
+																							</DefinedValue>
+																						</DefinedValues>
+																						<RelOp NodeId="14" PhysicalOp="Table Scan" LogicalOp="Table Scan" EstimateRows="1" EstimatedRowsRead="1" EstimateIO="0.003125" EstimateCPU="0.0001581" AvgRowSize="15" EstimatedTotalSubtreeCost="0.0032831" TableCardinality="0" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																							<OutputList>
+																							</OutputList>
+																							<RunTimeInformation>
+																								<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																								</RunTimeCountersPerThread>
+																							</RunTimeInformation>
+																							<TableScan Ordered="0" ForcedIndex="0" ForceScan="0" NoExpandHint="0" Storage="RowStore">
+																								<DefinedValues>
+																								</DefinedValues>
+																								<Object Database="[test]" Schema="[dbo]" Table="[catalog_sales_history]" IndexKind="Heap" Storage="RowStore">
+																								</Object>
+																								<Predicate>
+																									<ScalarOperator ScalarString="[test].[dbo].[catalog_sales_history].[cs_bill_customer_sk]=[test].[dbo].[customer].[c_customer_sk] AND [test].[dbo].[catalog_sales_history].[cs_sold_date_sk]&gt;=[Expr1003] AND [test].[dbo].[catalog_sales_history].[cs_sold_date_sk]&lt;=[Expr1004]">
+																										<Logical Operation="AND">
+																											<ScalarOperator>
+																												<Compare CompareOp="EQ">
+																													<ScalarOperator>
+																														<Identifier>
+																															<ColumnReference Database="[test]" Schema="[dbo]" Table="[catalog_sales_history]" Column="cs_bill_customer_sk">
+																															</ColumnReference>
+																														</Identifier>
+																													</ScalarOperator>
+																													<ScalarOperator>
+																														<Identifier>
+																															<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_customer_sk">
+																															</ColumnReference>
+																														</Identifier>
+																													</ScalarOperator>
+																												</Compare>
+																											</ScalarOperator>
+																											<ScalarOperator>
+																												<Compare CompareOp="GE">
+																													<ScalarOperator>
+																														<Identifier>
+																															<ColumnReference Database="[test]" Schema="[dbo]" Table="[catalog_sales_history]" Column="cs_sold_date_sk">
+																															</ColumnReference>
+																														</Identifier>
+																													</ScalarOperator>
+																													<ScalarOperator>
+																														<Identifier>
+																															<ColumnReference Column="Expr1003">
+																															</ColumnReference>
+																														</Identifier>
+																													</ScalarOperator>
+																												</Compare>
+																											</ScalarOperator>
+																											<ScalarOperator>
+																												<Compare CompareOp="LE">
+																													<ScalarOperator>
+																														<Identifier>
+																															<ColumnReference Database="[test]" Schema="[dbo]" Table="[catalog_sales_history]" Column="cs_sold_date_sk">
+																															</ColumnReference>
+																														</Identifier>
+																													</ScalarOperator>
+																													<ScalarOperator>
+																														<Identifier>
+																															<ColumnReference Column="Expr1004">
+																															</ColumnReference>
+																														</Identifier>
+																													</ScalarOperator>
+																												</Compare>
+																											</ScalarOperator>
+																										</Logical>
+																									</ScalarOperator>
+																								</Predicate>
+																							</TableScan>
+																						</RelOp>
+																					</StreamAggregate>
+																				</RelOp>
+																			</ComputeScalar>
+																		</RelOp>
+																	</NestedLoops>
+																</RelOp>
+																<RelOp NodeId="15" PhysicalOp="Compute Scalar" LogicalOp="Compute Scalar" EstimateRows="1" EstimateIO="0" EstimateCPU="0" AvgRowSize="11" EstimatedTotalSubtreeCost="0.00328538" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																	<OutputList>
+																		<ColumnReference Column="Expr1022">
+																		</ColumnReference>
+																	</OutputList>
+																	<ComputeScalar>
+																		<DefinedValues>
+																			<DefinedValue>
+																				<ColumnReference Column="Expr1022">
+																				</ColumnReference>
+																				<ScalarOperator ScalarString="CONVERT_IMPLICIT(int,[Expr1044],0)">
+																					<Convert DataType="int" Style="0" Implicit="1">
+																						<ScalarOperator>
+																							<Identifier>
+																								<ColumnReference Column="Expr1044">
+																								</ColumnReference>
+																							</Identifier>
+																						</ScalarOperator>
+																					</Convert>
+																				</ScalarOperator>
+																			</DefinedValue>
+																		</DefinedValues>
+																		<RelOp NodeId="16" PhysicalOp="Stream Aggregate" LogicalOp="Aggregate" EstimateRows="1" EstimateIO="0" EstimateCPU="1.1e-06" AvgRowSize="11" EstimatedTotalSubtreeCost="0.00328538" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																			<OutputList>
+																				<ColumnReference Column="Expr1044">
+																				</ColumnReference>
+																			</OutputList>
+																			<RunTimeInformation>
+																				<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																				</RunTimeCountersPerThread>
+																			</RunTimeInformation>
+																			<StreamAggregate>
+																				<DefinedValues>
+																					<DefinedValue>
+																						<ColumnReference Column="Expr1044">
+																						</ColumnReference>
+																						<ScalarOperator ScalarString="Count(*)">
+																							<Aggregate AggType="countstar" Distinct="0">
+																							</Aggregate>
+																						</ScalarOperator>
+																					</DefinedValue>
+																				</DefinedValues>
+																				<RelOp NodeId="17" PhysicalOp="Table Scan" LogicalOp="Table Scan" EstimateRows="1" EstimatedRowsRead="1" EstimateIO="0.003125" EstimateCPU="0.0001581" AvgRowSize="15" EstimatedTotalSubtreeCost="0.0032831" TableCardinality="0" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																					<OutputList>
+																					</OutputList>
+																					<RunTimeInformation>
+																						<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																						</RunTimeCountersPerThread>
+																					</RunTimeInformation>
+																					<TableScan Ordered="0" ForcedIndex="0" ForceScan="0" NoExpandHint="0" Storage="RowStore">
+																						<DefinedValues>
+																						</DefinedValues>
+																						<Object Database="[test]" Schema="[dbo]" Table="[web_sales_history]" IndexKind="Heap" Storage="RowStore">
+																						</Object>
+																						<Predicate>
+																							<ScalarOperator ScalarString="[test].[dbo].[web_sales_history].[ws_bill_customer_sk]=[test].[dbo].[customer].[c_customer_sk] AND [test].[dbo].[web_sales_history].[ws_sold_date_sk]&gt;=[Expr1003] AND [test].[dbo].[web_sales_history].[ws_sold_date_sk]&lt;=[Expr1004]">
+																								<Logical Operation="AND">
+																									<ScalarOperator>
+																										<Compare CompareOp="EQ">
+																											<ScalarOperator>
+																												<Identifier>
+																													<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_bill_customer_sk">
+																													</ColumnReference>
+																												</Identifier>
+																											</ScalarOperator>
+																											<ScalarOperator>
+																												<Identifier>
+																													<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_customer_sk">
+																													</ColumnReference>
+																												</Identifier>
+																											</ScalarOperator>
+																										</Compare>
+																									</ScalarOperator>
+																									<ScalarOperator>
+																										<Compare CompareOp="GE">
+																											<ScalarOperator>
+																												<Identifier>
+																													<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_sold_date_sk">
+																													</ColumnReference>
+																												</Identifier>
+																											</ScalarOperator>
+																											<ScalarOperator>
+																												<Identifier>
+																													<ColumnReference Column="Expr1003">
+																													</ColumnReference>
+																												</Identifier>
+																											</ScalarOperator>
+																										</Compare>
+																									</ScalarOperator>
+																									<ScalarOperator>
+																										<Compare CompareOp="LE">
+																											<ScalarOperator>
+																												<Identifier>
+																													<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_sold_date_sk">
+																													</ColumnReference>
+																												</Identifier>
+																											</ScalarOperator>
+																											<ScalarOperator>
+																												<Identifier>
+																													<ColumnReference Column="Expr1004">
+																													</ColumnReference>
+																												</Identifier>
+																											</ScalarOperator>
+																										</Compare>
+																									</ScalarOperator>
+																								</Logical>
+																							</ScalarOperator>
+																						</Predicate>
+																					</TableScan>
+																				</RelOp>
+																			</StreamAggregate>
+																		</RelOp>
+																	</ComputeScalar>
+																</RelOp>
+															</NestedLoops>
+														</RelOp>
+													</ComputeScalar>
+												</RelOp>
+												<RelOp NodeId="18" PhysicalOp="Nested Loops" LogicalOp="Inner Join" EstimateRows="1" EstimateIO="0" EstimateCPU="4.18e-06" AvgRowSize="36" EstimatedTotalSubtreeCost="3.3179e-05" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+													<OutputList>
+														<ColumnReference Column="Expr1032">
+														</ColumnReference>
+													</OutputList>
+													<RunTimeInformation>
+														<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+														</RunTimeCountersPerThread>
+													</RunTimeInformation>
+													<NestedLoops Optimized="0">
+														<OuterReferences>
+															<ColumnReference Column="Expr1026">
+															</ColumnReference>
+															<ColumnReference Column="Expr1029">
+															</ColumnReference>
+														</OuterReferences>
+														<RelOp NodeId="19" PhysicalOp="Nested Loops" LogicalOp="Left Outer Join" EstimateRows="1" EstimateIO="0" EstimateCPU="4.18e-06" AvgRowSize="37" EstimatedTotalSubtreeCost="1.7168e-05" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+															<OutputList>
+																<ColumnReference Column="Expr1026">
+																</ColumnReference>
+																<ColumnReference Column="Expr1029">
+																</ColumnReference>
+															</OutputList>
+															<RunTimeInformation>
+																<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																</RunTimeCountersPerThread>
+															</RunTimeInformation>
+															<NestedLoops Optimized="0">
+																<OuterReferences>
+																	<ColumnReference Column="Expr1026">
+																	</ColumnReference>
+																</OuterReferences>
+																<RelOp NodeId="20" PhysicalOp="Constant Scan" LogicalOp="Constant Scan" EstimateRows="1" EstimateIO="0" EstimateCPU="1.157e-06" AvgRowSize="9" EstimatedTotalSubtreeCost="1.157e-06" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																	<OutputList>
+																		<ColumnReference Column="Expr1026">
+																		</ColumnReference>
+																	</OutputList>
+																	<RunTimeInformation>
+																		<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																		</RunTimeCountersPerThread>
+																	</RunTimeInformation>
+																	<ConstantScan>
+																		<Values>
+																			<Row>
+																				<ScalarOperator ScalarString="CASE WHEN [Expr1011]&gt;[Expr1018] THEN (1) ELSE (0) END">
+																					<IF>
+																						<Condition>
+																							<ScalarOperator>
+																								<Compare CompareOp="GT">
+																									<ScalarOperator>
+																										<Identifier>
+																											<ColumnReference Column="Expr1011">
+																											</ColumnReference>
+																										</Identifier>
+																									</ScalarOperator>
+																									<ScalarOperator>
+																										<Identifier>
+																											<ColumnReference Column="Expr1018">
+																											</ColumnReference>
+																										</Identifier>
+																									</ScalarOperator>
+																								</Compare>
+																							</ScalarOperator>
+																						</Condition>
+																						<Then>
+																							<ScalarOperator>
+																								<Const ConstValue="(1)">
+																								</Const>
+																							</ScalarOperator>
+																						</Then>
+																						<Else>
+																							<ScalarOperator>
+																								<Const ConstValue="(0)">
+																								</Const>
+																							</ScalarOperator>
+																						</Else>
+																					</IF>
+																				</ScalarOperator>
+																			</Row>
+																		</Values>
+																	</ConstantScan>
+																</RelOp>
+																<RelOp NodeId="21" PhysicalOp="Nested Loops" LogicalOp="Inner Join" EstimateRows="1" EstimateIO="0" EstimateCPU="4.18e-06" AvgRowSize="36" EstimatedTotalSubtreeCost="1.1831e-05" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																	<OutputList>
+																		<ColumnReference Column="Expr1029">
+																		</ColumnReference>
+																	</OutputList>
+																	<RunTimeInformation>
+																		<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																		</RunTimeCountersPerThread>
+																	</RunTimeInformation>
+																	<NestedLoops Optimized="0">
+																		<OuterReferences>
+																			<ColumnReference Column="Expr1027">
+																			</ColumnReference>
+																		</OuterReferences>
+																		<RelOp NodeId="22" PhysicalOp="Constant Scan" LogicalOp="Constant Scan" EstimateRows="1" EstimateIO="0" EstimateCPU="1.157e-06" AvgRowSize="36" EstimatedTotalSubtreeCost="1.157e-06" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																			<OutputList>
+																				<ColumnReference Column="Expr1027">
+																				</ColumnReference>
+																			</OutputList>
+																			<RunTimeInformation>
+																				<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																				</RunTimeCountersPerThread>
+																			</RunTimeInformation>
+																			<ConstantScan>
+																				<Values>
+																					<Row>
+																						<ScalarOperator ScalarString="CASE WHEN [Expr1026] = (1) THEN &apos;Store&apos; ELSE NULL END">
+																							<IF>
+																								<Condition>
+																									<ScalarOperator>
+																										<Compare CompareOp="IS">
+																											<ScalarOperator>
+																												<Identifier>
+																													<ColumnReference Column="Expr1026">
+																													</ColumnReference>
+																												</Identifier>
+																											</ScalarOperator>
+																											<ScalarOperator>
+																												<Const ConstValue="(1)">
+																												</Const>
+																											</ScalarOperator>
+																										</Compare>
+																									</ScalarOperator>
+																								</Condition>
+																								<Then>
+																									<ScalarOperator>
+																										<Const ConstValue="&apos;Store&apos;">
+																										</Const>
+																									</ScalarOperator>
+																								</Then>
+																								<Else>
+																									<ScalarOperator>
+																										<Const ConstValue="NULL">
+																										</Const>
+																									</ScalarOperator>
+																								</Else>
+																							</IF>
+																						</ScalarOperator>
+																					</Row>
+																				</Values>
+																			</ConstantScan>
+																		</RelOp>
+																		<RelOp NodeId="23" PhysicalOp="Nested Loops" LogicalOp="Left Outer Join" EstimateRows="1" EstimateIO="0" EstimateCPU="4.18e-06" AvgRowSize="36" EstimatedTotalSubtreeCost="6.494e-06" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																			<OutputList>
+																				<ColumnReference Column="Expr1029">
+																				</ColumnReference>
+																			</OutputList>
+																			<RunTimeInformation>
+																				<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																				</RunTimeCountersPerThread>
+																			</RunTimeInformation>
+																			<NestedLoops Optimized="0">
+																				<OuterReferences>
+																					<ColumnReference Column="Expr1028">
+																					</ColumnReference>
+																				</OuterReferences>
+																				<RelOp NodeId="24" PhysicalOp="Constant Scan" LogicalOp="Constant Scan" EstimateRows="1" EstimateIO="0" EstimateCPU="1.157e-06" AvgRowSize="9" EstimatedTotalSubtreeCost="1.157e-06" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																					<OutputList>
+																						<ColumnReference Column="Expr1028">
+																						</ColumnReference>
+																					</OutputList>
+																					<RunTimeInformation>
+																						<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																						</RunTimeCountersPerThread>
+																					</RunTimeInformation>
+																					<ConstantScan>
+																						<Values>
+																							<Row>
+																								<ScalarOperator ScalarString="CASE WHEN [Expr1025]&gt;[Expr1011] THEN (1) ELSE (0) END">
+																									<IF>
+																										<Condition>
+																											<ScalarOperator>
+																												<Compare CompareOp="GT">
+																													<ScalarOperator>
+																														<Identifier>
+																															<ColumnReference Column="Expr1025">
+																															</ColumnReference>
+																														</Identifier>
+																													</ScalarOperator>
+																													<ScalarOperator>
+																														<Identifier>
+																															<ColumnReference Column="Expr1011">
+																															</ColumnReference>
+																														</Identifier>
+																													</ScalarOperator>
+																												</Compare>
+																											</ScalarOperator>
+																										</Condition>
+																										<Then>
+																											<ScalarOperator>
+																												<Const ConstValue="(1)">
+																												</Const>
+																											</ScalarOperator>
+																										</Then>
+																										<Else>
+																											<ScalarOperator>
+																												<Const ConstValue="(0)">
+																												</Const>
+																											</ScalarOperator>
+																										</Else>
+																									</IF>
+																								</ScalarOperator>
+																							</Row>
+																						</Values>
+																					</ConstantScan>
+																				</RelOp>
+																				<RelOp NodeId="25" PhysicalOp="Constant Scan" LogicalOp="Constant Scan" EstimateRows="1" EstimateIO="0" EstimateCPU="1.157e-06" AvgRowSize="36" EstimatedTotalSubtreeCost="1.157e-06" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																					<OutputList>
+																						<ColumnReference Column="Expr1029">
+																						</ColumnReference>
+																					</OutputList>
+																					<RunTimeInformation>
+																						<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																						</RunTimeCountersPerThread>
+																					</RunTimeInformation>
+																					<ConstantScan>
+																						<Values>
+																							<Row>
+																								<ScalarOperator ScalarString="CASE WHEN [Expr1026] = (1) AND [Expr1028] = (1) THEN &apos;Web&apos; ELSE [Expr1027] END">
+																									<IF>
+																										<Condition>
+																											<ScalarOperator>
+																												<Logical Operation="AND">
+																													<ScalarOperator>
+																														<Compare CompareOp="IS">
+																															<ScalarOperator>
+																																<Identifier>
+																																	<ColumnReference Column="Expr1026">
+																																	</ColumnReference>
+																																</Identifier>
+																															</ScalarOperator>
+																															<ScalarOperator>
+																																<Const ConstValue="(1)">
+																																</Const>
+																															</ScalarOperator>
+																														</Compare>
+																													</ScalarOperator>
+																													<ScalarOperator>
+																														<Compare CompareOp="IS">
+																															<ScalarOperator>
+																																<Identifier>
+																																	<ColumnReference Column="Expr1028">
+																																	</ColumnReference>
+																																</Identifier>
+																															</ScalarOperator>
+																															<ScalarOperator>
+																																<Const ConstValue="(1)">
+																																</Const>
+																															</ScalarOperator>
+																														</Compare>
+																													</ScalarOperator>
+																												</Logical>
+																											</ScalarOperator>
+																										</Condition>
+																										<Then>
+																											<ScalarOperator>
+																												<Const ConstValue="&apos;Web&apos;">
+																												</Const>
+																											</ScalarOperator>
+																										</Then>
+																										<Else>
+																											<ScalarOperator>
+																												<Identifier>
+																													<ColumnReference Column="Expr1027">
+																													</ColumnReference>
+																												</Identifier>
+																											</ScalarOperator>
+																										</Else>
+																									</IF>
+																								</ScalarOperator>
+																							</Row>
+																						</Values>
+																					</ConstantScan>
+																				</RelOp>
+																			</NestedLoops>
+																		</RelOp>
+																	</NestedLoops>
+																</RelOp>
+															</NestedLoops>
+														</RelOp>
+														<RelOp NodeId="26" PhysicalOp="Nested Loops" LogicalOp="Inner Join" EstimateRows="1" EstimateIO="0" EstimateCPU="4.18e-06" AvgRowSize="36" EstimatedTotalSubtreeCost="1.1831e-05" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+															<OutputList>
+																<ColumnReference Column="Expr1032">
+																</ColumnReference>
+															</OutputList>
+															<RunTimeInformation>
+																<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																</RunTimeCountersPerThread>
+															</RunTimeInformation>
+															<NestedLoops Optimized="0">
+																<OuterReferences>
+																	<ColumnReference Column="Expr1030">
+																	</ColumnReference>
+																</OuterReferences>
+																<RelOp NodeId="27" PhysicalOp="Constant Scan" LogicalOp="Constant Scan" EstimateRows="1" EstimateIO="0" EstimateCPU="1.157e-06" AvgRowSize="36" EstimatedTotalSubtreeCost="1.157e-06" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																	<OutputList>
+																		<ColumnReference Column="Expr1030">
+																		</ColumnReference>
+																	</OutputList>
+																	<RunTimeInformation>
+																		<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																		</RunTimeCountersPerThread>
+																	</RunTimeInformation>
+																	<ConstantScan>
+																		<Values>
+																			<Row>
+																				<ScalarOperator ScalarString="CASE WHEN [Expr1026] = (0) THEN &apos;Catalog&apos; ELSE [Expr1029] END">
+																					<IF>
+																						<Condition>
+																							<ScalarOperator>
+																								<Compare CompareOp="IS">
+																									<ScalarOperator>
+																										<Identifier>
+																											<ColumnReference Column="Expr1026">
+																											</ColumnReference>
+																										</Identifier>
+																									</ScalarOperator>
+																									<ScalarOperator>
+																										<Const ConstValue="(0)">
+																										</Const>
+																									</ScalarOperator>
+																								</Compare>
+																							</ScalarOperator>
+																						</Condition>
+																						<Then>
+																							<ScalarOperator>
+																								<Const ConstValue="&apos;Catalog&apos;">
+																								</Const>
+																							</ScalarOperator>
+																						</Then>
+																						<Else>
+																							<ScalarOperator>
+																								<Identifier>
+																									<ColumnReference Column="Expr1029">
+																									</ColumnReference>
+																								</Identifier>
+																							</ScalarOperator>
+																						</Else>
+																					</IF>
+																				</ScalarOperator>
+																			</Row>
+																		</Values>
+																	</ConstantScan>
+																</RelOp>
+																<RelOp NodeId="28" PhysicalOp="Nested Loops" LogicalOp="Left Outer Join" EstimateRows="1" EstimateIO="0" EstimateCPU="4.18e-06" AvgRowSize="36" EstimatedTotalSubtreeCost="6.494e-06" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																	<OutputList>
+																		<ColumnReference Column="Expr1032">
+																		</ColumnReference>
+																	</OutputList>
+																	<RunTimeInformation>
+																		<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																		</RunTimeCountersPerThread>
+																	</RunTimeInformation>
+																	<NestedLoops Optimized="0">
+																		<OuterReferences>
+																			<ColumnReference Column="Expr1031">
+																			</ColumnReference>
+																		</OuterReferences>
+																		<RelOp NodeId="29" PhysicalOp="Constant Scan" LogicalOp="Constant Scan" EstimateRows="1" EstimateIO="0" EstimateCPU="1.157e-06" AvgRowSize="9" EstimatedTotalSubtreeCost="1.157e-06" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																			<OutputList>
+																				<ColumnReference Column="Expr1031">
+																				</ColumnReference>
+																			</OutputList>
+																			<RunTimeInformation>
+																				<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																				</RunTimeCountersPerThread>
+																			</RunTimeInformation>
+																			<ConstantScan>
+																				<Values>
+																					<Row>
+																						<ScalarOperator ScalarString="CASE WHEN [Expr1025]&gt;[Expr1018] THEN (1) ELSE (0) END">
+																							<IF>
+																								<Condition>
+																									<ScalarOperator>
+																										<Compare CompareOp="GT">
+																											<ScalarOperator>
+																												<Identifier>
+																													<ColumnReference Column="Expr1025">
+																													</ColumnReference>
+																												</Identifier>
+																											</ScalarOperator>
+																											<ScalarOperator>
+																												<Identifier>
+																													<ColumnReference Column="Expr1018">
+																													</ColumnReference>
+																												</Identifier>
+																											</ScalarOperator>
+																										</Compare>
+																									</ScalarOperator>
+																								</Condition>
+																								<Then>
+																									<ScalarOperator>
+																										<Const ConstValue="(1)">
+																										</Const>
+																									</ScalarOperator>
+																								</Then>
+																								<Else>
+																									<ScalarOperator>
+																										<Const ConstValue="(0)">
+																										</Const>
+																									</ScalarOperator>
+																								</Else>
+																							</IF>
+																						</ScalarOperator>
+																					</Row>
+																				</Values>
+																			</ConstantScan>
+																		</RelOp>
+																		<RelOp NodeId="30" PhysicalOp="Constant Scan" LogicalOp="Constant Scan" EstimateRows="1" EstimateIO="0" EstimateCPU="1.157e-06" AvgRowSize="36" EstimatedTotalSubtreeCost="1.157e-06" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																			<OutputList>
+																				<ColumnReference Column="Expr1032">
+																				</ColumnReference>
+																			</OutputList>
+																			<RunTimeInformation>
+																				<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																				</RunTimeCountersPerThread>
+																			</RunTimeInformation>
+																			<ConstantScan>
+																				<Values>
+																					<Row>
+																						<ScalarOperator ScalarString="CASE WHEN [Expr1026] = (0) AND [Expr1031] = (1) THEN &apos;Web&apos; ELSE [Expr1030] END">
+																							<IF>
+																								<Condition>
+																									<ScalarOperator>
+																										<Logical Operation="AND">
+																											<ScalarOperator>
+																												<Compare CompareOp="IS">
+																													<ScalarOperator>
+																														<Identifier>
+																															<ColumnReference Column="Expr1026">
+																															</ColumnReference>
+																														</Identifier>
+																													</ScalarOperator>
+																													<ScalarOperator>
+																														<Const ConstValue="(0)">
+																														</Const>
+																													</ScalarOperator>
+																												</Compare>
+																											</ScalarOperator>
+																											<ScalarOperator>
+																												<Compare CompareOp="IS">
+																													<ScalarOperator>
+																														<Identifier>
+																															<ColumnReference Column="Expr1031">
+																															</ColumnReference>
+																														</Identifier>
+																													</ScalarOperator>
+																													<ScalarOperator>
+																														<Const ConstValue="(1)">
+																														</Const>
+																													</ScalarOperator>
+																												</Compare>
+																											</ScalarOperator>
+																										</Logical>
+																									</ScalarOperator>
+																								</Condition>
+																								<Then>
+																									<ScalarOperator>
+																										<Const ConstValue="&apos;Web&apos;">
+																										</Const>
+																									</ScalarOperator>
+																								</Then>
+																								<Else>
+																									<ScalarOperator>
+																										<Identifier>
+																											<ColumnReference Column="Expr1030">
+																											</ColumnReference>
+																										</Identifier>
+																									</ScalarOperator>
+																								</Else>
+																							</IF>
+																						</ScalarOperator>
+																					</Row>
+																				</Values>
+																			</ConstantScan>
+																		</RelOp>
+																	</NestedLoops>
+																</RelOp>
+															</NestedLoops>
+														</RelOp>
+													</NestedLoops>
+												</RelOp>
+											</NestedLoops>
+										</RelOp>
+									</NestedLoops>
+								</RelOp>
+							</ComputeScalar>
+						</RelOp>
+					</QueryPlan>
+				</StmtSimple>
+			</Statements>
+		</Batch>
+	</BatchSequence>
+</ShowPlanXML>

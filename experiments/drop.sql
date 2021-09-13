@@ -1,36 +1,36 @@
 -- Drop all tables in schema.
 
 
-DROP TABLE store_sales;
-DROP TABLE store_returns;
-DROP TABLE catalog_sales;
-DROP TABLE catalog_returns;
-DROP TABLE web_sales;
-DROP TABLE web_returns;
-DROP TABLE inventory;
+DROP TABLE IF EXISTS store_sales;
+DROP TABLE IF EXISTS  store_returns;
+DROP TABLE IF EXISTS catalog_sales;
+DROP TABLE IF EXISTS catalog_returns;
+DROP TABLE IF EXISTS web_sales;
+DROP TABLE IF EXISTS web_returns;
+DROP TABLE IF EXISTS inventory;
 
-DROP TABLE store;
-DROP TABLE call_center;
-DROP TABLE catalog_page;
-DROP TABLE web_site;
-DROP TABLE web_page;
-DROP TABLE warehouse;
-DROP TABLE customer;
-DROP TABLE customer_address;
-DROP TABLE customer_demographics;
-DROP TABLE date_dim;
-DROP TABLE household_demographics;
-DROP TABLE item;
-DROP TABLE income_band;
-DROP TABLE promotion;
-DROP TABLE reason;
-DROP TABLE ship_mode;
-DROP TABLE time_dim;
+DROP TABLE IF EXISTS store;
+DROP TABLE IF EXISTS call_center;
+DROP TABLE IF EXISTS catalog_page;
+DROP TABLE IF EXISTS web_site;
+DROP TABLE IF EXISTS web_page;
+DROP TABLE IF EXISTS warehouse;
+DROP TABLE IF EXISTS customer;
+DROP TABLE IF EXISTS customer_address;
+DROP TABLE IF EXISTS customer_demographics;
+DROP TABLE IF EXISTS date_dim;
+DROP TABLE IF EXISTS household_demographics;
+DROP TABLE IF EXISTS item;
+DROP TABLE IF EXISTS income_band;
+DROP TABLE IF EXISTS promotion;
+DROP TABLE IF EXISTS reason;
+DROP TABLE IF EXISTS ship_mode;
+DROP TABLE IF EXISTS time_dim;
 
-DROP TABLE store_sales_history;
-DROP TABLE store_returns_history;
-DROP TABLE catalog_sales_history;
-DROP TABLE catalog_returns_history;
-DROP TABLE web_sales_history;
-DROP TABLE web_returns_history;
-DROP TABLE inventory_history;
+DROP TABLE IF EXISTS store_sales_history;
+DROP TABLE IF EXISTS store_returns_history;
+DROP TABLE IF EXISTS catalog_sales_history;
+DROP TABLE IF EXISTS catalog_returns_history;
+DROP TABLE IF EXISTS web_sales_history;
+DROP TABLE IF EXISTS web_returns_history;
+DROP TABLE IF EXISTS inventory_history;

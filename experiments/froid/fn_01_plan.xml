@@ -1,0 +1,640 @@
+<ShowPlanXML xmlns="http://schemas.microsoft.com/sqlserver/2004/07/showplan" Version="1.557" Build="15.0.2195.186">
+	<BatchSequence>
+		<Batch>
+			<Statements>
+				<StmtSimple StatementText="SELECT ca_state, d_year, d_qoy,  dbo.totalLargePurchases(ca_state, 1000, d_year, d_qoy)&#xd;&#xa;    FROM customer_address, date_dim&#xd;&#xa;    WHERE d_year IN (1998, 1999, 2000) AND ca_state IS NOT NULL&#xd;&#xa;    GROUP BY ca_state, d_year, d_qoy&#xd;&#xa;    ORDER BY ca_state, d_year, d_qoy" StatementId="1" StatementCompId="1" StatementType="SELECT" StatementSqlHandle="0x090080FCB62EF72E52EA3A190C1AF32371EF0000000000000000000000000000000000000000000000000000" DatabaseContextSettingsId="4" ParentObjectId="0" StatementParameterizationType="0" RetrievedFromCache="true" StatementSubTreeCost="0.0597678" StatementEstRows="1" SecurityPolicyApplied="false" StatementOptmLevel="FULL" QueryHash="0x4C842A3BF54105FC" QueryPlanHash="0x3F6892F5CD187A35" StatementOptmEarlyAbortReason="GoodEnoughPlanFound" CardinalityEstimationModelVersion="150">
+					<StatementSetOptions QUOTED_IDENTIFIER="true" ARITHABORT="true" CONCAT_NULL_YIELDS_NULL="true" ANSI_NULLS="true" ANSI_PADDING="true" ANSI_WARNINGS="true" NUMERIC_ROUNDABORT="false">
+					</StatementSetOptions>
+					<QueryPlan DegreeOfParallelism="1" MemoryGrant="1024" CachedPlanSize="72" CompileTime="13" CompileCPU="13" CompileMemory="1080">
+						<MemoryGrantInfo SerialRequiredMemory="768" SerialDesiredMemory="864" RequiredMemory="768" DesiredMemory="864" RequestedMemory="1024" GrantWaitTime="0" MaxQueryMemory="399200" GrantedMemory="1024" MaxUsedMemory="0" LastRequestedMemory="1024" IsMemoryGrantFeedbackAdjusted="No: Accurate Grant">
+						</MemoryGrantInfo>
+						<OptimizerHardwareDependentProperties EstimatedAvailableMemoryGrant="136806" EstimatedPagesCached="17100" EstimatedAvailableDegreeOfParallelism="2" MaxCompileMemory="1589472">
+						</OptimizerHardwareDependentProperties>
+						<QueryTimeStats ElapsedTime="0" CpuTime="0">
+						</QueryTimeStats>
+						<RelOp NodeId="0" PhysicalOp="Compute Scalar" LogicalOp="Compute Scalar" EstimateRows="1" EstimateIO="0" EstimateCPU="1e-07" AvgRowSize="26" EstimatedTotalSubtreeCost="0.0597678" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+							<OutputList>
+								<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_address]" Column="ca_state">
+								</ColumnReference>
+								<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_year">
+								</ColumnReference>
+								<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_qoy">
+								</ColumnReference>
+								<ColumnReference Column="Expr1021">
+								</ColumnReference>
+							</OutputList>
+							<ComputeScalar>
+								<DefinedValues>
+									<DefinedValue>
+										<ColumnReference Column="Expr1021">
+										</ColumnReference>
+										<ScalarOperator ScalarString="CONVERT_IMPLICIT(decimal(15,2),CONVERT_IMPLICIT(decimal(15,2),[Expr1018],0),0)">
+											<Convert DataType="decimal" Precision="15" Scale="2" Style="0" Implicit="1">
+												<ScalarOperator>
+													<Convert DataType="decimal" Precision="15" Scale="2" Style="0" Implicit="1">
+														<ScalarOperator>
+															<Identifier>
+																<ColumnReference Column="Expr1018">
+																</ColumnReference>
+															</Identifier>
+														</ScalarOperator>
+													</Convert>
+												</ScalarOperator>
+											</Convert>
+										</ScalarOperator>
+									</DefinedValue>
+								</DefinedValues>
+								<RelOp NodeId="1" PhysicalOp="Nested Loops" LogicalOp="Inner Join" EstimateRows="1" EstimateIO="0" EstimateCPU="4.18e-06" AvgRowSize="34" EstimatedTotalSubtreeCost="0.0597677" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+									<OutputList>
+										<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_address]" Column="ca_state">
+										</ColumnReference>
+										<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_year">
+										</ColumnReference>
+										<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_qoy">
+										</ColumnReference>
+										<ColumnReference Column="Expr1018">
+										</ColumnReference>
+									</OutputList>
+									<RunTimeInformation>
+										<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="1" ActualExecutions="1" ActualExecutionMode="Row">
+										</RunTimeCountersPerThread>
+									</RunTimeInformation>
+									<NestedLoops Optimized="0">
+										<OuterReferences>
+											<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_address]" Column="ca_state">
+											</ColumnReference>
+											<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_year">
+											</ColumnReference>
+											<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_qoy">
+											</ColumnReference>
+										</OuterReferences>
+										<RelOp NodeId="2" PhysicalOp="Sort" LogicalOp="Distinct Sort" EstimateRows="1" EstimateIO="0.0112613" EstimateCPU="0.000100017" AvgRowSize="17" EstimatedTotalSubtreeCost="0.0179333" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+											<OutputList>
+												<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_address]" Column="ca_state">
+												</ColumnReference>
+												<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_year">
+												</ColumnReference>
+												<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_qoy">
+												</ColumnReference>
+											</OutputList>
+											<MemoryFractions Input="1" Output="0.333333">
+											</MemoryFractions>
+											<RunTimeInformation>
+												<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualRebinds="1" ActualRewinds="0" ActualEndOfScans="1" ActualExecutions="1" InputMemoryGrant="768" OutputMemoryGrant="208" UsedMemoryGrant="0" ActualExecutionMode="Row">
+												</RunTimeCountersPerThread>
+											</RunTimeInformation>
+											<Sort Distinct="1">
+												<OrderBy>
+													<OrderByColumn Ascending="1">
+														<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_address]" Column="ca_state">
+														</ColumnReference>
+													</OrderByColumn>
+													<OrderByColumn Ascending="1">
+														<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_year">
+														</ColumnReference>
+													</OrderByColumn>
+													<OrderByColumn Ascending="1">
+														<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_qoy">
+														</ColumnReference>
+													</OrderByColumn>
+												</OrderBy>
+												<RelOp NodeId="3" PhysicalOp="Nested Loops" LogicalOp="Inner Join" EstimateRows="1" EstimateIO="0" EstimateCPU="4.18e-06" AvgRowSize="17" EstimatedTotalSubtreeCost="0.00657204" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+													<OutputList>
+														<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_address]" Column="ca_state">
+														</ColumnReference>
+														<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_year">
+														</ColumnReference>
+														<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_qoy">
+														</ColumnReference>
+													</OutputList>
+													<RunTimeInformation>
+														<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="1" ActualExecutions="1" ActualExecutionMode="Row">
+														</RunTimeCountersPerThread>
+													</RunTimeInformation>
+													<NestedLoops Optimized="0">
+														<RelOp NodeId="4" PhysicalOp="Table Scan" LogicalOp="Table Scan" EstimateRows="1" EstimatedRowsRead="1" EstimateIO="0.003125" EstimateCPU="0.0001581" AvgRowSize="15" EstimatedTotalSubtreeCost="0.0032831" TableCardinality="0" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+															<OutputList>
+																<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_year">
+																</ColumnReference>
+																<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_qoy">
+																</ColumnReference>
+															</OutputList>
+															<RunTimeInformation>
+																<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="1" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="1" ActualExecutions="1" ActualExecutionMode="Row">
+																</RunTimeCountersPerThread>
+															</RunTimeInformation>
+															<TableScan Ordered="0" ForcedIndex="0" ForceScan="0" NoExpandHint="0" Storage="RowStore">
+																<DefinedValues>
+																	<DefinedValue>
+																		<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_year">
+																		</ColumnReference>
+																	</DefinedValue>
+																	<DefinedValue>
+																		<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_qoy">
+																		</ColumnReference>
+																	</DefinedValue>
+																</DefinedValues>
+																<Object Database="[test]" Schema="[dbo]" Table="[date_dim]" TableReferenceId="1" IndexKind="Heap" Storage="RowStore">
+																</Object>
+																<Predicate>
+																	<ScalarOperator ScalarString="[test].[dbo].[date_dim].[d_year]=(1998) OR [test].[dbo].[date_dim].[d_year]=(1999) OR [test].[dbo].[date_dim].[d_year]=(2000)">
+																		<Logical Operation="OR">
+																			<ScalarOperator>
+																				<Compare CompareOp="EQ">
+																					<ScalarOperator>
+																						<Identifier>
+																							<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_year">
+																							</ColumnReference>
+																						</Identifier>
+																					</ScalarOperator>
+																					<ScalarOperator>
+																						<Const ConstValue="(1998)">
+																						</Const>
+																					</ScalarOperator>
+																				</Compare>
+																			</ScalarOperator>
+																			<ScalarOperator>
+																				<Compare CompareOp="EQ">
+																					<ScalarOperator>
+																						<Identifier>
+																							<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_year">
+																							</ColumnReference>
+																						</Identifier>
+																					</ScalarOperator>
+																					<ScalarOperator>
+																						<Const ConstValue="(1999)">
+																						</Const>
+																					</ScalarOperator>
+																				</Compare>
+																			</ScalarOperator>
+																			<ScalarOperator>
+																				<Compare CompareOp="EQ">
+																					<ScalarOperator>
+																						<Identifier>
+																							<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_year">
+																							</ColumnReference>
+																						</Identifier>
+																					</ScalarOperator>
+																					<ScalarOperator>
+																						<Const ConstValue="(2000)">
+																						</Const>
+																					</ScalarOperator>
+																				</Compare>
+																			</ScalarOperator>
+																		</Logical>
+																	</ScalarOperator>
+																</Predicate>
+															</TableScan>
+														</RelOp>
+														<RelOp NodeId="5" PhysicalOp="Table Scan" LogicalOp="Table Scan" EstimateRows="1" EstimatedRowsRead="1" EstimateIO="0.003125" EstimateCPU="0.0001581" AvgRowSize="9" EstimatedTotalSubtreeCost="0.0032831" TableCardinality="0" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+															<OutputList>
+																<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_address]" Column="ca_state">
+																</ColumnReference>
+															</OutputList>
+															<RunTimeInformation>
+																<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																</RunTimeCountersPerThread>
+															</RunTimeInformation>
+															<TableScan Ordered="0" ForcedIndex="0" ForceScan="0" NoExpandHint="0" Storage="RowStore">
+																<DefinedValues>
+																	<DefinedValue>
+																		<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_address]" Column="ca_state">
+																		</ColumnReference>
+																	</DefinedValue>
+																</DefinedValues>
+																<Object Database="[test]" Schema="[dbo]" Table="[customer_address]" TableReferenceId="1" IndexKind="Heap" Storage="RowStore">
+																</Object>
+																<Predicate>
+																	<ScalarOperator ScalarString="[test].[dbo].[customer_address].[ca_state] IS NOT NULL">
+																		<Compare CompareOp="IS NOT">
+																			<ScalarOperator>
+																				<Identifier>
+																					<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_address]" Column="ca_state">
+																					</ColumnReference>
+																				</Identifier>
+																			</ScalarOperator>
+																			<ScalarOperator>
+																				<Const ConstValue="NULL">
+																				</Const>
+																			</ScalarOperator>
+																		</Compare>
+																	</ScalarOperator>
+																</Predicate>
+															</TableScan>
+														</RelOp>
+													</NestedLoops>
+												</RelOp>
+											</Sort>
+										</RelOp>
+										<RelOp NodeId="6" PhysicalOp="Compute Scalar" LogicalOp="Compute Scalar" EstimateRows="1" EstimateIO="0" EstimateCPU="0" AvgRowSize="24" EstimatedTotalSubtreeCost="0.0418302" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+											<OutputList>
+												<ColumnReference Column="Expr1018">
+												</ColumnReference>
+											</OutputList>
+											<ComputeScalar>
+												<DefinedValues>
+													<DefinedValue>
+														<ColumnReference Column="Expr1018">
+														</ColumnReference>
+														<ScalarOperator ScalarString="CASE WHEN [Expr1026]=(0) THEN NULL ELSE [Expr1027] END">
+															<IF>
+																<Condition>
+																	<ScalarOperator>
+																		<Compare CompareOp="EQ">
+																			<ScalarOperator>
+																				<Identifier>
+																					<ColumnReference Column="Expr1026">
+																					</ColumnReference>
+																				</Identifier>
+																			</ScalarOperator>
+																			<ScalarOperator>
+																				<Const ConstValue="(0)">
+																				</Const>
+																			</ScalarOperator>
+																		</Compare>
+																	</ScalarOperator>
+																</Condition>
+																<Then>
+																	<ScalarOperator>
+																		<Const ConstValue="NULL">
+																		</Const>
+																	</ScalarOperator>
+																</Then>
+																<Else>
+																	<ScalarOperator>
+																		<Identifier>
+																			<ColumnReference Column="Expr1027">
+																			</ColumnReference>
+																		</Identifier>
+																	</ScalarOperator>
+																</Else>
+															</IF>
+														</ScalarOperator>
+													</DefinedValue>
+												</DefinedValues>
+												<RelOp NodeId="7" PhysicalOp="Stream Aggregate" LogicalOp="Aggregate" EstimateRows="1" EstimateIO="0" EstimateCPU="1.1e-06" AvgRowSize="24" EstimatedTotalSubtreeCost="0.0418302" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+													<OutputList>
+														<ColumnReference Column="Expr1026">
+														</ColumnReference>
+														<ColumnReference Column="Expr1027">
+														</ColumnReference>
+													</OutputList>
+													<RunTimeInformation>
+														<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+														</RunTimeCountersPerThread>
+													</RunTimeInformation>
+													<StreamAggregate>
+														<DefinedValues>
+															<DefinedValue>
+																<ColumnReference Column="Expr1026">
+																</ColumnReference>
+																<ScalarOperator ScalarString="Count(*)">
+																	<Aggregate AggType="countstar" Distinct="0">
+																	</Aggregate>
+																</ScalarOperator>
+															</DefinedValue>
+															<DefinedValue>
+																<ColumnReference Column="Expr1027">
+																</ColumnReference>
+																<ScalarOperator ScalarString="SUM([test].[dbo].[catalog_sales_history].[cs_net_paid_inc_ship_tax])">
+																	<Aggregate Distinct="0" AggType="SUM">
+																		<ScalarOperator>
+																			<Identifier>
+																				<ColumnReference Database="[test]" Schema="[dbo]" Table="[catalog_sales_history]" Column="cs_net_paid_inc_ship_tax">
+																				</ColumnReference>
+																			</Identifier>
+																		</ScalarOperator>
+																	</Aggregate>
+																</ScalarOperator>
+															</DefinedValue>
+														</DefinedValues>
+														<RelOp NodeId="8" PhysicalOp="Merge Join" LogicalOp="Inner Join" EstimateRows="1" EstimateIO="0.000313" EstimateCPU="0.00564738" AvgRowSize="12" EstimatedTotalSubtreeCost="0.0418291" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+															<OutputList>
+																<ColumnReference Database="[test]" Schema="[dbo]" Table="[catalog_sales_history]" Column="cs_net_paid_inc_ship_tax">
+																</ColumnReference>
+															</OutputList>
+															<RunTimeInformation>
+																<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																</RunTimeCountersPerThread>
+															</RunTimeInformation>
+															<Merge ManyToMany="1">
+																<InnerSideJoinColumns>
+																	<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_current_addr_sk">
+																	</ColumnReference>
+																</InnerSideJoinColumns>
+																<OuterSideJoinColumns>
+																	<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_address]" Column="ca_address_sk">
+																	</ColumnReference>
+																</OuterSideJoinColumns>
+																<Residual>
+																	<ScalarOperator ScalarString="[test].[dbo].[customer].[c_current_addr_sk]=[test].[dbo].[customer_address].[ca_address_sk]">
+																		<Compare CompareOp="EQ">
+																			<ScalarOperator>
+																				<Identifier>
+																					<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_current_addr_sk">
+																					</ColumnReference>
+																				</Identifier>
+																			</ScalarOperator>
+																			<ScalarOperator>
+																				<Identifier>
+																					<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_address]" Column="ca_address_sk">
+																					</ColumnReference>
+																				</Identifier>
+																			</ScalarOperator>
+																		</Compare>
+																	</ScalarOperator>
+																</Residual>
+																<RelOp NodeId="9" PhysicalOp="Sort" LogicalOp="Sort" EstimateRows="1" EstimateIO="0.0112613" EstimateCPU="0.000100011" AvgRowSize="11" EstimatedTotalSubtreeCost="0.0146449" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																	<OutputList>
+																		<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_address]" Column="ca_address_sk">
+																		</ColumnReference>
+																	</OutputList>
+																	<MemoryFractions Input="0.666667" Output="0.333333">
+																	</MemoryFractions>
+																	<RunTimeInformation>
+																		<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualRebinds="0" ActualRewinds="0" ActualEndOfScans="0" ActualExecutions="0" InputMemoryGrant="680" OutputMemoryGrant="208" UsedMemoryGrant="0" ActualExecutionMode="Row">
+																		</RunTimeCountersPerThread>
+																	</RunTimeInformation>
+																	<Sort Distinct="0">
+																		<OrderBy>
+																			<OrderByColumn Ascending="1">
+																				<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_address]" Column="ca_address_sk">
+																				</ColumnReference>
+																			</OrderByColumn>
+																		</OrderBy>
+																		<RelOp NodeId="10" PhysicalOp="Table Scan" LogicalOp="Table Scan" EstimateRows="1" EstimatedRowsRead="1" EstimateIO="0.003125" EstimateCPU="0.0001581" AvgRowSize="13" EstimatedTotalSubtreeCost="0.0032831" TableCardinality="0" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																			<OutputList>
+																				<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_address]" Column="ca_address_sk">
+																				</ColumnReference>
+																			</OutputList>
+																			<RunTimeInformation>
+																				<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																				</RunTimeCountersPerThread>
+																			</RunTimeInformation>
+																			<TableScan Ordered="0" ForcedIndex="0" ForceScan="0" NoExpandHint="0" Storage="RowStore">
+																				<DefinedValues>
+																					<DefinedValue>
+																						<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_address]" Column="ca_address_sk">
+																						</ColumnReference>
+																					</DefinedValue>
+																				</DefinedValues>
+																				<Object Database="[test]" Schema="[dbo]" Table="[customer_address]" TableReferenceId="2" IndexKind="Heap" Storage="RowStore">
+																				</Object>
+																				<Predicate>
+																					<ScalarOperator ScalarString="[test].[dbo].[customer_address].[ca_state]=[test].[dbo].[customer_address].[ca_state]">
+																						<Compare CompareOp="EQ">
+																							<ScalarOperator>
+																								<Identifier>
+																									<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_address]" Column="ca_state">
+																									</ColumnReference>
+																								</Identifier>
+																							</ScalarOperator>
+																							<ScalarOperator>
+																								<Identifier>
+																									<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_address]" Column="ca_state">
+																									</ColumnReference>
+																								</Identifier>
+																							</ScalarOperator>
+																						</Compare>
+																					</ScalarOperator>
+																				</Predicate>
+																			</TableScan>
+																		</RelOp>
+																	</Sort>
+																</RelOp>
+																<RelOp NodeId="11" PhysicalOp="Nested Loops" LogicalOp="Inner Join" EstimateRows="1" EstimateIO="0" EstimateCPU="4.18e-06" AvgRowSize="16" EstimatedTotalSubtreeCost="0.0212209" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																	<OutputList>
+																		<ColumnReference Database="[test]" Schema="[dbo]" Table="[catalog_sales_history]" Column="cs_net_paid_inc_ship_tax">
+																		</ColumnReference>
+																		<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_current_addr_sk">
+																		</ColumnReference>
+																	</OutputList>
+																	<RunTimeInformation>
+																		<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																		</RunTimeCountersPerThread>
+																	</RunTimeInformation>
+																	<NestedLoops Optimized="0">
+																		<Predicate>
+																			<ScalarOperator ScalarString="[test].[dbo].[date_dim].[d_date_sk]=[test].[dbo].[catalog_sales_history].[cs_sold_date_sk]">
+																				<Compare CompareOp="EQ">
+																					<ScalarOperator>
+																						<Identifier>
+																							<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_date_sk">
+																							</ColumnReference>
+																						</Identifier>
+																					</ScalarOperator>
+																					<ScalarOperator>
+																						<Identifier>
+																							<ColumnReference Database="[test]" Schema="[dbo]" Table="[catalog_sales_history]" Column="cs_sold_date_sk">
+																							</ColumnReference>
+																						</Identifier>
+																					</ScalarOperator>
+																				</Compare>
+																			</ScalarOperator>
+																		</Predicate>
+																		<RelOp NodeId="12" PhysicalOp="Nested Loops" LogicalOp="Inner Join" EstimateRows="1" EstimateIO="0" EstimateCPU="4.18e-06" AvgRowSize="20" EstimatedTotalSubtreeCost="0.0179324" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																			<OutputList>
+																				<ColumnReference Database="[test]" Schema="[dbo]" Table="[catalog_sales_history]" Column="cs_sold_date_sk">
+																				</ColumnReference>
+																				<ColumnReference Database="[test]" Schema="[dbo]" Table="[catalog_sales_history]" Column="cs_net_paid_inc_ship_tax">
+																				</ColumnReference>
+																				<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_current_addr_sk">
+																				</ColumnReference>
+																			</OutputList>
+																			<RunTimeInformation>
+																				<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																				</RunTimeCountersPerThread>
+																			</RunTimeInformation>
+																			<NestedLoops Optimized="0">
+																				<Predicate>
+																					<ScalarOperator ScalarString="[test].[dbo].[catalog_sales_history].[cs_bill_customer_sk]=[test].[dbo].[customer].[c_customer_sk]">
+																						<Compare CompareOp="EQ">
+																							<ScalarOperator>
+																								<Identifier>
+																									<ColumnReference Database="[test]" Schema="[dbo]" Table="[catalog_sales_history]" Column="cs_bill_customer_sk">
+																									</ColumnReference>
+																								</Identifier>
+																							</ScalarOperator>
+																							<ScalarOperator>
+																								<Identifier>
+																									<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_customer_sk">
+																									</ColumnReference>
+																								</Identifier>
+																							</ScalarOperator>
+																						</Compare>
+																					</ScalarOperator>
+																				</Predicate>
+																				<RelOp NodeId="13" PhysicalOp="Sort" LogicalOp="Sort" EstimateRows="1" EstimateIO="0.0112613" EstimateCPU="0.000100015" AvgRowSize="15" EstimatedTotalSubtreeCost="0.0146444" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																					<OutputList>
+																						<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_customer_sk">
+																						</ColumnReference>
+																						<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_current_addr_sk">
+																						</ColumnReference>
+																					</OutputList>
+																					<MemoryFractions Input="0.333333" Output="0.333333">
+																					</MemoryFractions>
+																					<RunTimeInformation>
+																						<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualRebinds="0" ActualRewinds="0" ActualEndOfScans="0" ActualExecutions="0" InputMemoryGrant="592" OutputMemoryGrant="208" UsedMemoryGrant="0" ActualExecutionMode="Row">
+																						</RunTimeCountersPerThread>
+																					</RunTimeInformation>
+																					<Sort Distinct="0">
+																						<OrderBy>
+																							<OrderByColumn Ascending="1">
+																								<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_current_addr_sk">
+																								</ColumnReference>
+																							</OrderByColumn>
+																						</OrderBy>
+																						<RelOp NodeId="14" PhysicalOp="Table Scan" LogicalOp="Table Scan" EstimateRows="1" EstimatedRowsRead="1" EstimateIO="0.003125" EstimateCPU="0.0001581" AvgRowSize="15" EstimatedTotalSubtreeCost="0.0032831" TableCardinality="0" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																							<OutputList>
+																								<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_customer_sk">
+																								</ColumnReference>
+																								<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_current_addr_sk">
+																								</ColumnReference>
+																							</OutputList>
+																							<RunTimeInformation>
+																								<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																								</RunTimeCountersPerThread>
+																							</RunTimeInformation>
+																							<TableScan Ordered="0" ForcedIndex="0" ForceScan="0" NoExpandHint="0" Storage="RowStore">
+																								<DefinedValues>
+																									<DefinedValue>
+																										<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_customer_sk">
+																										</ColumnReference>
+																									</DefinedValue>
+																									<DefinedValue>
+																										<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer]" Column="c_current_addr_sk">
+																										</ColumnReference>
+																									</DefinedValue>
+																								</DefinedValues>
+																								<Object Database="[test]" Schema="[dbo]" Table="[customer]" IndexKind="Heap" Storage="RowStore">
+																								</Object>
+																							</TableScan>
+																						</RelOp>
+																					</Sort>
+																				</RelOp>
+																				<RelOp NodeId="15" PhysicalOp="Table Scan" LogicalOp="Table Scan" EstimateRows="1" EstimatedRowsRead="1" EstimateIO="0.003125" EstimateCPU="0.0001581" AvgRowSize="20" EstimatedTotalSubtreeCost="0.0032831" TableCardinality="0" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																					<OutputList>
+																						<ColumnReference Database="[test]" Schema="[dbo]" Table="[catalog_sales_history]" Column="cs_sold_date_sk">
+																						</ColumnReference>
+																						<ColumnReference Database="[test]" Schema="[dbo]" Table="[catalog_sales_history]" Column="cs_bill_customer_sk">
+																						</ColumnReference>
+																						<ColumnReference Database="[test]" Schema="[dbo]" Table="[catalog_sales_history]" Column="cs_net_paid_inc_ship_tax">
+																						</ColumnReference>
+																					</OutputList>
+																					<RunTimeInformation>
+																						<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																						</RunTimeCountersPerThread>
+																					</RunTimeInformation>
+																					<TableScan Ordered="0" ForcedIndex="0" ForceScan="0" NoExpandHint="0" Storage="RowStore">
+																						<DefinedValues>
+																							<DefinedValue>
+																								<ColumnReference Database="[test]" Schema="[dbo]" Table="[catalog_sales_history]" Column="cs_sold_date_sk">
+																								</ColumnReference>
+																							</DefinedValue>
+																							<DefinedValue>
+																								<ColumnReference Database="[test]" Schema="[dbo]" Table="[catalog_sales_history]" Column="cs_bill_customer_sk">
+																								</ColumnReference>
+																							</DefinedValue>
+																							<DefinedValue>
+																								<ColumnReference Database="[test]" Schema="[dbo]" Table="[catalog_sales_history]" Column="cs_net_paid_inc_ship_tax">
+																								</ColumnReference>
+																							</DefinedValue>
+																						</DefinedValues>
+																						<Object Database="[test]" Schema="[dbo]" Table="[catalog_sales_history]" IndexKind="Heap" Storage="RowStore">
+																						</Object>
+																						<Predicate>
+																							<ScalarOperator ScalarString="[test].[dbo].[catalog_sales_history].[cs_net_paid_inc_ship_tax]&gt;=(1000.00)">
+																								<Compare CompareOp="GE">
+																									<ScalarOperator>
+																										<Identifier>
+																											<ColumnReference Database="[test]" Schema="[dbo]" Table="[catalog_sales_history]" Column="cs_net_paid_inc_ship_tax">
+																											</ColumnReference>
+																										</Identifier>
+																									</ScalarOperator>
+																									<ScalarOperator>
+																										<Const ConstValue="(1000.00)">
+																										</Const>
+																									</ScalarOperator>
+																								</Compare>
+																							</ScalarOperator>
+																						</Predicate>
+																					</TableScan>
+																				</RelOp>
+																			</NestedLoops>
+																		</RelOp>
+																		<RelOp NodeId="16" PhysicalOp="Table Scan" LogicalOp="Table Scan" EstimateRows="1" EstimatedRowsRead="1" EstimateIO="0.003125" EstimateCPU="0.0001581" AvgRowSize="19" EstimatedTotalSubtreeCost="0.0032831" TableCardinality="0" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																			<OutputList>
+																				<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_date_sk">
+																				</ColumnReference>
+																			</OutputList>
+																			<RunTimeInformation>
+																				<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																				</RunTimeCountersPerThread>
+																			</RunTimeInformation>
+																			<TableScan Ordered="0" ForcedIndex="0" ForceScan="0" NoExpandHint="0" Storage="RowStore">
+																				<DefinedValues>
+																					<DefinedValue>
+																						<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_date_sk">
+																						</ColumnReference>
+																					</DefinedValue>
+																				</DefinedValues>
+																				<Object Database="[test]" Schema="[dbo]" Table="[date_dim]" TableReferenceId="2" IndexKind="Heap" Storage="RowStore">
+																				</Object>
+																				<Predicate>
+																					<ScalarOperator ScalarString="[test].[dbo].[date_dim].[d_year]=[test].[dbo].[date_dim].[d_year] AND [test].[dbo].[date_dim].[d_qoy]=[test].[dbo].[date_dim].[d_qoy]">
+																						<Logical Operation="AND">
+																							<ScalarOperator>
+																								<Compare CompareOp="EQ">
+																									<ScalarOperator>
+																										<Identifier>
+																											<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_year">
+																											</ColumnReference>
+																										</Identifier>
+																									</ScalarOperator>
+																									<ScalarOperator>
+																										<Identifier>
+																											<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_year">
+																											</ColumnReference>
+																										</Identifier>
+																									</ScalarOperator>
+																								</Compare>
+																							</ScalarOperator>
+																							<ScalarOperator>
+																								<Compare CompareOp="EQ">
+																									<ScalarOperator>
+																										<Identifier>
+																											<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_qoy">
+																											</ColumnReference>
+																										</Identifier>
+																									</ScalarOperator>
+																									<ScalarOperator>
+																										<Identifier>
+																											<ColumnReference Database="[test]" Schema="[dbo]" Table="[date_dim]" Column="d_qoy">
+																											</ColumnReference>
+																										</Identifier>
+																									</ScalarOperator>
+																								</Compare>
+																							</ScalarOperator>
+																						</Logical>
+																					</ScalarOperator>
+																				</Predicate>
+																			</TableScan>
+																		</RelOp>
+																	</NestedLoops>
+																</RelOp>
+															</Merge>
+														</RelOp>
+													</StreamAggregate>
+												</RelOp>
+											</ComputeScalar>
+										</RelOp>
+									</NestedLoops>
+								</RelOp>
+							</ComputeScalar>
+						</RelOp>
+					</QueryPlan>
+				</StmtSimple>
+			</Statements>
+		</Batch>
+	</BatchSequence>
+</ShowPlanXML>

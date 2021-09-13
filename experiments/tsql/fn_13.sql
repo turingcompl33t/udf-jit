@@ -1,6 +1,6 @@
 -- SQL ProcBench Scalar UDF 13: "Max Purchase Channel"
 
-CREATE OR ALTER FUNCTION maxpurchasechannel(@ckey INT, @fromDateSk INT, @toDateSk INT) RETURNS VARCHAR(50) AS
+CREATE OR ALTER FUNCTION maxPurchaseChannel(@ckey INT, @fromDateSk INT, @toDateSk INT) RETURNS VARCHAR(50) AS
 BEGIN
     DECLARE @numSalesFromStore   INT;
     DECLARE @numSalesFromCatalog INT;
