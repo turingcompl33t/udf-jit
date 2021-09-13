@@ -522,7 +522,7 @@ CREATE TABLE time_dim
     t_shift     CHAR(20),
     t_sub_shift CHAR(20),
     t_meal_time CHAR(20)
-) 
+);
 
 -- SQL ProcBench History Tables (7)
 
