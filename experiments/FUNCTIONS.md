@@ -17,7 +17,6 @@ SQL ProcBench consists of 24 scalar UDFs. Some of these functions are not viable
 - 11 "Generate Random Character"
 - 12 "Increase in Web Spending"
 - 13 "Max Purchase Channel"
-- 14 "Same Manager"
 - 17 "Preferred Channel WRT Count"
 - 18 "Preferred Channel WRT Expenditure"
 - 20a "Get Manufacturer (Simple)"
@@ -30,6 +29,7 @@ SQL ProcBench consists of 24 scalar UDFs. Some of these functions are not viable
 - 8: "Max Return Class"
 - 9a: "Wealth Ship Cost Correlation Catalog"
 - 9b: "Wealth Ship Cost Correlation Web"
+- 14 "Same Manager"
 - 15: "Income Band of Max Buy Customer"
 - 16: "Promo Versus No Promo"
 - 19: "Web Deficiency Amount"
@@ -54,7 +54,7 @@ A brief description of each function is provided below. If the function is unsup
 - **11** `GenerateRandomCharacter`: Calls another UDF (`GenerateRandomInteger`), with some basic conditional control flow.
 - **12** `IncreaseInWebSpending`: A couple simple aggregation queries with some conditional control flow at the end.
 - **13** `MaxPurchaseChannel`: Three aggregations followed by some conditional control flow.
-- **14** `SameManager`: Calls another UDF, contains a query-style `FOR`-loop construct meaning that it may be out of reach for Froid, also contains string-concatenation.
+- **14** `SameManager`: Unsupported because of cursor loop. Calls another UDF, contains a query-style `FOR`-loop construct meaning that it may be out of reach for Froid.
 - **15** `IncomeBandOfMaxBuyCustomer`: Complex queries followed by conditional control flow; unsupported because it contains subqueries that NoisePage cannot execute.
 - **16** `PromoVersusNoPromo`: Complex queries followed by conditional control flow, unsupported because it contains subqueries that NoisePage cannot execute.
 - **17** `PreferredChannelWrtCount`: Aggregations followed by conditional control flow.
@@ -65,5 +65,17 @@ A brief description of each function is provided below. If the function is unsup
 
 ### Inlining
 
-Even if some functions are supported by all systems, Froid is only capable of inlining a subset. Of the supported functions, 
+Even if some functions are supported by all systems, Froid is only capable of inlining a subset.
 
+Inlined:
+
+- Function 01: `TotalLargePurchases`
+- Function 04: `GenerateRandomInteger`
+- Function 06: `TotalDiscount`
+- Function 11: `GenerateRandomCharacter`
+- Function 13: `MaxPurchaseChannel`
+
+Not Inlined:
+- Function 12: `IncreaseInWebSpending`
+- Function 17: `PreferredChannelWrtCount`
+- Function 18: `PreferredChannelWrtExpenditure`
