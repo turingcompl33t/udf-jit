@@ -2,6 +2,18 @@
 
 This document provides a quick reference for the scalar UDFs provided in SQL ProcBench.
 
+### Selected Functions
+
+The functions selected for evaluation include:
+
+- Function 01: `TotalLargePurchases`
+- Function 04: `GenerateRandomInteger`
+- Function 05: `MorningToEveningRatio`
+- Function 06: `TotalDiscount`
+- Function 11: `GenerateRandomCharacter`
+- Function 13: `MaxPurchaseChannel`
+- Function 20a: `GetManufacturerSimple`
+
 ### Support
 
 SQL ProcBench consists of 24 scalar UDFs. Some of these functions are not viable for use in experiments because they contain constructs that are not supported by one or more of the systems involved in the evaluation.
@@ -70,12 +82,20 @@ Even if some functions are supported by all systems, Froid is only capable of in
 Inlined:
 
 - Function 01: `TotalLargePurchases`
+- Function 02: `MaxPromoChannel`
 - Function 04: `GenerateRandomInteger`
+- Function 05: `MorningToEveningRatio`
 - Function 06: `TotalDiscount`
 - Function 11: `GenerateRandomCharacter`
 - Function 13: `MaxPurchaseChannel`
+- Function 20a: `GetManufacturerSimple`
 
 Not Inlined:
 - Function 12: `IncreaseInWebSpending`
 - Function 17: `PreferredChannelWrtCount`
 - Function 18: `PreferredChannelWrtExpenditure`
+
+Not Tested:
+- Function 07: `ProfitableManager`
+- Function 10: `IsListDistinct`
+- Function 20b: `GetManufacturerComplex`
