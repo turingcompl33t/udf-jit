@@ -62,3 +62,8 @@ A brief description of each function is provided below. If the function is unsup
 - **19** `WebDeficiencyAmount`: Contains three distinct UDFs, two of which are unsupported because they contain `RETURN QUERY` constructs.
 - **20a** `GetManufacturerSimple`: Simple aggregation query.
 - **20b** `GetManufacturerComplex`: Aggregations with some conditional control flow.
+
+### Inlining
+
+Even if some functions are supported by all systems, Froid is only capable of inlining a subset. Of the supported functions, 
+
