@@ -15,7 +15,7 @@ BEGIN
 	IF (numWeb >= numStore and numWeb >= numCat) THEN
 		RETURN 'web';
     END IF;
-	IF (numStore > =numWeb and numStore >= numCat) THEN
+	IF (numStore >= numWeb and numStore >= numCat) THEN
 		RETURN 'store';
     END IF;
 	IF (numCat >= numStore and numCat >= numWeb) THEN
