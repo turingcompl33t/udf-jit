@@ -1,0 +1,682 @@
+<ShowPlanXML xmlns="http://schemas.microsoft.com/sqlserver/2004/07/showplan" Version="1.557" Build="15.0.2195.186">
+	<BatchSequence>
+		<Batch>
+			<Statements>
+				<StmtSimple StatementText="WITH t(depCount) AS (&#xd;&#xa;  SELECT DISTINCT cd_dep_count FROM customer_demographics&#xd;&#xa;) SELECT t.depCount, dbo.morningToEveRatio(t.depCount) FROM t" StatementId="1" StatementCompId="1" StatementType="SELECT" StatementSqlHandle="0x0900ABA6D4D06A215B7F659F83A2FF5E1F0B0000000000000000000000000000000000000000000000000000" DatabaseContextSettingsId="4" ParentObjectId="0" StatementParameterizationType="0" RetrievedFromCache="true" StatementSubTreeCost="0.0917372" StatementEstRows="1" SecurityPolicyApplied="false" StatementOptmLevel="FULL" QueryHash="0x8649FC2D334DB33B" QueryPlanHash="0x2A97DC6384D54561" StatementOptmEarlyAbortReason="GoodEnoughPlanFound" CardinalityEstimationModelVersion="150">
+					<StatementSetOptions QUOTED_IDENTIFIER="true" ARITHABORT="true" CONCAT_NULL_YIELDS_NULL="true" ANSI_NULLS="true" ANSI_PADDING="true" ANSI_WARNINGS="true" NUMERIC_ROUNDABORT="false">
+					</StatementSetOptions>
+					<QueryPlan DegreeOfParallelism="1" MemoryGrant="1024" CachedPlanSize="72" CompileTime="10" CompileCPU="10" CompileMemory="1048">
+						<MemoryGrantInfo SerialRequiredMemory="768" SerialDesiredMemory="864" RequiredMemory="768" DesiredMemory="864" RequestedMemory="1024" GrantWaitTime="0" MaxQueryMemory="399192" GrantedMemory="1024" MaxUsedMemory="0" LastRequestedMemory="1024" IsMemoryGrantFeedbackAdjusted="No: Accurate Grant">
+						</MemoryGrantInfo>
+						<OptimizerHardwareDependentProperties EstimatedAvailableMemoryGrant="136806" EstimatedPagesCached="17100" EstimatedAvailableDegreeOfParallelism="2" MaxCompileMemory="1590096">
+						</OptimizerHardwareDependentProperties>
+						<QueryTimeStats ElapsedTime="0" CpuTime="0">
+						</QueryTimeStats>
+						<RelOp NodeId="0" PhysicalOp="Compute Scalar" LogicalOp="Compute Scalar" EstimateRows="1" EstimateIO="0" EstimateCPU="1e-07" AvgRowSize="19" EstimatedTotalSubtreeCost="0.0917372" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+							<OutputList>
+								<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_demographics]" Column="cd_dep_count">
+								</ColumnReference>
+								<ColumnReference Column="Expr1032">
+								</ColumnReference>
+							</OutputList>
+							<ComputeScalar>
+								<DefinedValues>
+									<DefinedValue>
+										<ColumnReference Column="Expr1032">
+										</ColumnReference>
+										<ScalarOperator ScalarString="CONVERT_IMPLICIT(float(53),CONVERT(float(53),[Expr1012],0)/CONVERT(float(53),[Expr1025],0),0)">
+											<Convert DataType="float" Precision="53" Style="0" Implicit="1">
+												<ScalarOperator>
+													<Arithmetic Operation="DIV">
+														<ScalarOperator>
+															<Convert DataType="float" Precision="53" Style="0" Implicit="0">
+																<ScalarOperator>
+																	<Identifier>
+																		<ColumnReference Column="Expr1012">
+																		</ColumnReference>
+																	</Identifier>
+																</ScalarOperator>
+															</Convert>
+														</ScalarOperator>
+														<ScalarOperator>
+															<Convert DataType="float" Precision="53" Style="0" Implicit="0">
+																<ScalarOperator>
+																	<Identifier>
+																		<ColumnReference Column="Expr1025">
+																		</ColumnReference>
+																	</Identifier>
+																</ScalarOperator>
+															</Convert>
+														</ScalarOperator>
+													</Arithmetic>
+												</ScalarOperator>
+											</Convert>
+										</ScalarOperator>
+									</DefinedValue>
+								</DefinedValues>
+								<RelOp NodeId="1" PhysicalOp="Nested Loops" LogicalOp="Inner Join" EstimateRows="1" EstimateIO="0" EstimateCPU="4.18e-06" AvgRowSize="19" EstimatedTotalSubtreeCost="0.0917371" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+									<OutputList>
+										<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_demographics]" Column="cd_dep_count">
+										</ColumnReference>
+										<ColumnReference Column="Expr1012">
+										</ColumnReference>
+										<ColumnReference Column="Expr1025">
+										</ColumnReference>
+									</OutputList>
+									<RunTimeInformation>
+										<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="1" ActualExecutions="1" ActualExecutionMode="Row">
+										</RunTimeCountersPerThread>
+									</RunTimeInformation>
+									<NestedLoops Optimized="0">
+										<OuterReferences>
+											<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_demographics]" Column="cd_dep_count">
+											</ColumnReference>
+										</OuterReferences>
+										<RelOp NodeId="2" PhysicalOp="Sort" LogicalOp="Distinct Sort" EstimateRows="1" EstimateIO="0.0112613" EstimateCPU="0.000100011" AvgRowSize="11" EstimatedTotalSubtreeCost="0.0146444" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+											<OutputList>
+												<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_demographics]" Column="cd_dep_count">
+												</ColumnReference>
+											</OutputList>
+											<MemoryFractions Input="1" Output="0.333333">
+											</MemoryFractions>
+											<RunTimeInformation>
+												<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualRebinds="1" ActualRewinds="0" ActualEndOfScans="1" ActualExecutions="1" InputMemoryGrant="768" OutputMemoryGrant="208" UsedMemoryGrant="0" ActualExecutionMode="Row">
+												</RunTimeCountersPerThread>
+											</RunTimeInformation>
+											<Sort Distinct="1">
+												<OrderBy>
+													<OrderByColumn Ascending="1">
+														<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_demographics]" Column="cd_dep_count">
+														</ColumnReference>
+													</OrderByColumn>
+												</OrderBy>
+												<RelOp NodeId="3" PhysicalOp="Table Scan" LogicalOp="Table Scan" EstimateRows="1" EstimatedRowsRead="1" EstimateIO="0.003125" EstimateCPU="0.0001581" AvgRowSize="11" EstimatedTotalSubtreeCost="0.0032831" TableCardinality="0" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+													<OutputList>
+														<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_demographics]" Column="cd_dep_count">
+														</ColumnReference>
+													</OutputList>
+													<RunTimeInformation>
+														<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="1" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="1" ActualExecutions="1" ActualExecutionMode="Row">
+														</RunTimeCountersPerThread>
+													</RunTimeInformation>
+													<TableScan Ordered="0" ForcedIndex="0" ForceScan="0" NoExpandHint="0" Storage="RowStore">
+														<DefinedValues>
+															<DefinedValue>
+																<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_demographics]" Column="cd_dep_count">
+																</ColumnReference>
+															</DefinedValue>
+														</DefinedValues>
+														<Object Database="[test]" Schema="[dbo]" Table="[customer_demographics]" TableReferenceId="1" IndexKind="Heap" Storage="RowStore">
+														</Object>
+													</TableScan>
+												</RelOp>
+											</Sort>
+										</RelOp>
+										<RelOp NodeId="4" PhysicalOp="Nested Loops" LogicalOp="Inner Join" EstimateRows="1" EstimateIO="0" EstimateCPU="4.18e-06" AvgRowSize="15" EstimatedTotalSubtreeCost="0.0770885" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+											<OutputList>
+												<ColumnReference Column="Expr1012">
+												</ColumnReference>
+												<ColumnReference Column="Expr1025">
+												</ColumnReference>
+											</OutputList>
+											<RunTimeInformation>
+												<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+												</RunTimeCountersPerThread>
+											</RunTimeInformation>
+											<NestedLoops Optimized="0">
+												<RelOp NodeId="5" PhysicalOp="Compute Scalar" LogicalOp="Compute Scalar" EstimateRows="1" EstimateIO="0" EstimateCPU="0" AvgRowSize="11" EstimatedTotalSubtreeCost="0.0385422" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+													<OutputList>
+														<ColumnReference Column="Expr1012">
+														</ColumnReference>
+													</OutputList>
+													<ComputeScalar>
+														<DefinedValues>
+															<DefinedValue>
+																<ColumnReference Column="Expr1012">
+																</ColumnReference>
+																<ScalarOperator ScalarString="CONVERT_IMPLICIT(int,[Expr1037],0)">
+																	<Convert DataType="int" Style="0" Implicit="1">
+																		<ScalarOperator>
+																			<Identifier>
+																				<ColumnReference Column="Expr1037">
+																				</ColumnReference>
+																			</Identifier>
+																		</ScalarOperator>
+																	</Convert>
+																</ScalarOperator>
+															</DefinedValue>
+														</DefinedValues>
+														<RelOp NodeId="6" PhysicalOp="Stream Aggregate" LogicalOp="Aggregate" EstimateRows="1" EstimateIO="0" EstimateCPU="1.1e-06" AvgRowSize="11" EstimatedTotalSubtreeCost="0.0385422" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+															<OutputList>
+																<ColumnReference Column="Expr1037">
+																</ColumnReference>
+															</OutputList>
+															<RunTimeInformation>
+																<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																</RunTimeCountersPerThread>
+															</RunTimeInformation>
+															<StreamAggregate>
+																<DefinedValues>
+																	<DefinedValue>
+																		<ColumnReference Column="Expr1037">
+																		</ColumnReference>
+																		<ScalarOperator ScalarString="Count(*)">
+																			<Aggregate AggType="countstar" Distinct="0">
+																			</Aggregate>
+																		</ScalarOperator>
+																	</DefinedValue>
+																</DefinedValues>
+																<RelOp NodeId="7" PhysicalOp="Merge Join" LogicalOp="Inner Join" EstimateRows="1" EstimateIO="0.000313" EstimateCPU="0.00564738" AvgRowSize="9" EstimatedTotalSubtreeCost="0.0385411" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																	<OutputList>
+																	</OutputList>
+																	<RunTimeInformation>
+																		<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																		</RunTimeCountersPerThread>
+																	</RunTimeInformation>
+																	<Merge ManyToMany="1">
+																		<InnerSideJoinColumns>
+																			<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_sold_time_sk">
+																			</ColumnReference>
+																		</InnerSideJoinColumns>
+																		<OuterSideJoinColumns>
+																			<ColumnReference Database="[test]" Schema="[dbo]" Table="[time_dim]" Column="t_time_sk">
+																			</ColumnReference>
+																		</OuterSideJoinColumns>
+																		<Residual>
+																			<ScalarOperator ScalarString="[test].[dbo].[web_sales_history].[ws_sold_time_sk]=[test].[dbo].[time_dim].[t_time_sk]">
+																				<Compare CompareOp="EQ">
+																					<ScalarOperator>
+																						<Identifier>
+																							<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_sold_time_sk">
+																							</ColumnReference>
+																						</Identifier>
+																					</ScalarOperator>
+																					<ScalarOperator>
+																						<Identifier>
+																							<ColumnReference Database="[test]" Schema="[dbo]" Table="[time_dim]" Column="t_time_sk">
+																							</ColumnReference>
+																						</Identifier>
+																					</ScalarOperator>
+																				</Compare>
+																			</ScalarOperator>
+																		</Residual>
+																		<RelOp NodeId="8" PhysicalOp="Sort" LogicalOp="Sort" EstimateRows="1" EstimateIO="0.0112613" EstimateCPU="0.000100011" AvgRowSize="11" EstimatedTotalSubtreeCost="0.0146453" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																			<OutputList>
+																				<ColumnReference Database="[test]" Schema="[dbo]" Table="[time_dim]" Column="t_time_sk">
+																				</ColumnReference>
+																			</OutputList>
+																			<MemoryFractions Input="0.666667" Output="0.333333">
+																			</MemoryFractions>
+																			<RunTimeInformation>
+																				<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualRebinds="0" ActualRewinds="0" ActualEndOfScans="0" ActualExecutions="0" InputMemoryGrant="680" OutputMemoryGrant="208" UsedMemoryGrant="0" ActualExecutionMode="Row">
+																				</RunTimeCountersPerThread>
+																			</RunTimeInformation>
+																			<Sort Distinct="0">
+																				<OrderBy>
+																					<OrderByColumn Ascending="1">
+																						<ColumnReference Database="[test]" Schema="[dbo]" Table="[time_dim]" Column="t_time_sk">
+																						</ColumnReference>
+																					</OrderByColumn>
+																				</OrderBy>
+																				<RelOp NodeId="9" PhysicalOp="Table Scan" LogicalOp="Table Scan" EstimateRows="1" EstimatedRowsRead="1" EstimateIO="0.003125" EstimateCPU="0.0001581" AvgRowSize="15" EstimatedTotalSubtreeCost="0.0032831" TableCardinality="0" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																					<OutputList>
+																						<ColumnReference Database="[test]" Schema="[dbo]" Table="[time_dim]" Column="t_time_sk">
+																						</ColumnReference>
+																					</OutputList>
+																					<RunTimeInformation>
+																						<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																						</RunTimeCountersPerThread>
+																					</RunTimeInformation>
+																					<TableScan Ordered="0" ForcedIndex="0" ForceScan="0" NoExpandHint="0" Storage="RowStore">
+																						<DefinedValues>
+																							<DefinedValue>
+																								<ColumnReference Database="[test]" Schema="[dbo]" Table="[time_dim]" Column="t_time_sk">
+																								</ColumnReference>
+																							</DefinedValue>
+																						</DefinedValues>
+																						<Object Database="[test]" Schema="[dbo]" Table="[time_dim]" TableReferenceId="1" IndexKind="Heap" Storage="RowStore">
+																						</Object>
+																						<Predicate>
+																							<ScalarOperator ScalarString="[test].[dbo].[time_dim].[t_hour]&gt;=(8) AND [test].[dbo].[time_dim].[t_hour]&lt;=(9)">
+																								<Logical Operation="AND">
+																									<ScalarOperator>
+																										<Compare CompareOp="GE">
+																											<ScalarOperator>
+																												<Identifier>
+																													<ColumnReference Database="[test]" Schema="[dbo]" Table="[time_dim]" Column="t_hour">
+																													</ColumnReference>
+																												</Identifier>
+																											</ScalarOperator>
+																											<ScalarOperator>
+																												<Const ConstValue="(8)">
+																												</Const>
+																											</ScalarOperator>
+																										</Compare>
+																									</ScalarOperator>
+																									<ScalarOperator>
+																										<Compare CompareOp="LE">
+																											<ScalarOperator>
+																												<Identifier>
+																													<ColumnReference Database="[test]" Schema="[dbo]" Table="[time_dim]" Column="t_hour">
+																													</ColumnReference>
+																												</Identifier>
+																											</ScalarOperator>
+																											<ScalarOperator>
+																												<Const ConstValue="(9)">
+																												</Const>
+																											</ScalarOperator>
+																										</Compare>
+																									</ScalarOperator>
+																								</Logical>
+																							</ScalarOperator>
+																						</Predicate>
+																					</TableScan>
+																				</RelOp>
+																			</Sort>
+																		</RelOp>
+																		<RelOp NodeId="10" PhysicalOp="Nested Loops" LogicalOp="Inner Join" EstimateRows="1" EstimateIO="0" EstimateCPU="4.18e-06" AvgRowSize="11" EstimatedTotalSubtreeCost="0.0179324" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																			<OutputList>
+																				<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_sold_time_sk">
+																				</ColumnReference>
+																			</OutputList>
+																			<RunTimeInformation>
+																				<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																				</RunTimeCountersPerThread>
+																			</RunTimeInformation>
+																			<NestedLoops Optimized="0">
+																				<Predicate>
+																					<ScalarOperator ScalarString="[test].[dbo].[web_sales_history].[ws_bill_customer_sk]=[test].[dbo].[customer_demographics].[cd_demo_sk]">
+																						<Compare CompareOp="EQ">
+																							<ScalarOperator>
+																								<Identifier>
+																									<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_bill_customer_sk">
+																									</ColumnReference>
+																								</Identifier>
+																							</ScalarOperator>
+																							<ScalarOperator>
+																								<Identifier>
+																									<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_demographics]" Column="cd_demo_sk">
+																									</ColumnReference>
+																								</Identifier>
+																							</ScalarOperator>
+																						</Compare>
+																					</ScalarOperator>
+																				</Predicate>
+																				<RelOp NodeId="11" PhysicalOp="Sort" LogicalOp="Sort" EstimateRows="1" EstimateIO="0.0112613" EstimateCPU="0.000100015" AvgRowSize="15" EstimatedTotalSubtreeCost="0.0146444" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																					<OutputList>
+																						<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_sold_time_sk">
+																						</ColumnReference>
+																						<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_bill_customer_sk">
+																						</ColumnReference>
+																					</OutputList>
+																					<MemoryFractions Input="0.333333" Output="0.333333">
+																					</MemoryFractions>
+																					<RunTimeInformation>
+																						<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualRebinds="0" ActualRewinds="0" ActualEndOfScans="0" ActualExecutions="0" InputMemoryGrant="592" OutputMemoryGrant="208" UsedMemoryGrant="0" ActualExecutionMode="Row">
+																						</RunTimeCountersPerThread>
+																					</RunTimeInformation>
+																					<Sort Distinct="0">
+																						<OrderBy>
+																							<OrderByColumn Ascending="1">
+																								<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_sold_time_sk">
+																								</ColumnReference>
+																							</OrderByColumn>
+																						</OrderBy>
+																						<RelOp NodeId="12" PhysicalOp="Table Scan" LogicalOp="Table Scan" EstimateRows="1" EstimatedRowsRead="1" EstimateIO="0.003125" EstimateCPU="0.0001581" AvgRowSize="15" EstimatedTotalSubtreeCost="0.0032831" TableCardinality="0" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																							<OutputList>
+																								<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_sold_time_sk">
+																								</ColumnReference>
+																								<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_bill_customer_sk">
+																								</ColumnReference>
+																							</OutputList>
+																							<RunTimeInformation>
+																								<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																								</RunTimeCountersPerThread>
+																							</RunTimeInformation>
+																							<TableScan Ordered="0" ForcedIndex="0" ForceScan="0" NoExpandHint="0" Storage="RowStore">
+																								<DefinedValues>
+																									<DefinedValue>
+																										<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_sold_time_sk">
+																										</ColumnReference>
+																									</DefinedValue>
+																									<DefinedValue>
+																										<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_bill_customer_sk">
+																										</ColumnReference>
+																									</DefinedValue>
+																								</DefinedValues>
+																								<Object Database="[test]" Schema="[dbo]" Table="[web_sales_history]" TableReferenceId="1" IndexKind="Heap" Storage="RowStore">
+																								</Object>
+																							</TableScan>
+																						</RelOp>
+																					</Sort>
+																				</RelOp>
+																				<RelOp NodeId="13" PhysicalOp="Table Scan" LogicalOp="Table Scan" EstimateRows="1" EstimatedRowsRead="1" EstimateIO="0.003125" EstimateCPU="0.0001581" AvgRowSize="15" EstimatedTotalSubtreeCost="0.0032831" TableCardinality="0" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																					<OutputList>
+																						<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_demographics]" Column="cd_demo_sk">
+																						</ColumnReference>
+																					</OutputList>
+																					<RunTimeInformation>
+																						<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																						</RunTimeCountersPerThread>
+																					</RunTimeInformation>
+																					<TableScan Ordered="0" ForcedIndex="0" ForceScan="0" NoExpandHint="0" Storage="RowStore">
+																						<DefinedValues>
+																							<DefinedValue>
+																								<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_demographics]" Column="cd_demo_sk">
+																								</ColumnReference>
+																							</DefinedValue>
+																						</DefinedValues>
+																						<Object Database="[test]" Schema="[dbo]" Table="[customer_demographics]" TableReferenceId="2" IndexKind="Heap" Storage="RowStore">
+																						</Object>
+																						<Predicate>
+																							<ScalarOperator ScalarString="[test].[dbo].[customer_demographics].[cd_dep_count]=[test].[dbo].[customer_demographics].[cd_dep_count]">
+																								<Compare CompareOp="EQ">
+																									<ScalarOperator>
+																										<Identifier>
+																											<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_demographics]" Column="cd_dep_count">
+																											</ColumnReference>
+																										</Identifier>
+																									</ScalarOperator>
+																									<ScalarOperator>
+																										<Identifier>
+																											<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_demographics]" Column="cd_dep_count">
+																											</ColumnReference>
+																										</Identifier>
+																									</ScalarOperator>
+																								</Compare>
+																							</ScalarOperator>
+																						</Predicate>
+																					</TableScan>
+																				</RelOp>
+																			</NestedLoops>
+																		</RelOp>
+																	</Merge>
+																</RelOp>
+															</StreamAggregate>
+														</RelOp>
+													</ComputeScalar>
+												</RelOp>
+												<RelOp NodeId="14" PhysicalOp="Compute Scalar" LogicalOp="Compute Scalar" EstimateRows="1" EstimateIO="0" EstimateCPU="0" AvgRowSize="11" EstimatedTotalSubtreeCost="0.0385422" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+													<OutputList>
+														<ColumnReference Column="Expr1025">
+														</ColumnReference>
+													</OutputList>
+													<ComputeScalar>
+														<DefinedValues>
+															<DefinedValue>
+																<ColumnReference Column="Expr1025">
+																</ColumnReference>
+																<ScalarOperator ScalarString="CONVERT_IMPLICIT(int,[Expr1038],0)">
+																	<Convert DataType="int" Style="0" Implicit="1">
+																		<ScalarOperator>
+																			<Identifier>
+																				<ColumnReference Column="Expr1038">
+																				</ColumnReference>
+																			</Identifier>
+																		</ScalarOperator>
+																	</Convert>
+																</ScalarOperator>
+															</DefinedValue>
+														</DefinedValues>
+														<RelOp NodeId="15" PhysicalOp="Stream Aggregate" LogicalOp="Aggregate" EstimateRows="1" EstimateIO="0" EstimateCPU="1.1e-06" AvgRowSize="11" EstimatedTotalSubtreeCost="0.0385422" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+															<OutputList>
+																<ColumnReference Column="Expr1038">
+																</ColumnReference>
+															</OutputList>
+															<RunTimeInformation>
+																<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																</RunTimeCountersPerThread>
+															</RunTimeInformation>
+															<StreamAggregate>
+																<DefinedValues>
+																	<DefinedValue>
+																		<ColumnReference Column="Expr1038">
+																		</ColumnReference>
+																		<ScalarOperator ScalarString="Count(*)">
+																			<Aggregate AggType="countstar" Distinct="0">
+																			</Aggregate>
+																		</ScalarOperator>
+																	</DefinedValue>
+																</DefinedValues>
+																<RelOp NodeId="16" PhysicalOp="Merge Join" LogicalOp="Inner Join" EstimateRows="1" EstimateIO="0.000313" EstimateCPU="0.00564738" AvgRowSize="9" EstimatedTotalSubtreeCost="0.0385411" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																	<OutputList>
+																	</OutputList>
+																	<RunTimeInformation>
+																		<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																		</RunTimeCountersPerThread>
+																	</RunTimeInformation>
+																	<Merge ManyToMany="1">
+																		<InnerSideJoinColumns>
+																			<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_sold_time_sk">
+																			</ColumnReference>
+																		</InnerSideJoinColumns>
+																		<OuterSideJoinColumns>
+																			<ColumnReference Database="[test]" Schema="[dbo]" Table="[time_dim]" Column="t_time_sk">
+																			</ColumnReference>
+																		</OuterSideJoinColumns>
+																		<Residual>
+																			<ScalarOperator ScalarString="[test].[dbo].[web_sales_history].[ws_sold_time_sk]=[test].[dbo].[time_dim].[t_time_sk]">
+																				<Compare CompareOp="EQ">
+																					<ScalarOperator>
+																						<Identifier>
+																							<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_sold_time_sk">
+																							</ColumnReference>
+																						</Identifier>
+																					</ScalarOperator>
+																					<ScalarOperator>
+																						<Identifier>
+																							<ColumnReference Database="[test]" Schema="[dbo]" Table="[time_dim]" Column="t_time_sk">
+																							</ColumnReference>
+																						</Identifier>
+																					</ScalarOperator>
+																				</Compare>
+																			</ScalarOperator>
+																		</Residual>
+																		<RelOp NodeId="17" PhysicalOp="Sort" LogicalOp="Sort" EstimateRows="1" EstimateIO="0.0112613" EstimateCPU="0.000100011" AvgRowSize="11" EstimatedTotalSubtreeCost="0.0146453" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																			<OutputList>
+																				<ColumnReference Database="[test]" Schema="[dbo]" Table="[time_dim]" Column="t_time_sk">
+																				</ColumnReference>
+																			</OutputList>
+																			<MemoryFractions Input="0.666667" Output="0.333333">
+																			</MemoryFractions>
+																			<RunTimeInformation>
+																				<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualRebinds="0" ActualRewinds="0" ActualEndOfScans="0" ActualExecutions="0" InputMemoryGrant="680" OutputMemoryGrant="208" UsedMemoryGrant="0" ActualExecutionMode="Row">
+																				</RunTimeCountersPerThread>
+																			</RunTimeInformation>
+																			<Sort Distinct="0">
+																				<OrderBy>
+																					<OrderByColumn Ascending="1">
+																						<ColumnReference Database="[test]" Schema="[dbo]" Table="[time_dim]" Column="t_time_sk">
+																						</ColumnReference>
+																					</OrderByColumn>
+																				</OrderBy>
+																				<RelOp NodeId="18" PhysicalOp="Table Scan" LogicalOp="Table Scan" EstimateRows="1" EstimatedRowsRead="1" EstimateIO="0.003125" EstimateCPU="0.0001581" AvgRowSize="15" EstimatedTotalSubtreeCost="0.0032831" TableCardinality="0" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																					<OutputList>
+																						<ColumnReference Database="[test]" Schema="[dbo]" Table="[time_dim]" Column="t_time_sk">
+																						</ColumnReference>
+																					</OutputList>
+																					<RunTimeInformation>
+																						<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																						</RunTimeCountersPerThread>
+																					</RunTimeInformation>
+																					<TableScan Ordered="0" ForcedIndex="0" ForceScan="0" NoExpandHint="0" Storage="RowStore">
+																						<DefinedValues>
+																							<DefinedValue>
+																								<ColumnReference Database="[test]" Schema="[dbo]" Table="[time_dim]" Column="t_time_sk">
+																								</ColumnReference>
+																							</DefinedValue>
+																						</DefinedValues>
+																						<Object Database="[test]" Schema="[dbo]" Table="[time_dim]" TableReferenceId="2" IndexKind="Heap" Storage="RowStore">
+																						</Object>
+																						<Predicate>
+																							<ScalarOperator ScalarString="[test].[dbo].[time_dim].[t_hour]&gt;=(19) AND [test].[dbo].[time_dim].[t_hour]&lt;=(20)">
+																								<Logical Operation="AND">
+																									<ScalarOperator>
+																										<Compare CompareOp="GE">
+																											<ScalarOperator>
+																												<Identifier>
+																													<ColumnReference Database="[test]" Schema="[dbo]" Table="[time_dim]" Column="t_hour">
+																													</ColumnReference>
+																												</Identifier>
+																											</ScalarOperator>
+																											<ScalarOperator>
+																												<Const ConstValue="(19)">
+																												</Const>
+																											</ScalarOperator>
+																										</Compare>
+																									</ScalarOperator>
+																									<ScalarOperator>
+																										<Compare CompareOp="LE">
+																											<ScalarOperator>
+																												<Identifier>
+																													<ColumnReference Database="[test]" Schema="[dbo]" Table="[time_dim]" Column="t_hour">
+																													</ColumnReference>
+																												</Identifier>
+																											</ScalarOperator>
+																											<ScalarOperator>
+																												<Const ConstValue="(20)">
+																												</Const>
+																											</ScalarOperator>
+																										</Compare>
+																									</ScalarOperator>
+																								</Logical>
+																							</ScalarOperator>
+																						</Predicate>
+																					</TableScan>
+																				</RelOp>
+																			</Sort>
+																		</RelOp>
+																		<RelOp NodeId="19" PhysicalOp="Nested Loops" LogicalOp="Inner Join" EstimateRows="1" EstimateIO="0" EstimateCPU="4.18e-06" AvgRowSize="11" EstimatedTotalSubtreeCost="0.0179324" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																			<OutputList>
+																				<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_sold_time_sk">
+																				</ColumnReference>
+																			</OutputList>
+																			<RunTimeInformation>
+																				<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																				</RunTimeCountersPerThread>
+																			</RunTimeInformation>
+																			<NestedLoops Optimized="0">
+																				<Predicate>
+																					<ScalarOperator ScalarString="[test].[dbo].[web_sales_history].[ws_bill_customer_sk]=[test].[dbo].[customer_demographics].[cd_demo_sk]">
+																						<Compare CompareOp="EQ">
+																							<ScalarOperator>
+																								<Identifier>
+																									<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_bill_customer_sk">
+																									</ColumnReference>
+																								</Identifier>
+																							</ScalarOperator>
+																							<ScalarOperator>
+																								<Identifier>
+																									<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_demographics]" Column="cd_demo_sk">
+																									</ColumnReference>
+																								</Identifier>
+																							</ScalarOperator>
+																						</Compare>
+																					</ScalarOperator>
+																				</Predicate>
+																				<RelOp NodeId="20" PhysicalOp="Sort" LogicalOp="Sort" EstimateRows="1" EstimateIO="0.0112613" EstimateCPU="0.000100015" AvgRowSize="15" EstimatedTotalSubtreeCost="0.0146444" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																					<OutputList>
+																						<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_sold_time_sk">
+																						</ColumnReference>
+																						<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_bill_customer_sk">
+																						</ColumnReference>
+																					</OutputList>
+																					<MemoryFractions Input="0.333333" Output="0.333333">
+																					</MemoryFractions>
+																					<RunTimeInformation>
+																						<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualRebinds="0" ActualRewinds="0" ActualEndOfScans="0" ActualExecutions="0" InputMemoryGrant="592" OutputMemoryGrant="208" UsedMemoryGrant="0" ActualExecutionMode="Row">
+																						</RunTimeCountersPerThread>
+																					</RunTimeInformation>
+																					<Sort Distinct="0">
+																						<OrderBy>
+																							<OrderByColumn Ascending="1">
+																								<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_sold_time_sk">
+																								</ColumnReference>
+																							</OrderByColumn>
+																						</OrderBy>
+																						<RelOp NodeId="21" PhysicalOp="Table Scan" LogicalOp="Table Scan" EstimateRows="1" EstimatedRowsRead="1" EstimateIO="0.003125" EstimateCPU="0.0001581" AvgRowSize="15" EstimatedTotalSubtreeCost="0.0032831" TableCardinality="0" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																							<OutputList>
+																								<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_sold_time_sk">
+																								</ColumnReference>
+																								<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_bill_customer_sk">
+																								</ColumnReference>
+																							</OutputList>
+																							<RunTimeInformation>
+																								<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																								</RunTimeCountersPerThread>
+																							</RunTimeInformation>
+																							<TableScan Ordered="0" ForcedIndex="0" ForceScan="0" NoExpandHint="0" Storage="RowStore">
+																								<DefinedValues>
+																									<DefinedValue>
+																										<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_sold_time_sk">
+																										</ColumnReference>
+																									</DefinedValue>
+																									<DefinedValue>
+																										<ColumnReference Database="[test]" Schema="[dbo]" Table="[web_sales_history]" Column="ws_bill_customer_sk">
+																										</ColumnReference>
+																									</DefinedValue>
+																								</DefinedValues>
+																								<Object Database="[test]" Schema="[dbo]" Table="[web_sales_history]" TableReferenceId="2" IndexKind="Heap" Storage="RowStore">
+																								</Object>
+																							</TableScan>
+																						</RelOp>
+																					</Sort>
+																				</RelOp>
+																				<RelOp NodeId="22" PhysicalOp="Table Scan" LogicalOp="Table Scan" EstimateRows="1" EstimatedRowsRead="1" EstimateIO="0.003125" EstimateCPU="0.0001581" AvgRowSize="15" EstimatedTotalSubtreeCost="0.0032831" TableCardinality="0" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+																					<OutputList>
+																						<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_demographics]" Column="cd_demo_sk">
+																						</ColumnReference>
+																					</OutputList>
+																					<RunTimeInformation>
+																						<RunTimeCountersPerThread Thread="0" ActualRows="0" Batches="0" ActualElapsedms="0" ActualCPUms="0" ActualScans="0" ActualLogicalReads="0" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualEndOfScans="0" ActualExecutions="0" ActualExecutionMode="Row">
+																						</RunTimeCountersPerThread>
+																					</RunTimeInformation>
+																					<TableScan Ordered="0" ForcedIndex="0" ForceScan="0" NoExpandHint="0" Storage="RowStore">
+																						<DefinedValues>
+																							<DefinedValue>
+																								<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_demographics]" Column="cd_demo_sk">
+																								</ColumnReference>
+																							</DefinedValue>
+																						</DefinedValues>
+																						<Object Database="[test]" Schema="[dbo]" Table="[customer_demographics]" TableReferenceId="3" IndexKind="Heap" Storage="RowStore">
+																						</Object>
+																						<Predicate>
+																							<ScalarOperator ScalarString="[test].[dbo].[customer_demographics].[cd_dep_count]=[test].[dbo].[customer_demographics].[cd_dep_count]">
+																								<Compare CompareOp="EQ">
+																									<ScalarOperator>
+																										<Identifier>
+																											<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_demographics]" Column="cd_dep_count">
+																											</ColumnReference>
+																										</Identifier>
+																									</ScalarOperator>
+																									<ScalarOperator>
+																										<Identifier>
+																											<ColumnReference Database="[test]" Schema="[dbo]" Table="[customer_demographics]" Column="cd_dep_count">
+																											</ColumnReference>
+																										</Identifier>
+																									</ScalarOperator>
+																								</Compare>
+																							</ScalarOperator>
+																						</Predicate>
+																					</TableScan>
+																				</RelOp>
+																			</NestedLoops>
+																		</RelOp>
+																	</Merge>
+																</RelOp>
+															</StreamAggregate>
+														</RelOp>
+													</ComputeScalar>
+												</RelOp>
+											</NestedLoops>
+										</RelOp>
+									</NestedLoops>
+								</RelOp>
+							</ComputeScalar>
+						</RelOp>
+					</QueryPlan>
+				</StmtSimple>
+			</Statements>
+		</Batch>
+	</BatchSequence>
+</ShowPlanXML>
