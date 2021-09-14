@@ -2,4 +2,4 @@
 
 WITH t(depCount) AS (
   SELECT DISTINCT cd_dep_count FROM customer_demographics
-) SELECT t.depCount, dbo.morningToEveRatio(t.depCount);
+) SELECT t.depCount, dbo.morningToEveRatio(t.depCount) FROM t;
