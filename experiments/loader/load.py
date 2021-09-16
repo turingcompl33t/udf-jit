@@ -1,11 +1,13 @@
 # load.py
 # A data loader for NoisePage.
 
+import os
 import sys
 import argparse
 import psycopg2
 from contextlib import contextmanager
 
+from typing import List
 from psycopg2 import OperationalError
 
 # Script exit codes
@@ -16,6 +18,43 @@ EXIT_FAILURE = 1
 DEFAULT_DB_NAME = "noisepage"
 DEFAULT_DB_HOST = "localhost"
 DEFAULT_DB_PORT = "15721"
+
+# Maps from table name -> table data filename
+TABLE_DATA_SOURCES = {
+    "store_sales": "store_sales.dat",
+    "store_returns": "store_returns.dat",
+    "catalog_sales": "catalog_sales.dat",
+    "catalog_returns": "catalog_returns.dat",
+    "web_sales": "web_sales.dat",
+    "web_returns": "web_returns.dat",
+    "inventory": "inventory.dat",
+    "store": "store.dat",
+    "call_center": "call_center.dat",
+    "catalog_page": "catalog_page.dat",
+    "web_site": "web_site.dat",
+    "web_page": "web_page.dat",
+    "warehouse": "warehouse.dat",
+    "customer": "customer.dat",
+    "customer_address": "customer_address.dat",
+    "customer_demographics": "customer_demographics.dat",
+    "date_dim": "date_dim.dat",
+    "household_demographics": "household_demographics.dat",
+    "item": "item.dat",
+    "income_band": "income_band.dat",
+    "promotion": "promotion.dat",
+    "reason": "reason.dat",
+    "ship_mode": "ship_mode.dat",
+    "time_dim": "time_dim.dat",
+    # NOTE: The history tables are populated with the same data
+    # as the standard fact tables for the TPC-DS benchmark
+    "store_sales_history": "store_sales.dat",
+    "store_returns_history": "store_returns.dat",
+    "catalog_sales_history": "catalog_sales.dat",
+    "catalog_returns_history": "catalog_returns.dat",
+    "web_sales_history": "web_sales.dat",
+    "web_returns_history": "web_returns.dat",
+    "inventory_history": "inventory.dat",
+}
 
 # -----------------------------------------------------------------------------
 # Logging
@@ -42,7 +81,9 @@ def parse_arguments():
     Parse commandline arguments.
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("schema", help="The path to the schema file (.sql)", type=str)
+    parser.add_argument(
+        "schema_file", help="The path to the schema file (.sql)", type=str
+    )
     parser.add_argument(
         "data_directory", help="The path the directory with output from dsgen", type=str
     )
@@ -133,17 +174,145 @@ def close_connection(connection):
 
 
 # -----------------------------------------------------------------------------
+# Loading Table Metadata
+# -----------------------------------------------------------------------------
+
+
+class Column:
+    """
+    The column class represents a schema column.
+    """
+
+    @staticmethod
+    def from_column_definition(column_definition: str):
+        """
+        Construct a Column from a column definition string.
+        :param The column definition string
+        :return The Column
+        """
+        return Column(*(column_definition.strip().split()[:2]))
+
+    def __init__(self, name: str, type: str):
+        """
+        Initialize a new Column instance.
+        :param name The name of the column
+        :param type The type of the column
+        """
+        self.name = name
+        self.type = type
+
+    def __str__(self):
+        """Return a string representation of the column."""
+        return f"({self.name} : {self.type})"
+
+
+class Schema:
+    """
+    The Schema class represents a table schema.
+    """
+
+    @staticmethod
+    def from_column_definitions(column_definitions: List[str]):
+        """
+        Construct a Schema instance from a list of column definitions.
+        :param column_definitions The list of column definitions
+        :return The Schema
+        """
+        return Schema([Column.from_column_definition(d) for d in column_definitions])
+
+    def __init__(self, columns: List[Column]):
+        """
+        Initialize a new Schema instance.
+        :param columns The list of columns
+        """
+        self.columns = columns
+
+    def __str__(self):
+        """Return a string representation of the schema."""
+        name_width = max(len(c.name) for c in self.columns)
+        s = "(\n"
+        for column in self.columns:
+            s += f"\t{column.name:<{name_width}} {column.type}\n"
+        s += ")"
+        return s
+
+
+class TableMeta:
+    """
+    The TableMeta class describes a table.
+    """
+
+    @staticmethod
+    def from_statement(statement: str, data_directory: str):
+        """
+        Factory function to construct a TableMeta
+        instance from a CREATE TABLE statement.
+        :param statement The statement
+        :param data_directory The path to the data directory
+        :return The TableMeta instance
+        """
+        lines = [
+            l
+            for l in statement.split("\n")
+            if l != ")" and l != "(" and len(l.strip()) > 0
+        ]
+        if not lines[0].startswith("CREATE TABLE"):
+            raise RuntimeError("Malformed schema file")
+
+        # Extract the table name
+        name = lines[0].strip("CREATE TABLE").strip()
+        if name not in TABLE_DATA_SOURCES:
+            raise RuntimeError("Unexpected table in schema")
+
+        # Extract the table columns
+        schema = Schema.from_column_definitions(lines[1:])
+        # Construct the path to the data source
+        data_source = os.path.join(data_directory, TABLE_DATA_SOURCES[name])
+
+        return TableMeta(name, schema, data_source)
+
+    def __init__(self, name: str, schema: Schema, data_source: str):
+        """
+        Initialize a new TableMeta instance.
+        :param name The name of the table
+        :param schema The table schema
+        :param data_source The path to the table data file
+        """
+        # The name of the table
+        self.name = name
+        # The table schema
+        self.schema = schema
+        # The path to the table data source
+        self.data_source = data_source
+
+    def __str__(self):
+        """Return a string representation of the table metdata."""
+        return f"{self.name}\n{self.schema}"
+
+
+def load_table_metadata(schema_file: str, data_directory: str) -> List[TableMeta]:
+    """
+    Load all SQL ProcBench schemas from the schema file.
+    :param schema The path to the schema file
+    :param data_directory The path to the data directory
+    :return A list of table metadata objects
+    """
+    with open(schema_file, "r") as f:
+        statements = [s for s in map(str.strip, f.read().split(";")) if len(s) > 0]
+        return [TableMeta.from_statement(s, data_directory) for s in statements]
+
+
+# -----------------------------------------------------------------------------
 # Main
 # -----------------------------------------------------------------------------
 
 
 def main() -> int:
     args = parse_arguments()
-    try:
-        with connection(args.db_name, "", "", args.db_host, args.db_port) as conn:
-            print("Context Manager!")
-    except RuntimeError:
-        return EXIT_FAILURE
+
+    # Load tables to in-memory representation
+    tables = load_table_metadata(args.schema_file, args.data_directory)
+    info(f"Loaded {len(tables)} tables from {args.schema_file}")
 
     return EXIT_SUCCESS
 

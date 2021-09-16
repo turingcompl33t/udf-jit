@@ -1,7 +1,3 @@
--- Create all tables in schema.
-
--- TPC-DS Fact Tables (7)
-
 CREATE TABLE store_sales
 (
     ss_sold_date_sk           INTEGER                       ,
@@ -195,8 +191,6 @@ CREATE TABLE inventory
     inv_warehouse_sk          INTEGER               		,
     inv_quantity_on_hand      INTEGER                      
 );
-
--- TPC-DS Dimension Tables (17)
 
 CREATE TABLE store
 (
@@ -523,8 +517,6 @@ CREATE TABLE time_dim
     t_sub_shift CHAR(20),
     t_meal_time CHAR(20)
 );
-
--- SQL ProcBench History Tables (7)
 
 CREATE TABLE store_sales_history
 (
