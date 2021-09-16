@@ -221,8 +221,8 @@ CREATE TABLE store
     s_state            CHAR(2),
     s_zip              CHAR(10),
     s_country          VARCHAR(20),
-    s_gmt_offset       DECIMAL(5, 2),
-    s_tax_percentage   DECIMAL(5, 2)
+    s_gmt_offset       DECIMAL(5,2),
+    s_tax_percentage   DECIMAL(5,2)
 ); 
 
 CREATE TABLE call_center
@@ -256,8 +256,8 @@ CREATE TABLE call_center
     cc_state          CHAR(2),
     cc_zip            CHAR(10),
     cc_country        VARCHAR(20),
-    cc_gmt_offset     DECIMAL(5, 2),
-    cc_tax_percentage DECIMAL(5, 2)
+    cc_gmt_offset     DECIMAL(5,2),
+    cc_tax_percentage DECIMAL(5,2)
 ); 
 
 CREATE TABLE catalog_page
@@ -299,8 +299,8 @@ CREATE TABLE web_site
     web_state           CHAR(2),
     web_zip             CHAR(10),
     web_country         VARCHAR(20),
-    web_gmt_offset      DECIMAL(5, 2),
-    web_tax_percentage  DECIMAL(5, 2)
+    web_gmt_offset      DECIMAL(5,2),
+    web_tax_percentage  DECIMAL(5,2)
 ); 
 
 CREATE TABLE web_page
@@ -336,7 +336,7 @@ CREATE TABLE warehouse
     w_state           CHAR(2),
     w_zip             CHAR(10),
     w_country         VARCHAR(20),
-    w_gmt_offset      DECIMAL(5, 2)
+    w_gmt_offset      DECIMAL(5,2)
 ); 
 
 CREATE TABLE customer
@@ -374,7 +374,7 @@ CREATE TABLE customer_address
     ca_state         CHAR(2),
     ca_zip           CHAR(10),
     ca_country       VARCHAR(20),
-    ca_gmt_offset    DECIMAL(5, 2),
+    ca_gmt_offset    DECIMAL(5,2),
     ca_location_type CHAR(20)
 ); 
 
@@ -439,8 +439,8 @@ CREATE TABLE item
     i_rec_start_date DATE,
     i_rec_end_date   DATE,
     i_item_desc      VARCHAR(200),
-    i_current_price  DECIMAL(7, 2),
-    i_wholesale_cost DECIMAL(7, 2),
+    i_current_price  DECIMAL(7,2),
+    i_wholesale_cost DECIMAL(7,2),
     i_brand_id       INTEGER,
     i_brand          CHAR(50),
     i_class_id       INTEGER,
@@ -471,7 +471,7 @@ CREATE TABLE promotion
     p_start_date_sk   INTEGER,
     p_end_date_sk     INTEGER,
     p_item_sk         INTEGER,
-    p_cost            DECIMAL(15, 2),
+    p_cost            DECIMAL(15,2),
     p_response_target INTEGER,
     p_promo_name      CHAR(50),
     p_channel_dmail   CHAR(1),

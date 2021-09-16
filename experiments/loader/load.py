@@ -190,7 +190,8 @@ class Column:
         :param The column definition string
         :return The Column
         """
-        return Column(*(column_definition.strip().split()[:2]))
+        name, type = column_definition.strip().split()[:2]
+        return Column(name, type.strip(","))
 
     def __init__(self, name: str, type: str):
         """
@@ -229,10 +230,12 @@ class Schema:
 
     def __str__(self):
         """Return a string representation of the schema."""
+        n_columns = len(self.columns)
         name_width = max(len(c.name) for c in self.columns)
         s = "(\n"
-        for column in self.columns:
-            s += f"\t{column.name:<{name_width}} {column.type}\n"
+        for idx, column in enumerate(self.columns):
+            comma = "," if idx < n_columns - 1 else ""
+            s += f"\t{column.name:<{name_width}} {column.type}{comma}\n"
         s += ")"
         return s
 
@@ -303,6 +306,87 @@ def load_table_metadata(schema_file: str, data_directory: str) -> List[TableMeta
 
 
 # -----------------------------------------------------------------------------
+# General Connection Helpers
+# -----------------------------------------------------------------------------
+
+
+def execute_query(connection, query: str):
+    """
+    Execute the query against the database instance.
+    :param connection The database connection to use
+    :param query The query text
+    """
+    cursor = connection.cursor()
+    try:
+        cursor.execute(query)
+    except OperationalError as e:
+        error(f"Failed to execute query: {e}")
+
+
+# -----------------------------------------------------------------------------
+# DDL
+# -----------------------------------------------------------------------------
+
+
+def create_table(connection, table: TableMeta):
+    """
+    Create a table.
+    :param connection The database connection
+    :param table The table metadata
+    """
+    info(f"Creating table {table.name}...")
+
+    query = f"CREATE TABLE {table.name} {table.schema};"
+    execute_query(connection, query)
+
+    info(f"Created table {table.name}")
+
+
+def create_tables(connection, tables: List[TableMeta]):
+    """
+    Create all benchmark tables.
+    :param connection The database connection
+    :param tables The list of tables to create.
+    """
+    for table in tables:
+        create_table(connection, table)
+
+
+def drop_table(connection, table: TableMeta):
+    """
+    Drop a table.
+    :param connection The database connection
+    :param table The table metadata
+    """
+    info(f"Dropping table {table.name}...")
+
+    query = f"DROP TABLE IF EXISTS {table.name};"
+    execute_query(connection, query)
+
+    info(f"Dropped table {table.name}")
+
+
+def drop_tables(connection, tables: List[TableMeta]):
+    """
+    Drop all benchmark tables.
+    :param connection The database connection
+    :param tables The list of tables to drop.
+    """
+    for table in tables:
+        drop_table(connection, table)
+
+
+def setup_tables(connection, tables: List[TableMeta]):
+    """
+    Ensure all benchmark tables are created.
+    :param connection The database connection
+    :param tables The list of table metdata objects
+    """
+    drop_tables(connection, tables)
+    create_tables(connection, tables)
+
+
+# -----------------------------------------------------------------------------
 # Main
 # -----------------------------------------------------------------------------
 
@@ -313,6 +397,9 @@ def main() -> int:
     # Load tables to in-memory representation
     tables = load_table_metadata(args.schema_file, args.data_directory)
     info(f"Loaded {len(tables)} tables from {args.schema_file}")
+
+    with connection(args.db_name, "", "", args.db_host, args.db_port) as conn:
+        setup_tables(conn, tables)
 
     return EXIT_SUCCESS
 
