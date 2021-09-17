@@ -1,5 +1,25 @@
-# load.py
-# A data loader for NoisePage.
+# loader.py
+# A data loader for SQL ProcBench benchmark.
+#
+# usage: loader.py [-h] [--create-only] [--db-user DB_USER]
+#                  [--db-password DB_PASSWORD] [--db-name DB_NAME]
+#                  [--db-host DB_HOST] [--db-port DB_PORT]
+#                  schema_file data_directory
+#
+# positional arguments:
+#   schema_file           The path to the schema file (.sql)
+#   data_directory        The path the directory with output from dsgen
+#
+# optional arguments:
+#   -h, --help            show this help message and exit
+#   --create-only         Create tables only (do not load data)
+#   --db-user DB_USER     The database user (default:
+#   --db-password DB_PASSWORD
+#                         The database user password (default: )
+#   --db-name DB_NAME     The database name (default: noisepage)
+#   --db-host DB_HOST     The database server host (default: localhost)
+#   --db-port DB_PORT     The database server port (default: 15721)
+
 
 import os
 import sys
@@ -7,6 +27,7 @@ import argparse
 import psycopg2
 from contextlib import contextmanager
 
+from tqdm import tqdm
 from typing import List
 from psycopg2 import OperationalError
 
@@ -91,6 +112,11 @@ def parse_arguments():
     )
     parser.add_argument(
         "data_directory", help="The path the directory with output from dsgen", type=str
+    )
+    parser.add_argument(
+        "--create-only",
+        help="Create tables only (do not load data)",
+        action="store_true",
     )
     parser.add_argument(
         "--db-user",
@@ -453,8 +479,9 @@ def load_table(connection, table: TableMeta):
     layout += ")"
 
     base_query = f"INSERT INTO {layout} VALUES {{}}"
-    with open(table.data_source, "r") as f:
-        for line in f:
+    line_count = sum(1 for line in open(table.data_source, "r"))
+    with open(table.data_source, "r", encoding="latin-1") as f:
+        for line in tqdm(f, total=line_count):
             value = format_value(line, table.schema)
             query = base_query.format(value)
             execute_query(connection, query)
@@ -489,12 +516,16 @@ def main() -> int:
     with connection(
         args.db_name, args.db_user, args.db_password, args.db_host, args.db_port
     ) as conn:
+        conn.autocommit = True
         # Initialize tables
         setup_tables(conn, tables)
-        # Load from generated data
-        load_tables(conn, tables)
+
+        if not args.create_only:
+            # Load from generated data
+            load_tables(conn, tables)
 
     info("Database loading complete!")
+
     return EXIT_SUCCESS
 
 
