@@ -15,9 +15,14 @@ EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
 
 # Database connection defaults
+DEFAULT_DB_USER = ""
+DEFAULT_DB_PASS = ""
 DEFAULT_DB_NAME = "noisepage"
 DEFAULT_DB_HOST = "localhost"
 DEFAULT_DB_PORT = "15721"
+
+# The column delimiter in data source files
+DATA_SOURCE_FILE_DELIMITER = "|"
 
 # Maps from table name -> table data filename
 TABLE_DATA_SOURCES = {
@@ -88,6 +93,18 @@ def parse_arguments():
         "data_directory", help="The path the directory with output from dsgen", type=str
     )
     parser.add_argument(
+        "--db-user",
+        help=f"The database user (default: {DEFAULT_DB_USER}",
+        type=str,
+        default=DEFAULT_DB_USER,
+    )
+    parser.add_argument(
+        "--db-password",
+        help=f"The database user password (default: {DEFAULT_DB_PASS})",
+        type=str,
+        default=DEFAULT_DB_PASS,
+    )
+    parser.add_argument(
         "--db-name",
         help=f"The database name (default: {DEFAULT_DB_NAME})",
         type=str,
@@ -136,8 +153,7 @@ def open_connection(
     db_name: str, db_user: str, db_password: str, db_host: str, db_port: str
 ):
     """
-    Create a connection to the NoisePage server instance.
-    NOTE: I took this straight from the RealPython article.
+    Create a connection to the database server instance.
     :param db_name The database name
     :param db_user The database user
     :param db_password The user password
@@ -147,7 +163,7 @@ def open_connection(
     :raise RuntimeError in the event the connection fails
     """
     connection = None
-    info(f"Connecting to NoisePage server at {db_host}:{db_port}...")
+    info(f"Connecting to database server at {db_host}:{db_port}...")
     try:
         connection = psycopg2.connect(
             database=db_name,
@@ -156,9 +172,9 @@ def open_connection(
             host=db_host,
             port=db_port,
         )
-        info("Connection to NoisePage server successful")
+        info("Connection to database server successful")
     except OperationalError as e:
-        error(f"Failed to connect to NoisePage server: {e}")
+        error(f"Failed to connect to database server: {e}")
         raise RuntimeError("")
     return connection
 
@@ -170,7 +186,7 @@ def close_connection(connection):
     """
     if connection is not None:
         connection.close()
-        info("Connection to NoisePage server closed")
+        info("Connection to database server closed")
 
 
 # -----------------------------------------------------------------------------
@@ -324,7 +340,7 @@ def execute_query(connection, query: str):
 
 
 # -----------------------------------------------------------------------------
-# DDL
+# Table Create and Drop
 # -----------------------------------------------------------------------------
 
 
@@ -387,20 +403,98 @@ def setup_tables(connection, tables: List[TableMeta]):
 
 
 # -----------------------------------------------------------------------------
+# Data Loading
+# -----------------------------------------------------------------------------
+
+
+def requires_quote(column_type: str) -> bool:
+    """
+    Determine if the column type requires quotation.
+    :param column_type The type of the column, as a string.
+    :return `True` if the column value requires quotation
+    """
+    return "VARCHAR" in column_type or "CHAR" in column_type or "DATE" in column_type
+
+
+def format_value(line: str, schema: Schema) -> str:
+    """
+    Format a value suitable for insert
+    from a raw data source file line.
+    :param line The input line
+    :param schema The table schema
+    :return The formatted value
+    """
+    # Handle missing values in generated data
+    fields = [
+        field if len(field) > 0 else "NULL"
+        for field in line.split(DATA_SOURCE_FILE_DELIMITER)
+    ]
+    # Handle string values (enclose in quotes)
+    fields = [
+        f"'{field}'" if requires_quote(column.type) and field != "NULL" else field
+        for field, column in zip(fields, schema.columns)
+    ]
+    # Join the fields into a single value
+    return f"({','.join(fields).strip().strip(',')})"
+
+
+def load_table(connection, table: TableMeta):
+    """
+    Load a table.
+    :param connection The database connection
+    :param table The table metadata object
+    """
+    info(f"Loading table {table.name}...")
+
+    layout = f"{table.name}("
+    for idx, column in enumerate(table.schema.columns):
+        comma = "," if idx < len(table.schema.columns) - 1 else ""
+        layout += f"{column.name}{comma}"
+    layout += ")"
+
+    base_query = f"INSERT INTO {layout} VALUES {{}}"
+    with open(table.data_source, "r") as f:
+        for line in f:
+            value = format_value(line, table.schema)
+            query = base_query.format(value)
+            execute_query(connection, query)
+
+    info(f"Loaded table {table.name}")
+
+
+def load_tables(connection, tables: List[TableMeta]):
+    """
+    Load all benchmark tables.
+    :param connection The database connection
+    :param table The list of table metadata objects
+    """
+    for table in tables:
+        load_table(connection, table)
+
+
+# -----------------------------------------------------------------------------
 # Main
 # -----------------------------------------------------------------------------
 
 
 def main() -> int:
+    """Run the program."""
+
     args = parse_arguments()
 
     # Load tables to in-memory representation
     tables = load_table_metadata(args.schema_file, args.data_directory)
     info(f"Loaded {len(tables)} tables from {args.schema_file}")
 
-    with connection(args.db_name, "", "", args.db_host, args.db_port) as conn:
+    with connection(
+        args.db_name, args.db_user, args.db_password, args.db_host, args.db_port
+    ) as conn:
+        # Initialize tables
         setup_tables(conn, tables)
+        # Load from generated data
+        load_tables(conn, tables)
 
+    info("Database loading complete!")
     return EXIT_SUCCESS
 
 
