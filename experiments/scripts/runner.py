@@ -7,6 +7,7 @@ import time
 import argparse
 import subprocess
 
+from tqdm import tqdm
 from typing import List
 
 # Exit codes
@@ -62,6 +63,11 @@ def parse_arguments():
         help=f"The number of iterations run for each function (default: {DEFAULT_N_ITERATIONS})",
         type=int,
         default=DEFAULT_N_ITERATIONS,
+    )
+    parser.add_argument(
+        "--function",
+        help="The function identifer for a specfic function to test",
+        type=str,
     )
     parser.add_argument(
         "--db-user", help="The database user", type=str, default=DEFAULT_DB_USER
@@ -244,8 +250,11 @@ def benchmark_function(
     :param function The function metadata
     :param iterations The number of iterations
     """
+
+    info(f"Benchmarking function {function.function_id}...")
+
     durations = []
-    for _ in range(iterations):
+    for _ in tqdm(range(iterations)):
         start = time.time()
         p = subprocess.run(
             [*psql_connection(conn_meta), "-f", function.invocation_file],
@@ -256,6 +265,8 @@ def benchmark_function(
         if p.returncode != EXIT_SUCCESS:
             raise RuntimeError("Failed to execute query")
         durations.append(stop - start)
+
+    info(f"Completed benchmark for function {function.function_id}")
 
     return BenchmarkResult(function.function_id, sum(durations) / len(durations))
 
@@ -280,19 +291,30 @@ def benchmark_functions(
 def main() -> int:
     args = parse_arguments()
 
+    if args.function is not None and args.function not in FUNCTION_IDS:
+        error(f"Invalid function: {args.function}")
+        return EXIT_FAILURE
+
     # Save database connection information
     conn_meta = ConnectionMeta(
         args.db_user, args.db_password, args.db_name, args.db_host, args.db_port
     )
 
     # Load function metatdata
-    functions = [FunctionMeta.from_id(fn_id) for fn_id in FUNCTION_IDS]
+    functions = [args.function] if args.function is not None else FUNCTION_IDS
+    functions = [FunctionMeta.from_id(fn_id) for fn_id in functions]
 
     # Load functions
     load_functions(conn_meta, functions)
 
     # Run benchmarks
     results = benchmark_functions(conn_meta, functions, args.iterations)
+
+    # Record results
+    with open(args.results_out, "w") as f:
+        for result in results:
+            f.write(f"{result}\n")
+
     for result in results:
         print(result)
 

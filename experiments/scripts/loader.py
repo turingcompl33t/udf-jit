@@ -211,6 +211,7 @@ def close_connection(connection):
     :param connection The connection
     """
     if connection is not None:
+        connection.commit()
         connection.close()
         info("Connection to database server closed")
 
@@ -370,6 +371,19 @@ def execute_query(connection, query: str):
 # -----------------------------------------------------------------------------
 
 
+def find_table(name: str, tables: List[TableMeta]) -> TableMeta:
+    """
+    Find the table identified by `name`.
+    :param name The name of the desired table
+    :param tables The collection of tables
+    :return The requested table, or `None` if not found
+    """
+    for table in tables:
+        if table.name == name:
+            return table
+    return None
+
+
 def create_table(connection, table: TableMeta):
     """
     Create a table.
@@ -442,6 +456,15 @@ def requires_quote(column_type: str) -> bool:
     return "VARCHAR" in column_type or "CHAR" in column_type or "DATE" in column_type
 
 
+def escape_quotes(field: str) -> str:
+    """
+    Escape a single quotation mark in string value.
+    :param field The input field
+    :return The escaped string
+    """
+    return "".join("" if c == "'" else c for c in field)
+
+
 def format_value(line: str, schema: Schema) -> str:
     """
     Format a value suitable for insert
@@ -455,6 +478,8 @@ def format_value(line: str, schema: Schema) -> str:
         field if len(field) > 0 else "NULL"
         for field in line.split(DATA_SOURCE_FILE_DELIMITER)
     ]
+    # Escape individual quotation marks
+    fields = [escape_quotes(field) for field in fields]
     # Handle string values (enclose in quotes)
     fields = [
         f"'{field}'" if requires_quote(column.type) and field != "NULL" else field
@@ -479,7 +504,7 @@ def load_table(connection, table: TableMeta):
     layout += ")"
 
     base_query = f"INSERT INTO {layout} VALUES {{}}"
-    line_count = sum(1 for line in open(table.data_source, "r"))
+    line_count = sum(1 for line in open(table.data_source, "r", encoding="latin-1"))
     with open(table.data_source, "r", encoding="latin-1") as f:
         for line in tqdm(f, total=line_count):
             value = format_value(line, table.schema)
@@ -516,10 +541,8 @@ def main() -> int:
     with connection(
         args.db_name, args.db_user, args.db_password, args.db_host, args.db_port
     ) as conn:
-        conn.autocommit = True
         # Initialize tables
         setup_tables(conn, tables)
-
         if not args.create_only:
             # Load from generated data
             load_tables(conn, tables)

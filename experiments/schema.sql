@@ -444,6 +444,7 @@ CREATE TABLE item
     i_brand_id       INTEGER,
     i_brand          CHAR(50),
     i_class_id       INTEGER,
+    i_class          CHAR(50),
     i_category_id    INTEGER,
     i_category       CHAR(50),
     i_manufact_id    INTEGER,
