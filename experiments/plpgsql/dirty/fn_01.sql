@@ -1,6 +1,6 @@
 -- SQL ProcBench Scalar UDF 01: "Total Large Purchases"
 
-CREATE OR REPLACE FUNCTION totalLargePurchases(givenState CHAR, amount FLOAT8, yr INT, qtr INT) RETURNS FLOAT8 AS $$
+CREATE OR REPLACE FUNCTION totalLargePurchases(givenState VARCHAR, amount FLOAT8, yr INT, qtr INT) RETURNS FLOAT8 AS $$
 DECLARE
     largePurchase FLOAT8;
 BEGIN
