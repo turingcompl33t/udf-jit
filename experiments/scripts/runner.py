@@ -16,9 +16,6 @@ EXIT_FAILURE = 1
 
 # The list of function identifiers
 FUNCTION_IDS = ["01", "04", "05", "06", "11", "13", "20a"]
-# The relative path to the directory containing
-# the function definitions and invoking queries
-FUNCTIONS_DIR = "../plpgsql/"
 
 # The default number of iterations for each benchmark
 DEFAULT_N_ITERATIONS = 1
@@ -53,6 +50,7 @@ def error(message: str):
 def parse_arguments():
     """Parse commandline arguments."""
     parser = argparse.ArgumentParser()
+    parser.add_argument("functions_dir", help="The path to the directory containing functions", type=str)
     parser.add_argument(
         "results_out",
         help="The path to the file to which results are written",
@@ -130,14 +128,15 @@ class FunctionMeta:
     """
 
     @staticmethod
-    def from_id(function_id: str):
+    def from_id(functions_dir: str, function_id: str):
         """
         Load a function metdata instance from a function ID.
+        :param functions_dir The path to the directory in which functions are located
         :param function_id The function identifier
         :return The FunctionMeta instance
         """
-        definition_path = os.path.join(FUNCTIONS_DIR, f"fn_{function_id}.sql")
-        invocation_path = os.path.join(FUNCTIONS_DIR, f"invoke_{function_id}.sql")
+        definition_path = os.path.join(functions_dir, f"fn_{function_id}.sql")
+        invocation_path = os.path.join(functions_dir, f"invoke_{function_id}.sql")
         return FunctionMeta(function_id, definition_path, invocation_path)
 
     def __init__(self, function_id: str, definition_file: str, invocation_file: str):
@@ -302,7 +301,7 @@ def main() -> int:
 
     # Load function metatdata
     functions = [args.function] if args.function is not None else FUNCTION_IDS
-    functions = [FunctionMeta.from_id(fn_id) for fn_id in functions]
+    functions = [FunctionMeta.from_id(args.functions_dir, fn_id) for fn_id in functions]
 
     # Load functions
     load_functions(conn_meta, functions)
