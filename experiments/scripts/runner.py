@@ -21,7 +21,7 @@ FUNCTION_IDS = ["01", "04", "05", "06", "11", "13", "20a"]
 FUNCTIONS_DIR = "../plpgsql/"
 
 # The default number of iterations for each benchmark
-DEFAULT_N_ITERATIONS = 5
+DEFAULT_N_ITERATIONS = 1
 
 # The default database connection parameters
 DEFAULT_DB_USER = "postgres"
