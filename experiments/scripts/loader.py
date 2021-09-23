@@ -25,7 +25,10 @@ import os
 import sys
 import argparse
 import psycopg2
+import multiprocessing
+import concurrent.futures
 from contextlib import contextmanager
+from concurrent.futures import ThreadPoolExecutor
 
 from tqdm import tqdm
 from typing import List
@@ -331,6 +334,10 @@ class TableMeta:
         # The path to the table data source
         self.data_source = data_source
 
+    def line_count(self) -> int:
+        """Return the line count for the source file."""
+        return sum(1 for _ in open(self.data_source, "r", encoding="latin-1"))
+
     def __str__(self):
         """Return a string representation of the table metdata."""
         return f"{self.name}\n{self.schema}"
@@ -489,14 +496,13 @@ def format_value(line: str, schema: Schema) -> str:
     return f"({','.join(fields).strip().strip(',')})"
 
 
-def load_table(connection, table: TableMeta):
+def load_table(connection, table: TableMeta, pbar):
     """
     Load a table.
     :param connection The database connection
     :param table The table metadata object
+    :param pbar The progress bar object from tqdm
     """
-    info(f"Loading table {table.name}...")
-
     layout = f"{table.name}("
     for idx, column in enumerate(table.schema.columns):
         comma = "," if idx < len(table.schema.columns) - 1 else ""
@@ -504,14 +510,12 @@ def load_table(connection, table: TableMeta):
     layout += ")"
 
     base_query = f"INSERT INTO {layout} VALUES {{}}"
-    line_count = sum(1 for line in open(table.data_source, "r", encoding="latin-1"))
     with open(table.data_source, "r", encoding="latin-1") as f:
-        for line in tqdm(f, total=line_count):
+        for line in f:
             value = format_value(line, table.schema)
             query = base_query.format(value)
             execute_query(connection, query)
-
-    info(f"Loaded table {table.name}")
+            pbar.update(1)
 
 
 def load_tables(connection, tables: List[TableMeta]):
@@ -520,8 +524,15 @@ def load_tables(connection, tables: List[TableMeta]):
     :param connection The database connection
     :param table The list of table metadata objects
     """
-    for table in tables:
-        load_table(connection, table)
+    # Compute the total line count across all source files
+    total_line_count = sum(table.line_count() for table in tables)
+
+    with tqdm(total=total_line_count) as pbar:
+        with ThreadPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
+            futures = [
+                executor.submit(load_table, connection, table, pbar) for table in tables
+            ]
+            concurrent.futures.wait(futures)
 
 
 # -----------------------------------------------------------------------------
