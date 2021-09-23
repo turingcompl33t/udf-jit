@@ -1,3 +1,4 @@
 env/
+creds/
 experiments/loader/data/
 script/sql/libpg_query/
