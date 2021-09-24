@@ -1,8 +1,8 @@
 -- SQL ProcBench Scalar UDF 04: "Generate Random Integer"
 
-CREATE OR REPLACE FUNCTION genRandomInt(lower INT, upper INT, rand FLOAT) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION genRandomInt(lower INT, upper INT, rand FLOAT) RETURNS FLOAT AS $$
 DECLARE
-    result INT;
+    result FLOAT;
     range INT;
 BEGIN
   range := upper - lower + 1;
