@@ -1,12 +1,10 @@
 -- SQL ProcBench Scalar UDF 05: "Morning to Evening Ratio"
 
-CREATE OR REPLACE FUNCTION morningToEveRatio(dep INT) RETURNS FLOAT AS $$
+CREATE OR REPLACE FUNCTION morningToEveRatio(dep INT) RETURNS INT AS $$
 DECLARE
 	morningSale INT;
 	eveningSale INT;
-	morningSaleFloat FLOAT;
-	eveningSaleFloat FLOAT;
-	ratio FLOAT;
+	totalSale INT;
 BEGIN
 	morningSale := (SELECT COUNT(*)
 		FROM web_sales_history, time_dim, customer_demographics
@@ -22,9 +20,7 @@ BEGIN
 			AND t_hour >= 19 AND t_hour <= 20
 			AND cd_dep_count = dep);
 
-	morningSaleFloat := CAST(morningSale AS FLOAT);
-	eveningSaleFloat := CAST(eveningSale AS FLOAT);
-	ratio :=  morningSaleFloat / eveningSaleFloat; 
-	RETURN ratio;
+	totalSale := morningSale + eveningSale;
+	RETURN totalSale;
 end; 
 $$ LANGUAGE PLPGSQL;
