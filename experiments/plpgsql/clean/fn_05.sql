@@ -4,6 +4,8 @@ CREATE OR REPLACE FUNCTION morningToEveRatio(dep INT) RETURNS FLOAT AS $$
 DECLARE
 	morningSale INT;
 	eveningSale INT;
+	morningSaleFloat FLOAT;
+	eveningSaleFloat FLOAT;
 	ratio FLOAT;
 BEGIN
 	morningSale := (SELECT COUNT(*)
@@ -20,7 +22,9 @@ BEGIN
 			AND t_hour >= 19 AND t_hour <= 20
 			AND cd_dep_count = dep);
 
-	ratio := CAST(morningSale AS FLOAT) / CAST(eveningSale AS FLOAT);
+	morningSaleFloat := CAST(morningSale AS FLOAT);
+	eveningSaleFloat := CAST(eveningSale AS FLOAT);
+	ratio :=  morningSaleFloat / eveningSaleFloat; 
 	RETURN ratio;
 end; 
 $$ LANGUAGE PLPGSQL;
