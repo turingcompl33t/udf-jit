@@ -6,17 +6,21 @@
 
 CREATE OR REPLACE FUNCTION genRandomChar(chars VARCHAR, rand FLOAT) RETURNS VARCHAR AS $$
 DECLARE
-    rslt CHAR(1) := NULL;
-    resultIndex INT := NULL;
+    r VARCHAR;
+    i INT;
+    l INT;
 BEGIN
     IF chars IS NULL THEN
-        rslt := NULL;
-    ELSIF LENGTH(chars) = 0 THEN
-        rslt := NULL;
+        r := NULL;
     ELSE
-        resultIndex := genRandomInt(1, LENGTH(chars), rand);
-        rslt := SUBSTR(chars, resultIndex, 1);
+        IF LENGTH(chars) = 0 THEN
+            r := NULL;
+        ELSE
+            l = LENGTH(chars);
+            i := genRandomInt(1, l, rand);
+            r := SUBSTR(chars, i, 1);
+        END IF;
     END IF;
-    RETURN rslt;
+    RETURN r;
 END; 
 $$ LANGUAGE PLPGSQL;

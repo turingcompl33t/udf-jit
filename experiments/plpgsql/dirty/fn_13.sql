@@ -1,11 +1,11 @@
 -- SQL ProcBench Scalar UDF 13: "Max Purchase Channel"
 
-CREATE OR REPLACE function maxpurchasechannel(ckey INT, fromdatesk INT, todatesk INT) RETURNS VARCHAR(50) AS $$
+CREATE OR REPLACE function maxpurchasechannel(ckey INT, fromdatesk INT, todatesk INT) RETURNS VARCHAR AS $$
 DECLARE
     numsalesfromstore   INT;
     numSalesFromCatalog INT;
     numSalesFromWeb     INT;
-    maxChannel          VARCHAR(50);
+    maxChannel          VARCHAR;
 BEGIN
     SELECT COUNT(*)
         INTO   numsalesfromstore
