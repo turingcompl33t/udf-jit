@@ -1,4 +1,5 @@
 env/
 creds/
 experiments/loader/data/
+experiments/loader/subset/
 script/sql/libpg_query/

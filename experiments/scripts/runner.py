@@ -18,7 +18,7 @@ EXIT_FAILURE = 1
 FUNCTION_IDS = ["01", "04", "05", "06", "11", "13", "20a"]
 
 # The default number of iterations for each benchmark
-DEFAULT_N_ITERATIONS = 1
+DEFAULT_N_ITERATIONS = 5
 
 # The default database connection parameters
 DEFAULT_DB_USER = "postgres"
