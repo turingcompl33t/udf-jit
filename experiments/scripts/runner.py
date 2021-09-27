@@ -253,7 +253,7 @@ def benchmark_function(
     info(f"Benchmarking function {function.function_id}...")
 
     durations = []
-    for _ in tqdm(range(iterations)):
+    for iter in tqdm(range(iterations)):
         start = time.time()
         p = subprocess.run(
             [*psql_connection(conn_meta), "-f", function.invocation_file],
@@ -263,7 +263,10 @@ def benchmark_function(
         stop = time.time()
         if p.returncode != EXIT_SUCCESS:
             raise RuntimeError("Failed to execute query")
-        durations.append(stop - start)
+        duration = stop - start
+        durations.append(duration)
+
+        info(f"Ran iteration {iter} for function {function.function_id} in {duration} seconds")
 
     info(f"Completed benchmark for function {function.function_id}")
 
