@@ -4,10 +4,6 @@
 import time
 import subprocess
 
-# Default arguments for the DBMS server
-DEFAULT_DB_HOST = "localhost"
-DEFAULT_DB_PORT = "15721"
-
 # -----------------------------------------------------------------------------
 # NoisePageServer
 
@@ -17,9 +13,7 @@ class NoisePageServer:
     NoisePageServer represents a NoisePage DBMS instance.
     """
 
-    def __init__(
-        self, binary_path: str, host: str = DEFAULT_DB_HOST, port: str = DEFAULT_DB_PORT
-    ):
+    def __init__(self, binary_path: str, host: str, port: str):
         """
         Initialize a new DBMS server instance.
         :param binary_path The path to the NoisePage binary
@@ -35,9 +29,7 @@ class NoisePageServer:
         """
         Start the NoisePage server instance.
         """
-        start_time = time.time()
         db_process = subprocess.run([f"{self.binary_path}"], capture_output=True)
-
         check_line = f"NoisePage - Self-Driving Database Management System [port={self.db_port}] [PID={db_process.pid}]"
 
         while True:

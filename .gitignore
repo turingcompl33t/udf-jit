@@ -3,3 +3,7 @@ creds/
 experiments/loader/data/
 experiments/loader/subset/
 script/sql/libpg_query/
+__pycache__/
+
+experiments/scripts/out.txt
+experiments/scripts/subset/

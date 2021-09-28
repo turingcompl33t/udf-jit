@@ -50,9 +50,11 @@ def error(message: str):
 def parse_arguments():
     """Parse commandline arguments."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("functions_dir", help="The path to the directory containing functions", type=str)
     parser.add_argument(
-        "results_out",
+        "functions_dir", help="The path to the directory containing functions", type=str
+    )
+    parser.add_argument(
+        "--results_out",
         help="The path to the file to which results are written",
         type=str,
     )
@@ -65,6 +67,11 @@ def parse_arguments():
     parser.add_argument(
         "--function",
         help="The function identifer for a specfic function to test",
+        type=str,
+    )
+    parser.add_argument(
+        "--exclude",
+        help="A common-separated list of function identifiers to exclude",
         type=str,
     )
     parser.add_argument(
@@ -91,7 +98,17 @@ def parse_arguments():
         type=str,
         default=DEFAULT_DB_PORT,
     )
+    parser.add_argument("--verbose", help="Enable verbose output", action="store_true")
     return parser.parse_args()
+
+
+def parse_exclude_list(exclude_list: str) -> List[str]:
+    """
+    Parse the comma-separated string of functions to exclude to a list.
+    :param exclude_list The comma-separated string
+    :return A list of the individual function IDs
+    """
+    return exclude_list.split(",")
 
 
 # -----------------------------------------------------------------------------
@@ -206,11 +223,12 @@ def psql_connection(conn_meta: ConnectionMeta) -> List[str]:
 # -----------------------------------------------------------------------------
 
 
-def load_function(conn_meta: ConnectionMeta, function: FunctionMeta):
+def load_function(conn_meta: ConnectionMeta, function: FunctionMeta, verbose: bool):
     """
     Load a function into the database.
     :param conn_meta The connection metadata
     :param function The function metadata
+    :param verbose Enable verbose output
     """
     info(f"Loading function {function.function_id}...")
 
@@ -222,17 +240,21 @@ def load_function(conn_meta: ConnectionMeta, function: FunctionMeta):
     if p.returncode != EXIT_SUCCESS:
         raise RuntimeError(f"Failed to load function {function.function_id}")
 
-    info(f"Loaded function {function.function_id}")
+    if verbose:
+        info(f"Loaded function {function.function_id}")
 
 
-def load_functions(conn_meta: ConnectionMeta, functions: List[FunctionMeta]):
+def load_functions(
+    conn_meta: ConnectionMeta, functions: List[FunctionMeta], verbose: bool
+):
     """
     Load all functions from the benchmark.
     :param conn_meta The connection metadata
     :param functions The list of function metadata objects
+    :param verbose Enable verbose output
     """
     for function in functions:
-        load_function(conn_meta, function)
+        load_function(conn_meta, function, verbose)
 
 
 # -----------------------------------------------------------------------------
@@ -241,16 +263,18 @@ def load_functions(conn_meta: ConnectionMeta, functions: List[FunctionMeta]):
 
 
 def benchmark_function(
-    conn_meta: ConnectionMeta, function: FunctionMeta, iterations: int
+    conn_meta: ConnectionMeta, function: FunctionMeta, iterations: int, verbose: bool
 ) -> BenchmarkResult:
     """
     Benchmark a single function.
     :param The connection metadata
     :param function The function metadata
     :param iterations The number of iterations
+    :param verbose Enable verbose output
     """
 
-    info(f"Benchmarking function {function.function_id}...")
+    if verbose:
+        info(f"Benchmarking function {function.function_id}...")
 
     durations = []
     for iter in tqdm(range(iterations)):
@@ -266,23 +290,31 @@ def benchmark_function(
         duration = stop - start
         durations.append(duration)
 
-        info(f"Ran iteration {iter} for function {function.function_id} in {duration} seconds")
+        if verbose:
+            info(
+                f"Ran iteration {iter} for function {function.function_id} in {duration} seconds"
+            )
 
-    info(f"Completed benchmark for function {function.function_id}")
+    if verbose:
+        info(f"Completed benchmark for function {function.function_id}")
 
     return BenchmarkResult(function.function_id, sum(durations) / len(durations))
 
 
 def benchmark_functions(
-    conn_meta: ConnectionMeta, functions: List[FunctionMeta], iterations: int
+    conn_meta: ConnectionMeta,
+    functions: List[FunctionMeta],
+    iterations: int,
+    verbose: bool,
 ) -> List[BenchmarkResult]:
     """
     Benchmark all functions.
     :param The connection metadata
     :param functions The list of function metadata objects
-    :param The number of iterations
+    :param iterations The number of iterations
+    :param verbose Enable verbose output
     """
-    return [benchmark_function(conn_meta, f, iterations) for f in functions]
+    return [benchmark_function(conn_meta, f, iterations, verbose) for f in functions]
 
 
 # -----------------------------------------------------------------------------
@@ -304,21 +336,28 @@ def main() -> int:
 
     # Load function metatdata
     functions = [args.function] if args.function is not None else FUNCTION_IDS
+    functions = [
+        fn_id for fn_id in functions if fn_id not in parse_exclude_list(args.exclude)
+    ]
+    if len(functions) == 0:
+        error("No functions to test")
+        return EXIT_FAILURE
+
     functions = [FunctionMeta.from_id(args.functions_dir, fn_id) for fn_id in functions]
 
     # Load functions
-    load_functions(conn_meta, functions)
+    load_functions(conn_meta, functions, args.verbose)
 
     # Run benchmarks
-    results = benchmark_functions(conn_meta, functions, args.iterations)
+    results = benchmark_functions(conn_meta, functions, args.iterations, args.verbose)
 
     # Record results
-    with open(args.results_out, "w") as f:
-        for result in results:
-            f.write(f"{result}\n")
+    if args.results_out is not None:
+        with open(args.results_out, "w") as f:
+            f.write("\n".join([f"{r}" for r in results]))
 
-    for result in results:
-        print(result)
+    # Write results to standard output
+    sys.stdout.write("\n".join([f"{r}" for r in results]))
 
     return EXIT_SUCCESS
 
