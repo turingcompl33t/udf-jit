@@ -34,7 +34,7 @@ EXCLUDED_FUNCTIONS = "06,13"
 
 # The parameters for database subset sizes
 MIN_SUBSET_SIZE = 5
-MAX_SUBSET_SIZE = 5
+MAX_SUBSET_SIZE = 100
 SUBSET_SIZE_STEP = 5
 
 # The name of the directory that contains database subset
