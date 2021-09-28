@@ -34,7 +34,7 @@ EXCLUDED_FUNCTIONS = "06,13"
 
 # The parameters for database subset sizes
 MIN_SUBSET_SIZE = 5
-MAX_SUBSET_SIZE = 100
+MAX_SUBSET_SIZE = 5
 SUBSET_SIZE_STEP = 5
 
 # The name of the directory that contains database subset
@@ -186,6 +186,10 @@ def stop_noisepage(config: BenchmarkConfig):
         raise RuntimeError("Missing server handle")
     config.server_handle.stop()
     config.server_handle = None
+
+    # Remove the write-ahead log file;
+    # assumes the WAL is written in CWD
+    os.remove("wal.log")
 
 
 def start_server(config: BenchmarkConfig):
@@ -349,19 +353,19 @@ def main() -> int:
             POSTGRES_DB_PASS,
             POSTGRES_DB_NAME,
             args.data_dir,
-        )
+        ),
+        BenchmarkConfig(
+            System.NOISEPAGE,
+            args.noisepage_bin,
+            NOISEPAGE_DB_HOST,
+            NOISEPAGE_DB_PORT,
+            NOISEPAGE_DB_USER,
+            NOISEPAGE_DB_PASS,
+            NOISEPAGE_DB_NAME,
+            args.data_dir,
+        ),
     ]
 
-    # BenchmarkConfig(
-    #     System.NOISEPAGE,
-    #     args.noisepage_bin,
-    #     NOISEPAGE_DB_HOST,
-    #     NOISEPAGE_DB_PORT,
-    #     NOISEPAGE_DB_USER,
-    #     NOISEPAGE_DB_PASS,
-    #     NOISEPAGE_DB_NAME,
-    #     args.data_dir,
-    # ),
     try:
         run_configurations(configs)
     except RuntimeError as e:

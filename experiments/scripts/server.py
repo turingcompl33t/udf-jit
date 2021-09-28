@@ -29,7 +29,9 @@ class NoisePageServer:
         """
         Start the NoisePage server instance.
         """
-        db_process = subprocess.run([f"{self.binary_path}"], capture_output=True)
+        db_process = subprocess.Popen(
+            [f"{self.binary_path}"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
         check_line = f"NoisePage - Self-Driving Database Management System [port={self.db_port}] [PID={db_process.pid}]"
 
         while True:
