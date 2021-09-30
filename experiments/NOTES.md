@@ -1,6 +1,10 @@
 ### Function 06
 
-Function 06 fails with the same error as Function 13, yet both of the individual queries work correctly. Need to dump the generated code to see where it is going wrong.
+Function 06 fails with the same error as Function 13, also in the storage layer:
+
+```sql
+SELECT AVG(ws_ext_discount_amt) FROM web_sales_history, item WHERE ws_item_sk = i_item_sk AND i_manufact_id = 0;
+```
 
 ### Function 13
 
