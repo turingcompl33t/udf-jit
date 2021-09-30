@@ -65,8 +65,8 @@ def parse_arguments():
         default=DEFAULT_N_ITERATIONS,
     )
     parser.add_argument(
-        "--function",
-        help="The function identifer for a specfic function to test",
+        "--include",
+        help="A comma-separated list of function identifiers to include",
         type=str,
     )
     parser.add_argument(
@@ -102,13 +102,22 @@ def parse_arguments():
     return parser.parse_args()
 
 
+def parse_include_list(include_list: str) -> List[str]:
+    """
+    Parse the comma-separated string of functions to include to a list.
+    :param include_list The comma-separated string
+    :return A list of the individual function IDs
+    """
+    return FUNCTION_IDS if include_list is None else include_list.split(",")
+
+
 def parse_exclude_list(exclude_list: str) -> List[str]:
     """
     Parse the comma-separated string of functions to exclude to a list.
     :param exclude_list The comma-separated string
     :return A list of the individual function IDs
     """
-    return exclude_list.split(",")
+    return [] if exclude_list is None else exclude_list.split(",")
 
 
 # -----------------------------------------------------------------------------
@@ -154,6 +163,11 @@ class FunctionMeta:
         """
         definition_path = os.path.join(functions_dir, f"fn_{function_id}.sql")
         invocation_path = os.path.join(functions_dir, f"invoke_{function_id}.sql")
+        if not os.path.exists(definition_path):
+            raise RuntimeError(f"Function definition {definition_path} is missing")
+        if not os.path.exists(invocation_path):
+            raise RuntimeError(f"Function invocation {invocation_path} is missing")
+
         return FunctionMeta(function_id, definition_path, invocation_path)
 
     def __init__(self, function_id: str, definition_file: str, invocation_file: str):
@@ -322,28 +336,36 @@ def benchmark_functions(
 # -----------------------------------------------------------------------------
 
 
+def desired_functions(args) -> List[str]:
+    """
+    Determine the desired functions to run from commandline arguments.
+    :param args The parsed commandline arguments
+    :return A list of function identifiers
+    """
+    functions = [fn_id for fn_id in parse_include_list(args.include)]
+    return [
+        fn_id for fn_id in functions if fn_id not in parse_exclude_list(args.exclude)
+    ]
+
+
 def main() -> int:
     args = parse_arguments()
-
-    if args.function is not None and args.function not in FUNCTION_IDS:
-        error(f"Invalid function: {args.function}")
-        return EXIT_FAILURE
 
     # Save database connection information
     conn_meta = ConnectionMeta(
         args.db_user, args.db_password, args.db_name, args.db_host, args.db_port
     )
 
-    # Load function metatdata
-    functions = [args.function] if args.function is not None else FUNCTION_IDS
-    functions = [
-        fn_id for fn_id in functions if fn_id not in parse_exclude_list(args.exclude)
-    ]
-    if len(functions) == 0:
+    functions = desired_functions(args)
+    if len(functions) == 0 or not all(fn_id in FUNCTION_IDS for fn_id in functions):
         error("No functions to test")
         return EXIT_FAILURE
 
-    functions = [FunctionMeta.from_id(args.functions_dir, fn_id) for fn_id in functions]
+    try:
+        functions = [FunctionMeta.from_id(args.functions_dir, fn_id) for fn_id in functions]
+    except RuntimeError as e:
+        error(f"{e}")
+        return EXIT_FAILURE
 
     # Load functions
     load_functions(conn_meta, functions, args.verbose)
@@ -358,6 +380,7 @@ def main() -> int:
 
     # Write results to standard output
     sys.stdout.write("\n".join([f"{r}" for r in results]))
+    sys.stdout.write("\n")
 
     return EXIT_SUCCESS
 

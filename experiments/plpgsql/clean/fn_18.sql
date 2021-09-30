@@ -2,9 +2,9 @@
 
 CREATE OR REPLACE FUNCTION preferredChannel_wrtExpenditure(cust_key INT) RETURNS VARCHAR(50) AS $$
 DECLARE
-	numWeb DECIMAL;
-	numStore DECIMAL;
-	numCat DECIMAL;
+	numWeb FLOAT8;
+	numStore FLOAT8;
+	numCat FLOAT8;
 BEGIN 
 	numWeb := 0;
     numStore := 0; 

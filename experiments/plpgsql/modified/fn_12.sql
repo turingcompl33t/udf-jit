@@ -1,0 +1,32 @@
+-- SQL ProcBench Scalar UDF 12: "Increase in Web Spending"
+
+CREATE OR REPLACE FUNCTION increaseInWebSpending(cust_sk INT) RETURNS FLOAT8 AS $$
+DECLARE
+    spending1  FLOAT8;
+	spending2  FLOAT8;
+	increase  FLOAT8;
+BEGIN
+	spending1 := 0;
+    spending2 := 0;
+    increase := 0;
+    
+	SELECT SUM(ws_net_paid_inc_ship_tax) INTO spending1 
+    FROM web_sales_history, date_dim
+    WHERE d_date_sk = ws_sold_date_sk
+        AND d_year = 2001
+        AND ws_bill_customer_sk = cust_sk;
+        
+	SELECT SUM(ws_net_paid_inc_ship_tax) INTO spending2
+    FROM web_sales_history, date_dim
+    WHERE d_date_sk = ws_sold_date_sk
+        AND d_year = 2000
+        AND ws_bill_customer_sk = cust_sk;
+        
+	IF (spending1 < spending2) THEN
+	    RETURN -1;
+	ELSE
+		increase := spending1-spending2;
+    END IF;
+	RETURN increase;
+END;
+$$ LANGUAGE PLPGSQL;

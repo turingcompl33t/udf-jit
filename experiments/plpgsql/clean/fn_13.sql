@@ -2,44 +2,41 @@
 
 CREATE OR REPLACE function maxpurchasechannel(ckey INT, fromdatesk INT, todatesk INT) RETURNS VARCHAR AS $$
 DECLARE
-    numsalesfromstore   INT;
+    numSalesFromStore   INT;
     numSalesFromCatalog INT;
     numSalesFromWeb     INT;
     maxChannel          VARCHAR;
 BEGIN
-    SELECT COUNT(*)
-        INTO   numsalesfromstore
+    numSalesFromStore := (SELECT COUNT(*)
         FROM   store_sales_history
         WHERE  ss_customer_sk = ckey
         AND    ss_sold_date_sk >= fromdatesk
-        AND    ss_sold_date_sk <= todatesk;
+        AND    ss_sold_date_sk <= todatesk);
 
-    SELECT COUNT(*)
-        INTO   numsalesfromcatalog
+    numSalesFromCatalog := (SELECT COUNT(*)
         FROM   catalog_sales_history
         WHERE  cs_bill_customer_sk = ckey
         AND    cs_sold_date_sk >= fromdatesk
-        AND    cs_sold_date_sk <= todatesk;
+        AND    cs_sold_date_sk <= todatesk);
 
-    SELECT COUNT(*)
-        INTO   numsalesfromweb
+    numSalesFromWeb := (SELECT COUNT(*)
         FROM   web_sales_history
         WHERE  ws_bill_customer_sk = ckey
         AND    ws_sold_date_sk >= fromdatesk
-        AND    ws_sold_date_sk <= todatesk;
+        AND    ws_sold_date_sk <= todatesk);
 
-    IF (numsalesfromstore > numsalesfromcatalog) THEN
-        maxchannel := 'Store';
-        IF (numsalesfromweb > numsalesfromstore) THEN
-            maxchannel := 'Web';
+    IF (numSalesFromStore > numSalesFromCatalog) THEN
+        maxChannel := 'Store';
+        IF (numsalesfromweb > numSalesFromStore) THEN
+            maxChannel := 'Web';
         END IF;
     ELSE
-        maxchannel := 'Catalog';
-        IF (numsalesfromweb > numsalesfromcatalog) THEN
-            maxchannel := 'Web';
+        maxChannel := 'Catalog';
+        IF (numsalesfromweb > numSalesFromCatalog) THEN
+            maxChannel := 'Web';
         END IF;
     END IF;
     
-    RETURN maxchannel;
+    RETURN maxChannel;
 END;
 $$ LANGUAGE PLPGSQL;
