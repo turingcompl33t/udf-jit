@@ -18,7 +18,7 @@ EXIT_FAILURE = 1
 FUNCTION_IDS = ["01", "04", "05", "06", "11", "13", "20a"]
 
 # The default number of iterations for each benchmark
-DEFAULT_N_ITERATIONS = 5
+DEFAULT_N_ITERATIONS = 2
 
 # The default database connection parameters
 DEFAULT_DB_USER = "postgres"
@@ -362,7 +362,9 @@ def main() -> int:
         return EXIT_FAILURE
 
     try:
-        functions = [FunctionMeta.from_id(args.functions_dir, fn_id) for fn_id in functions]
+        functions = [
+            FunctionMeta.from_id(args.functions_dir, fn_id) for fn_id in functions
+        ]
     except RuntimeError as e:
         error(f"{e}")
         return EXIT_FAILURE

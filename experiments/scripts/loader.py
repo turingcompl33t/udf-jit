@@ -74,6 +74,7 @@ TABLE_DATA_SOURCES = {
     "reason": "reason.dat",
     "ship_mode": "ship_mode.dat",
     "time_dim": "time_dim.dat",
+
     # NOTE: The history tables are populated with the same data
     # as the standard fact tables for the TPC-DS benchmark
     "store_sales_history": "store_sales.dat",
@@ -83,6 +84,9 @@ TABLE_DATA_SOURCES = {
     "web_sales_history": "web_sales.dat",
     "web_returns_history": "web_returns.dat",
     "inventory_history": "inventory.dat",
+
+    # Custom tables
+    "integers": "integers.dat"
 }
 
 # -----------------------------------------------------------------------------
@@ -311,7 +315,7 @@ class TableMeta:
         # Extract the table name
         name = lines[0].strip("CREATE TABLE").strip()
         if name not in TABLE_DATA_SOURCES:
-            raise RuntimeError("Unexpected table in schema")
+            raise RuntimeError(f"Unexpected table '{name}' in schema")
 
         # Extract the table columns
         schema = Schema.from_column_definitions(lines[1:])
