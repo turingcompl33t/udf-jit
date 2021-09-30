@@ -49,7 +49,7 @@ Averaged over 5 runs. Run on `dev12`. SQL ProcBench schema SF1.
 System: POSTGRES
 Function 01 : 0.15 seconds
 Function 04 : 0.10 seconds
-Function 05 : 1.53 seconds
+Function 05 : 10.5 seconds
 Function 11 : 0.10 seconds
 Function 20a : 0.10 seconds
 
