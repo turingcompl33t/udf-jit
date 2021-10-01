@@ -34,7 +34,7 @@ SUBSET_SIZE_STEP = 5
 # The name of the table
 TABLE_NAME = "integers"
 # The number of rows in `integers`
-TABLE_SIZE = 100000000
+TABLE_SIZE = 10000000
 # The name of the function we are benchmarking
 FUNCTION_NAME = "addOne"
 
