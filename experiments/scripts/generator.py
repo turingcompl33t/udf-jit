@@ -1,5 +1,14 @@
 # generator.py
 # Data generator for custom tables.
+#
+# usage: generator.py [-h] output_path
+#
+# positional arguments:
+#   output_path  The path to the directory in which data is generated
+#
+# optional arguments:
+#   -h, --help   show this help message and exit
+
 
 import os
 import sys

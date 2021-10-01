@@ -1,6 +1,5 @@
 -- Drop all tables in schema.
 
-
 DROP TABLE IF EXISTS store_sales;
 DROP TABLE IF EXISTS  store_returns;
 DROP TABLE IF EXISTS catalog_sales;
