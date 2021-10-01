@@ -23,7 +23,7 @@ DEFAULT_DB_HOST = "localhost"
 DEFAULT_DB_PORT = "5432"
 
 # The default number of iterations for each benchmark
-DEFAULT_N_ITERATIONS = 3
+DEFAULT_N_ITERATIONS = 2
 
 # The minimum and maximum subset sizes
 SUBSET_SIZE_MIN = 0
@@ -150,7 +150,7 @@ def run_compiled_at_limit(conn, limit: int, iterations: int):
     :param iterations The number of iterations
     :return The average duration
     """
-    query = f"SELECT addOne(x) FROM {TABLE_NAME} LIMIT {limit};"
+    query = f"SELECT {FUNCTION_NAME}(x) FROM {TABLE_NAME} LIMIT {limit};"
     return average_duration_over(conn, query, iterations)
 
 
@@ -167,7 +167,7 @@ def run(config: ServerConfig, iterations: int) -> Dict[int, List[float]]:
     ) as conn:
         conn.autocommit = True
         for subset_size in tqdm(
-            range(SUBSET_SIZE_MIN, SUBSET_SIZE_MAX, SUBSET_SIZE_STEP)
+            range(SUBSET_SIZE_MIN, SUBSET_SIZE_MAX + SUBSET_SIZE_STEP, SUBSET_SIZE_STEP)
         ):
             # Initialize results for this subset size
             batch = []
