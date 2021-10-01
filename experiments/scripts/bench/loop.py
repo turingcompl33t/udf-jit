@@ -4,6 +4,7 @@
 import sys
 import time
 import json
+import math
 import argparse
 
 from tqdm import tqdm
@@ -23,13 +24,11 @@ DEFAULT_DB_HOST = "localhost"
 DEFAULT_DB_PORT = "5432"
 
 # The default number of iterations for each benchmark
-DEFAULT_N_ITERATIONS = 2
+DEFAULT_N_ITERATIONS = 1
 
 # The minimum and maximum subset sizes
 COUNT_MIN = 0
-COUNT_MAX = 10
-# The step between individual iterations
-COUNT_STEP = 5
+COUNT_MAX = 100000000
 
 # The name of the function we are benchmarking
 FUNCTION_NAME = "busyLoop"
@@ -139,13 +138,13 @@ def run(config: ServerConfig, iterations: int) -> Dict[int, List[float]]:
     ) as conn:
         conn.autocommit = True
         for count in tqdm(
-            range(COUNT_MIN, COUNT_MAX + COUNT_STEP, COUNT_STEP)
+            [1 * math.pow(10, i) for i in range(int(math.log(COUNT_MAX, 10)) + 1)]
         ):
             # Initialize results for this subset size
             batch = []
 
             # Run the benchmarks
-            batch.append(run_compiled_at_count(conn, count, iterations))
+            batch.append(run_compiled_at_count(conn, int(count), iterations))
 
             # Record results
             results[count] = batch
