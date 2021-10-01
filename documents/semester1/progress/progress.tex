@@ -1,0 +1,221 @@
+% MCDS Capstone Design Document
+% Kyle Dotterrer
+% 4 October, 2021
+
+%% ==================================================================
+%% BOILERPLATE
+%% ==================================================================
+
+\documentclass{vldb}
+
+\newcommand{\paperTitle}{JIT Compilation for User-Defined Functions\\ 
+    \large Capstone Fall Progress Report\\
+    \today}
+\newcommand{\paperKeywords}{}
+\newcommand{\paperAuthors}{}
+
+\setlength{\paperheight}{11in}
+\setlength{\paperwidth}{8.5in}
+
+\usepackage[
+            bookmarks=true,
+            bookmarksopen=true,
+            pdfhighlight=/I,
+            pdfpagemode=UseOutlines,
+            linkcolor=blue,
+            pdfborder={ 0 0 0 },
+            pageanchor=false]{hyperref}
+\hypersetup{
+    pdfauthor = {\paperAuthors},
+    pdftitle = {\paperTitle},
+    pdfkeywords = {\paperKeywords},
+    pdfborder={ 0 0 0 }
+}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{times}
+\usepackage{boxedminipage}
+\usepackage{xspace}
+\usepackage{array}
+\usepackage{epsfig}
+\usepackage{calc}
+\usepackage{multirow}
+\usepackage{rotating}
+\usepackage{enumitem}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{tabularx}
+\usepackage{tikz}
+\usepackage{wasysym }
+\usepackage[hyphenbreaks]{breakurl}
+\usepackage{xcolor}
+\usepackage[font={small}]{caption}
+\usepackage{alltt}
+\usepackage{setspace}
+\usepackage{wrapfig}
+\usepackage{etoolbox}
+
+% Font selection
+\usepackage[final]{microtype}
+\usepackage[scaled]{inconsolata}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{soul}
+\usepackage{pifont}
+
+% Other misc. things
+\usepackage{float}
+\usepackage{bookmark}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{latexsym}
+\usepackage{multirow}
+\usepackage{emptypage}
+\usepackage{booktabs}
+\usepackage{enumerate}
+\usepackage{braket}
+\usepackage{balance}
+
+%% ==================================================================
+%% MACROS
+%% ==================================================================
+
+\newcommand{\subparagraph}{}
+
+\newcommand{\sysname}{NoisePage\xspace}
+
+% Framework Components
+\newcommand{\dbTranslator}{Translator\xspace}
+\newcommand{\dbCompiler}{Compiler\xspace}
+\newcommand{\dbPlanner}{planner\xspace}
+\newcommand{\dbInterpreter}{interpreter\xspace}
+\newcommand{\dbAnalyzer}{analyzer\xspace}
+\newcommand{\dbPCQ}{PCQ\xspace}
+\newcommand{\dbAQP}{AQP\xspace}
+\newcommand{\dbHook}{hook\xspace}
+\newcommand{\dbHooks}{hooks\xspace}
+
+\newcommand{\dbSQL}[1]{\texttt{\textbf{#1}}\xspace}
+\newcommand{\dbTable}[1]{\texttt{\MakeUppercase{#1}}\xspace}
+\newcommand{\dbColumn}[1]{\texttt{col#1}\xspace}
+\newcommand{\dbRawColumn}[1]{\texttt{#1}\xspace}
+\newcommand{\dbConfig}[1]{\textsf{#1}\xspace}
+
+\newcommand{\dbmsOracle}{Oracle\xspace}
+\newcommand{\dbmsDBTwo}{DB2\xspace}
+\newcommand{\dbmsTeradata}{Teradata\xspace}
+\newcommand{\dbmsHANA}{HANA\xspace}
+\newcommand{\dbmsMSSQL}{SQL Server\xspace}
+\newcommand{\dbmsMySQL}{MySQL\xspace}
+\newcommand{\dbmsPostgres}{PostgreSQL\xspace}
+\newcommand{\dbmsMemSQL}{MemSQL\xspace}
+\newcommand{\dbmsHyper}{HyPer\xspace}
+\newcommand{\dbmsVector}{Vector\xspace}
+
+\newcommand{\tplType}[1]{\texttt{#1}\xspace}
+\newcommand{\tpl}{\texttt{TPL}\xspace}
+\newcommand{\tbc}{\texttt{TBC}\xspace}
+\newcommand{\dbCode}[1]{{\sffamily\small \textbf{#1}}\xspace}
+
+\newcommand{\tidlist}{\texttt{TupleIdList}\xspace}
+\newcommand{\tidlists}{\texttt{TupleIdLists}\xspace}
+
+%% ==================================================================
+%% PAPER CONTENT
+%% ==================================================================
+
+\begin{document}
+
+\title{\paperTitle}
+
+\numberofauthors{2}
+\author{
+    \alignauthor Kyle Dotterrer, Andrew Pavlo\\
+    \affaddr{Carnegie Mellon University}\\
+    \email 
+        \{\href{mailto:kdottere@cs.cmu.edu}{kdottere},
+        \href{mailto:pavlo@cs.cmu.edu}{pavlo}\}@cs.cmu.edu\\
+}
+
+% Remove the space for the copyright box for VLDB
+\makeatletter
+\def\@copyrightspace{\relax}
+\makeatother
+
+\maketitle
+
+%% ==================================================================
+%% INTRODUCTION
+%% ==================================================================
+
+\section{Introduction}
+
+TODO
+
+%% ==================================================================
+%% MOTIVATION
+%% ==================================================================
+
+\section{Motivation}
+
+Briefly describe the problem we are tackling.
+
+%% ==================================================================
+%% PROBLEM STATEMENT
+%% ==================================================================
+
+\section{Problem Statement}
+
+What part of the problem did we focus on during the first half of the semester?
+
+%% ==================================================================
+%% PROJECT PLAN
+%% ==================================================================
+
+\section{Project Plan}
+
+Describe in actionable points how we are achieving the objective stated in the problem statement.
+
+%% ==================================================================
+%% PROGRESS
+%% ==================================================================
+
+\section{Progress}
+
+What is the progress of each item mentioned below.
+
+%% ==================================================================
+%% PROGRESS ON FEEDBACK
+%% ==================================================================
+
+\section{Progress on Feedback}
+
+Summarize feedback from the Fall semester update and report progress to remedy shortcomings.
+
+%% ==================================================================
+%% SELF-APPRAISAL
+%% ==================================================================
+
+\section{Self-Appraisal}
+
+At what points could we have done better or been more efficient? What steps could we have taken to help in achieving our project goal?
+
+%% ==================================================================
+%% NEXT STEPS
+%% ==================================================================
+
+\section{Next Steps}
+
+Present next steps in a timeline. Are the project goals achievable? Do we need to reassess goals?
+
+%% ==================================================================
+%% BIBLIOGRAPHY
+%% ==================================================================
+
+% NOTE: Had to add this mysterious command to compile...
+\newcommand{\newblock}{}
+
+\newpage
+\bibliographystyle{abbrv}
+\bibliography{progress}
+
+\end{document}
