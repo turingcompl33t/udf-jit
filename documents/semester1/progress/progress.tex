@@ -183,6 +183,55 @@ Describe in actionable points how we are achieving the objective stated in the p
 
 What is the progress of each item mentioned below.
 
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=\columnwidth]{plots/pg_call_legend.pdf}
+    \\
+    \includegraphics[width=\columnwidth]{plots/pg_call.pdf}
+    \caption{
+        \textbf{Function Call Overhead (PostgreSQL)} --
+        Comparison among baseline query, inlined column increment, and column increment with a function call to UDF \dbCode{addOne} in PostgreSQL.
+    }
+    \label{fig:bench_pg_call}
+\end{figure}
+
+
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=\columnwidth]{plots/np_call_legend.pdf}
+    \\
+    \includegraphics[width=\columnwidth]{plots/np_call.pdf}
+    \caption{
+        \textbf{Function Call Overhead (NoisePage)} --
+        Comparison among baseline query, inlined column increment, and column increment with a function call to UDF \dbCode{addOne} in NoisePage.
+    }
+    \label{fig:bench_np_call}
+\end{figure}
+
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=\columnwidth]{plots/loop_legend.pdf}
+    \\
+    \includegraphics[width=\columnwidth]{plots/loop.pdf}
+    \caption{
+        \textbf{Function Call Scalability} --
+        Comparison of the runtime required by PostgreSQL and NoisePage to execute the UDF \dbCode{busyLoop} for a specified number of iterations.
+    }
+    \label{fig:bench_loop}
+\end{figure}
+
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=\columnwidth]{plots/procbench_legend.pdf}
+    \\
+    \includegraphics[width=\columnwidth]{plots/procbench.pdf}
+    \caption{
+        \textbf{End-to-End Benchmark Performance} --
+        Comparison of query runtime on PostgreSQL and NoisePage during execution of select functions from the SQL ProcBench benchmark.
+    }
+    \label{fig:bench_procbench}
+\end{figure}
+
 %% ==================================================================
 %% PROGRESS ON FEEDBACK
 %% ==================================================================

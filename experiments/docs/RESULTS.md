@@ -47,15 +47,15 @@ TODO: Hardware Stats
 Averaged over 5 runs. Run on `dev12`. SQL ProcBench schema SF1.
 
 System: POSTGRES
-Function 01 : 0.15 seconds
-Function 04 : 0.10 seconds
-Function 05 : 10.5 seconds
-Function 11 : 0.10 seconds
-Function 20a : 0.10 seconds
+- Function 01 : 0.15 seconds
+- Function 04 : 0.10 seconds
+- Function 05 : 10.5 seconds
+- Function 11 : 0.10 seconds
+- Function 20a : 0.10 seconds
 
 System: NOISEPAGE
-Function 01 : 52.8 seconds
-Function 04 : 0.10 seconds
-Function 05 : 3500.1 seconds
-Function 11 : 0.15 seconds
-Function 20a : 0.23 seconds
+- Function 01 : 52.8 seconds
+- Function 04 : 0.10 seconds
+- Function 05 : 3500.1 seconds
+- Function 11 : 0.15 seconds
+- Function 20a : 0.23 seconds
