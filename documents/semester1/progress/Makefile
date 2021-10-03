@@ -41,7 +41,8 @@ $(TRG)	: %.pdf : %.tex $(DEP) $(PDFPICS) $(BIBFILE)
 	  @$(run-latex)
 
 clean	:
-	  -rm -f $(TRG) $(PSF) $(PDF) $(TRG:%.pdf=%.aux) $(TRG:%.pdf=%.bbl) $(TRG:%.pdf=%.blg) $(TRG:%.pdf=%.log) $(TRG:%.pdf=%.out) $(TRG:%.pdf=%.dvi) $(TRG:%.pdf=%.synctex.gz) $(TRG:%.pdf=%.fdb_latexmk) $(TRG:%.pdf=%.fls)
+	  -rm -f $(TRG) $(PSF) $(PDF) $(TRG:%.pdf=%.aux) $(TRG:%.pdf=%.bbl) $(TRG:%.pdf=%.blg) $(TRG:%.pdf=%.log) $(TRG:%.pdf=%.out) $(TRG:%.pdf=%.dvi) $(TRG:%.pdf=%.synctex.gz) $(TRG:%.pdf=%.fdb_latexmk) $(TRG:%.pdf=%.fls) $(TRG:%.pdf=%.pyg)
+	  -rm -rf _minted-progress
 
 .PHONY	: all show clean ps pdf showps stylecheck spellcheck
 

@@ -75,6 +75,22 @@
 \usepackage{braket}
 \usepackage{balance}
 
+\usepackage[newfloat]{minted}
+
+\definecolor{commentgray}{rgb}{0.2,0.2,0.2}
+\definecolor{bggray}{rgb}{0.98,0.98,0.98}
+
+\setminted{
+  bgcolor=bggray,
+  numberblanklines=false,
+  frame=single,
+  numbers=left,
+  tabsize=2,
+  xleftmargin=1.8em,
+  xrightmargin=0.5em
+}
+
+
 %% ==================================================================
 %% MACROS
 %% ==================================================================
@@ -149,7 +165,7 @@
 
 \section{Introduction}
 
-TODO
+This document provides a description of the progress made thus far this semester towards achieving the goals of this capstone. Section 2 provides an overview of the domain and a high-level description of the problem we are attempting to solve. Next, in section 3, we provide further details regarding the aspects of the problem we have addressed so far this semester. Section 4 breaks the problem down into actionable points and describes how we are making progress towards achieving each of these. In Section 5 we present preliminary results. Section 6 provides a status update specifically targeting the feedback received during submission of the Fall Completion Plan. In Section 7 we reflect on several areas of improvement for the project. We conclude in Section 8 by describing our next steps.
 
 %% ==================================================================
 %% MOTIVATION
@@ -157,7 +173,44 @@ TODO
 
 \section{Motivation}
 
-Briefly describe the problem we are tackling.
+User-defined functions (UDFs) are a powerful tool for encapsulating complex application logic that may subsequently be embedded into SQL queries. Consider a scenario in which we would like to write a query that computes the "reward level" for each customer in a table of retail transactions based on the total amount spent by each customer. Expressing such a query in pure SQL is certainly possible, but non-trivial. In contrast, with the help of SQL's procedural extensions, the definition of a UDF that implements this logic is straightforward, as shown in figure~\ref{fig:cust_level_def}.
+
+\begin{listing}[H]
+    \begin{minted}[frame=lines]{plpgsql}
+CREATE FUNCTION cust_level(ckey int)
+    RETURNS CHAR(10) AS $$
+    DECLARE total float;
+    DECLARE level char(10);
+BEGIN
+    SELECT total = SUM(o_totalprice)
+        FROM orders WHERE o_custkey=ckey;
+    IF (total > 1000000)
+        level = 'Platinum';
+    ELSE
+        level = 'Regular';
+    END IF;
+    RETURN level;
+END 
+$$ LANGUAGE PLPGSQL;
+    \end{minted}
+    \caption{The definition of UDF \dbCode{cust\_level}.}
+    \label{fig:cust_level_def}
+\end{listing}
+
+Once the UDF is defined, we can then use the UDF in subsequent queries to efficiently express high-level application logic. A query that invokes the UDF \dbCode{cust\_level} is shown in figure~\ref{fig:cust_level_call}.
+    
+\begin{listing}[H]
+    \begin{minted}[frame=lines]{plpgsql}
+SELECT c_custkey, cust_level(c_custkey)
+    FROM customer;
+    \end{minted}
+    \caption{The invocation of UDF \dbCode{cust\_level}.}
+    \label{fig:cust_level_call}
+\end{listing}
+
+Although they offer a practical complement to SQL, their use in production database environments is often limited because of their associated performance costs \cite{froid, apfel}. For instance, a recent study from a team at Microsoft finds that expressing the same logic in SQL and SQL with procedural extensions leads to an orders-of-magnitude increase in query runtime - from milliseconds to over thirteen hours \cite{froid}.
+
+In this project, we evaluate the efficacy of methods intended to address the performance limitations of UDFs in the context of relational database management systems (DBMSs). We compare the performance of an existing, state-of-the-art technique, UDF inlining, with our own novel strategy that executes UDFs as native code via JIT-compilation. Our evaluation efforts are ongoing.
 
 %% ==================================================================
 %% PROBLEM STATEMENT
@@ -183,6 +236,19 @@ Describe in actionable points how we are achieving the objective stated in the p
 
 What is the progress of each item mentioned below.
 
+\begin{listing}
+    \begin{minted}[frame=lines]{plpgsql}
+CREATE FUNCTION addOne(x INTEGER) 
+    RETURNS INTEGER AS $$
+BEGIN
+    RETURN x + 1;
+END
+$$ LANGUAGE PLPGSQL;
+    \end{minted}
+    \caption{The definition of UDF \dbCode{addOne}.}
+    \label{list:udf_addone}
+\end{listing}
+
 \begin{figure}[t!]
     \centering
     \includegraphics[width=\columnwidth]{plots/pg_call_legend.pdf}
@@ -207,6 +273,24 @@ What is the progress of each item mentioned below.
     }
     \label{fig:bench_np_call}
 \end{figure}
+
+\begin{listing}
+    \begin{minted}[frame=lines]{plpgsql}
+CREATE FUNCTION busyLoop(x INTEGER) 
+    RETURNS INTEGER AS $$
+DECLARE
+    c INTEGER := 0;
+BEGIN
+    WHILE c < x LOOP;
+        c = c + 1;
+    END LOOP;
+    RETURN c;
+END
+$$ LANGUAGE PLPGSQL;
+    \end{minted}
+    \caption{The definition of UDF \dbCode{busyLoop}.}
+    \label{list:udf_busyLoop}
+\end{listing}
 
 \begin{figure}[t!]
     \centering
