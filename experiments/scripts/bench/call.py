@@ -23,7 +23,7 @@ DEFAULT_DB_HOST = "localhost"
 DEFAULT_DB_PORT = "5432"
 
 # The default number of iterations for each benchmark
-DEFAULT_N_ITERATIONS = 2
+DEFAULT_N_ITERATIONS = 5
 
 # The minimum and maximum subset sizes
 SUBSET_SIZE_MIN = 0
@@ -34,7 +34,7 @@ SUBSET_SIZE_STEP = 5
 # The name of the table
 TABLE_NAME = "integers"
 # The number of rows in `integers`
-TABLE_SIZE = 10000000
+TABLE_SIZE = 100000
 # The name of the function we are benchmarking
 FUNCTION_NAME = "addOne"
 
@@ -167,7 +167,7 @@ def run(config: ServerConfig, iterations: int) -> Dict[int, List[float]]:
     ) as conn:
         conn.autocommit = True
         for subset_size in tqdm(
-            range(SUBSET_SIZE_MIN, SUBSET_SIZE_MAX + SUBSET_SIZE_STEP, SUBSET_SIZE_STEP)
+            range(SUBSET_SIZE_MIN + SUBSET_SIZE_STEP, SUBSET_SIZE_MAX + SUBSET_SIZE_STEP, SUBSET_SIZE_STEP)
         ):
             # Initialize results for this subset size
             batch = []

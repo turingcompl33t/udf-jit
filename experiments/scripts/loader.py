@@ -39,8 +39,8 @@ EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
 
 # Database connection defaults
-DEFAULT_DB_USER = ""
-DEFAULT_DB_PASS = ""
+DEFAULT_DB_USER = "postgres"
+DEFAULT_DB_PASS = "password"
 DEFAULT_DB_NAME = "noisepage"
 DEFAULT_DB_HOST = "localhost"
 DEFAULT_DB_PORT = "15721"
