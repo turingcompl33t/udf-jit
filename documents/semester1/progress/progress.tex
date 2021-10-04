@@ -179,11 +179,11 @@ User-defined functions (UDFs) are a powerful tool for encapsulating complex appl
     \begin{minted}[frame=lines]{plpgsql}
 CREATE FUNCTION cust_level(ckey int)
     RETURNS CHAR(10) AS $$
-    DECLARE total float;
-    DECLARE level char(10);
+    DECLARE total FLOAT;
+    DECLARE level CHAR(10);
 BEGIN
-    SELECT total = SUM(o_totalprice)
-        FROM orders WHERE o_custkey=ckey;
+    total = (SELECT SUM(o_totalprice) 
+        FROM orders WHERE o_custkey=ckey);
     IF (total > 1000000)
         level = 'Platinum';
     ELSE
@@ -218,7 +218,27 @@ In this project, we evaluate the efficacy of methods intended to address the per
 
 \section{Problem Statement}
 
-What part of the problem did we focus on during the first half of the semester?
+During the first half of this semester, we focused our efforts on designing and implementing benchmarks for the UDF performance optimization techniques under consideration. 
+
+With the majority of the engineering effort required to implement our novel approach to UDF JIT-compilation completed, we are now able to turn our attention to answering our research questions: 
+
+\begin{itemize}
+    \item \textit{Which of the approaches to UDF runtime optimization performs best?}
+    \item \textit{If there is not a single, dominant technique that outperforms the others under all conditions, under which sets of conditions does each technique excel?}
+    \item \textit{Why does one technique outperform another under a particular set of conditions?}
+\end{itemize}
+
+We aim to answer these questions empirically - by performing a series of experiments in which we compare the performance of UDFs executed with our novel approach to UDF JIT-compilation against those produced by systems that perform UDF-inlining \cite{apfel, froid}. We partition this empirical evaluation into the following subproblems:
+
+\begin{itemize}
+    \item \textbf{Identification of Benchmarks} The first step in our evaluation is to determine the set of benchmarks we intend to run. This decision drives the remainder of the process.
+    \item \textbf{Preparation of Evaluated Functions and Queries} Once the benchmarks are decided upon, we must prepare the individual functions (UDFs) and their invoking queries for input to the benchmarking process.
+    \item \textbf{Preparation of Benchmarking Infrastructure} Performance benchmarks for high-performance systems require a high-degree of automation to support replicability. This allows us to run individual benchmarks over multiple iterations, across multiple software and hardware environments so that we may be assured of the generality of our results. In this context, benchmarking infrastructure refers to the set of scripts that we utilize to automate the benchmarking process.
+    \item \textbf{Execution of Benchmarks} Once the benchmarking infrastructure is complete and tested, we can use it to run the benchmarks themselves and collect the results.
+    \item \textbf{Communication of Benchmark Results} Finally, once we have the benchmark results, we must organize and communicate them in a way that allows us to draw meaningful conclusions.
+\end{itemize}
+
+Our progress towards each of these specific sub-problems is described in the \textit{Project Plan} section below.
 
 %% ==================================================================
 %% PROJECT PLAN
@@ -226,7 +246,27 @@ What part of the problem did we focus on during the first half of the semester?
 
 \section{Project Plan}
 
-Describe in actionable points how we are achieving the objective stated in the problem statement.
+During the first half of the semester, we have made progress towards each of the sub-problems identified above. In this section, we provide further details describing the steps we have taken towards achieving our objective.
+
+\subsection{Identification of Benchmarks} 
+
+The first step in our evaluation is to determine the set of benchmarks we intend to run. This decision drives the remainder of the process.
+
+\subsection{Preparation of Evaluated Functions and Queries} 
+
+Once the benchmarks are decided upon, we must prepare the individual functions (UDFs) and their invoking queries for input to the benchmarking process.
+
+\subsection{Preparation of Benchmarking Infrastructure} 
+
+Performance benchmarks for high-performance systems require a high-degree of automation to support replicability. This allows us to run individual benchmarks over multiple iterations, across multiple software and hardware environments so that we may be assured of the generality of our results. In this context, benchmarking infrastructure refers to the set of scripts that we utilize to automate the benchmarking process.
+
+\subsection{Execution of Benchmarks} 
+
+Once the benchmarking infrastructure is complete and tested, we can use it to run the benchmarks themselves and collect the results.
+
+\subsection{Communication of Benchmark Results} 
+
+Finally, once we have the benchmark results, we must organize and communicate them in a way that allows us to draw meaningful conclusions.
 
 %% ==================================================================
 %% PROGRESS
@@ -234,7 +274,33 @@ Describe in actionable points how we are achieving the objective stated in the p
 
 \section{Progress}
 
-What is the progress of each item mentioned below.
+In this section, we present some of the initial results of our evaluation.
+
+The first aspect of our implementation we intend to evaluate is the overhead imposed by individual function calls. While this does not reflect performance improvements or degregations on production workloads, it does allow us to quickly evaluate the viability of our approach.
+
+In order to measure the runtime overhead imposed by an individual function call, we design a simple synthetic benchmark. This benchmark consists of three queries:
+
+\begin{itemize}
+    \item A baseline query that simply performs a sequential scan over a single integer column of a table. This query is shown in listing~\ref{list:udf_call_baseline}. 
+    \item A query that invokes the UDF \dbCode{addOne} to increment this integer column by the constant value one. The definition of \dbCode{addOne} is shown in listing~\ref{list:udf_call_functiondef} and the associated invocation is shown in listing~\ref{list:udf_call_function}.
+    \item A query that represents a "perfectly-inlined" version of the call to UDf \dbCode{addOne}. This query is shown in figure~\ref{list:udf_call_inlined}.
+\end{itemize}
+
+\begin{listing}
+    \begin{minted}[frame=lines]{sql}
+SELECT x FROM integers;
+    \end{minted}
+    \caption{The baseline query for evaluating the overhead of a UDF call.}
+    \label{list:udf_call_baseline}
+\end{listing}
+
+\begin{listing}
+    \begin{minted}[frame=lines]{sql}
+SELECT x, addOne(x) FROM integers;
+    \end{minted}
+    \caption{The inlined query for evaluating the overhead of a UDF call.}
+    \label{list:udf_call_function}
+\end{listing}
 
 \begin{listing}
     \begin{minted}[frame=lines]{plpgsql}
@@ -246,8 +312,20 @@ END
 $$ LANGUAGE PLPGSQL;
     \end{minted}
     \caption{The definition of UDF \dbCode{addOne}.}
-    \label{list:udf_addone}
+    \label{list:udf_call_functiondef}
 \end{listing}
+
+\begin{listing}
+    \begin{minted}[frame=lines]{sql}
+SELECT x, x + 1 FROM integers;
+    \end{minted}
+    \caption{The inlined query for evaluating the overhead of a UDF call.}
+    \label{list:udf_call_inlined}
+\end{listing}
+
+We run this performance benchmark on two systems: PostgreSQL 12 and NoisePage. Here, PostgreSQL serves as a baseline against which we compare our implementation. PostgreSQL implements UDF execution in a manner that incurs significant context-switching overhead \cite{apfel}. As a consequence of this, we expect to observe high function-call overhead in PostgreSQL. In contrast, the benchmark run on NoisePage uses our approach to UDF JIT-compilation that elides any context switching overhead. 
+
+The results of this benchmark are shown in figure~\ref{fig:bench_pg_call} and figure~\ref{fig:bench_np_call}. The results demonstrate the expected trend: UDF execution in PostgreSQL is slower in absolute terms than UDF execution in NosiePage. More importantly, as the size of the table grows, the overall query runtime for PostgreSQL scales much more poorly that it does for NoisePage. This indicates that our implementation of UDF JIT-compilation does not incur large function call overhead, relative to the "optimal" inlined version of the query.
 
 \begin{figure}[t!]
     \centering
@@ -322,7 +400,7 @@ $$ LANGUAGE PLPGSQL;
 
 \section{Progress on Feedback}
 
-Summarize feedback from the Fall semester update and report progress to remedy shortcomings.
+The primary point of feedback we received from the Fall update presentation was our failure to include a detailed timeline for our remaining project goals, specifically our publication plans. We address this shortcoming in the \textit{Next Steps} section below.
 
 %% ==================================================================
 %% SELF-APPRAISAL
@@ -339,6 +417,30 @@ At what points could we have done better or been more efficient? What steps coul
 \section{Next Steps}
 
 Present next steps in a timeline. Are the project goals achievable? Do we need to reassess goals?
+
+\begin{center}
+    \begin{tabular}{ |c|l| } 
+        \hline
+        \textbf{Date} & \textbf{Milestone} \\ 
+        \hline
+        1 March 2021 & Begin System Design \\
+        \hline
+        21 March 2021 & All tests for feature designed \\
+        \hline
+        28 March 2021 & \textit{Parser} support implemented; tests passing \\
+        \hline
+        4 April 2021 & \textit{Binder} support implemented; tests passing \\
+        \hline
+        11 April 2021 & \textit{Execution Engine} codegen implemented; tests passing \\
+        \hline
+        18 April 2021 & \textit{Execution Engine} LLVM implemented; tests passing \\
+        \hline
+        25 April 2021 & Integration tests implemented and passing \\
+        \hline
+        1 May 2021 & Feature Complete \\
+        \hline
+    \end{tabular}
+\end{center}
 
 %% ==================================================================
 %% BIBLIOGRAPHY
