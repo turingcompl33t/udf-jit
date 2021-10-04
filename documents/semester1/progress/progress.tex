@@ -165,7 +165,7 @@
 
 \section{Introduction}
 
-This document provides a description of the progress made thus far this semester towards achieving the goals of this capstone. Section 2 provides an overview of the domain and a high-level description of the problem we are attempting to solve. Next, in section 3, we provide further details regarding the aspects of the problem we have addressed so far this semester. Section 4 breaks the problem down into actionable points and describes how we are making progress towards achieving each of these. In Section 5 we present preliminary results. Section 6 provides a status update specifically targeting the feedback received during submission of the Fall Completion Plan. In Section 7 we reflect on several areas of improvement for the project. We conclude in Section 8 by describing our next steps.
+This document provides a description of the progress made this semester towards achieving the goals of this capstone. Section 2 provides an overview of the domain and a high-level description of the problem we are attempting to solve. Next, in section 3, we provide further details regarding the aspects of the problem we have addressed so far this semester. Section 4 breaks the problem down into actionable points and describes how we are making progress towards achieving each of these. In Section 5 we present preliminary results. Section 6 provides a status update specifically targeting the feedback received during submission of the Fall Completion Plan. In Section 7 we reflect on areas of improvement for the project. We conclude in Section 8 by describing our next steps.
 
 %% ==================================================================
 %% MOTIVATION
@@ -208,7 +208,7 @@ SELECT c_custkey, cust_level(c_custkey)
     \label{fig:cust_level_call}
 \end{listing}
 
-Although they offer a practical complement to SQL, their use in production database environments is often limited because of their associated performance costs \cite{froid, apfel}. For instance, a recent study from a team at Microsoft finds that expressing the same logic in SQL and SQL with procedural extensions leads to an orders-of-magnitude increase in query runtime - from milliseconds to over thirteen hours \cite{froid}.
+Although they offer a practical complement to SQL, their use in production database environments is often limited because of their associated performance costs \cite{froid, apfel}. For instance, a recent study from a team at Microsoft finds that expressing the same logic in SQL and SQL with procedural extensions may lead to an orders-of-magnitude increase in query runtime - from milliseconds to over thirteen hours \cite{froid}.
 
 In this project, we evaluate the efficacy of methods intended to address the performance limitations of UDFs in the context of relational database management systems (DBMSs). We compare the performance of an existing, state-of-the-art technique, UDF inlining, with our own novel strategy that executes UDFs as native code via JIT-compilation. Our evaluation efforts are ongoing.
 
@@ -232,9 +232,9 @@ We aim to answer these questions empirically - by performing a series of experim
 
 \begin{itemize}
     \item \textbf{Identification of Benchmarks} The first step in our evaluation is to determine the set of benchmarks we intend to run. This decision drives the remainder of the process.
-    \item \textbf{Preparation of Evaluated Functions and Queries} Once the benchmarks are decided upon, we must prepare the individual functions (UDFs) and their invoking queries for input to the benchmarking process.
-    \item \textbf{Preparation of Benchmarking Infrastructure} Performance benchmarks for high-performance systems require a high-degree of automation to support replicability. This allows us to run individual benchmarks over multiple iterations, across multiple software and hardware environments so that we may be assured of the generality of our results. In this context, benchmarking infrastructure refers to the set of scripts that we utilize to automate the benchmarking process.
-    \item \textbf{Execution of Benchmarks} Once the benchmarking infrastructure is complete and tested, we can use it to run the benchmarks themselves and collect the results.
+    \item \textbf{Preparation of Evaluated Functions and Queries} Once the benchmarks are decided upon, we must prepare the individual functions (UDFs) and their invoking queries for input to the benchmarking process. We intend to run all benchmarks in the context of the NoisePage research DBMS \cite{noisepage}, so preparation of functions and queries from the output of other systems requires manual implementation of query plans in the NoisePage domain specific language (DSL) \tpl.
+    \item \textbf{Preparation of Benchmarking Infrastructure} Performance benchmarks for high-performance systems require a high-degree of automation to support replicability. This allows us to run individual benchmarks over many iterations, across multiple software and hardware environments so that we may be assured of the generality of our results. In this context, benchmarking infrastructure refers to the set of scripts that we utilize to automate the benchmarking process.
+    \item \textbf{Execution of Benchmarks} Once the benchmarking infrastructure is complete and tested, we can use it to run the benchmarks themselves and collect results.
     \item \textbf{Communication of Benchmark Results} Finally, once we have the benchmark results, we must organize and communicate them in a way that allows us to draw meaningful conclusions.
 \end{itemize}
 
@@ -246,21 +246,21 @@ Our progress towards each of these specific sub-problems is described in the \te
 
 \section{Project Plan}
 
-During the first half of the semester, we have made progress towards each of the sub-problems identified above. In this section, we provide further details describing the steps we have taken towards achieving our objective.
+During the first half of the semester, we made progress towards each of the sub-problems identified above. In this section, we provide further details describing the steps we have taken towards achieving our objective.
 
 \subsection{Identification of Benchmarks} 
 
-During the first part of this semester, we identified all of the benchmarks we intend to run to evaluate UDF optimization techniques. These include the following:
+During the first part of this semester, we identified the benchmarks we intend to run to evaluate UDF optimization techniques. These include the following:
 
 \begin{itemize}
     \item \textbf{Synthetic Benchmark \textit{Call}} This manually constructed benchmark evaluates the overhead of a function call in our implementation of UDF JIT-compilation. This benchmark is adapted from prior work by Nayak \cite{tanuj}.
     \item \textbf{Synthetic Benchmark \textit{Loop}} This manually-constructed benchmark evaluates the computational efficiency of our implementation of UDF JIT-compilation. This benchmark is adapted from prior work by Nayak \cite{tanuj}.
-    \item \textbf{Select Functions from SQL ProcBench}. SQL ProcBench \cite{procbench} is a new DBMS benchmark specifically designed to emulate the types of UDF workloads found in production environments. We select a subset of functions from this benchmark for our evaluation. Functions were selected based on the ability of each framework under consideration to properly handle the constructs used in the functions and their associated invoking queries.
+    \item \textbf{Select Functions from SQL ProcBench}. SQL ProcBench \cite{procbench} is a new DBMS benchmark specifically designed to emulate the types of UDF workloads found in production environments. We select a subset of functions from this benchmark for our evaluation. Functions were selected based on the ability of each framework under consideration to properly handle the constructs used in the functions and their associated invoking queries. A complete description of the reason each function was selected along with the function definitions themselves can be found at \cite{udf-jit}.
 \end{itemize}
 
 \subsection{Preparation of Evaluated Functions and Queries} 
 
-In addition to compiling and executing UDFs on NoisePage, we require outputs from the UDF inling frameworks \textit{Froid} \cite{froid} and \textit{Apfel} \cite{apfel} in order to perform our evaluation.
+In addition to compiling and executing UDFs on NoisePage, we require outputs from the UDF inling frameworks \textit{Froid} \cite{froid} and \textit{Apfel} \cite{apfel} in order to perform our evaluation. These represent state-of-the-art approaches to the problem of UDF performance optimization, but they accomplish this in a way that is different from our JIT-compilation technique.
 
 All inlined query plans from Microsoft SQL Server have been gathered and are available at \cite{udf-jit}. We have collected the inlined versions of all but two of the SQL ProcBench functions from the Apfel framework via its web interface, and we are working with the authors of the framework to address the issues that inhibit compilation of the remaining functions.
 
@@ -272,11 +272,11 @@ We have written a collection of scripts that automate all aspects of the benchma
 
 \subsection{Execution of Benchmarks} 
 
-The collection of benchmarking scripts described above removes much of the manual effort involved in running benchmarks. By combining hardware owned by the CMU Database Group with access to AWS EC2 on-demand compute, we have a variety of hardware environments for benchmarking.
+The collection of benchmarking scripts described above removes much of the manual effort involved in running benchmarks. By combining hardware owned by the CMU Database Group with access to AWS EC2 on-demand instances, we have a variety of hardware environments for benchmarking.
 
 \subsection{Communication of Benchmark Results} 
 
-We provide preliminary results of our benchmarks in the following section. These graphics and figures do not necessarily reflect the versions that will appear in our final report, but they do 
+We provide preliminary results of our benchmarks in the following section. These graphics and figures do not necessarily reflect the versions that will appear in our final report, but they do give some indication of both the strengths and weaknesses of our approach.
 
 %% ==================================================================
 %% PROGRESS
@@ -284,16 +284,14 @@ We provide preliminary results of our benchmarks in the following section. These
 
 \section{Progress}
 
-In this section, we present some initial results from our evaluation.
+In this section, we present initial results from our evaluation. The first aspect of our implementation we intend to evaluate is the overhead imposed by individual function calls. While this does not reflect performance improvements or degregations on production workloads, it does allow us to quickly evaluate the viability of our approach to UDF optimization via JIT compilation.
 
-The first aspect of our implementation we intend to evaluate is the overhead imposed by individual function calls. While this does not reflect performance improvements or degregations on production workloads, it does allow us to quickly evaluate the viability of our approach.
-
-In order to measure the runtime overhead imposed by an individual function call, we design a simple synthetic benchmark. This benchmark consists of three queries:
+In order to measure the runtime overhead imposed by an individual function call, we design a simple synthetic benchmark \textit{Call}. This benchmark consists of three queries:
 
 \begin{itemize}
     \item A baseline query that simply performs a sequential scan over a single integer column of a table. This query is shown in listing~\ref{list:udf_call_baseline}. 
     \item A query that invokes the UDF \dbCode{addOne} to increment this integer column by the constant value one. The definition of \dbCode{addOne} is shown in listing~\ref{list:udf_call_functiondef} and the associated invocation is shown in listing~\ref{list:udf_call_function}.
-    \item A query that represents a "perfectly-inlined" version of the call to UDf \dbCode{addOne}. This query is shown in figure~\ref{list:udf_call_inlined}.
+    \item A query that represents a "perfectly-inlined" version of the call to UDf \dbCode{addOne}. In this query, the logic to increment the integer column is completely inlined into the top-level query, eliding the function call entirely. This query is shown in figure~\ref{list:udf_call_inlined}.
 \end{itemize}
 
 \begin{listing}
@@ -302,14 +300,6 @@ SELECT x FROM integers;
     \end{minted}
     \caption{The baseline query for evaluating the overhead of a UDF call.}
     \label{list:udf_call_baseline}
-\end{listing}
-
-\begin{listing}
-    \begin{minted}[frame=lines]{sql}
-SELECT x, addOne(x) FROM integers;
-    \end{minted}
-    \caption{The inlined query for evaluating the overhead of a UDF call.}
-    \label{list:udf_call_function}
 \end{listing}
 
 \begin{listing}
@@ -327,13 +317,21 @@ $$ LANGUAGE PLPGSQL;
 
 \begin{listing}
     \begin{minted}[frame=lines]{sql}
+SELECT x, addOne(x) FROM integers;
+    \end{minted}
+    \caption{The inlined query for evaluating the overhead of a UDF call.}
+    \label{list:udf_call_function}
+\end{listing}
+
+\begin{listing}
+    \begin{minted}[frame=lines]{sql}
 SELECT x, x + 1 FROM integers;
     \end{minted}
     \caption{The inlined query for evaluating the overhead of a UDF call.}
     \label{list:udf_call_inlined}
 \end{listing}
 
-We run this performance benchmark on two systems: PostgreSQL 12 and NoisePage. Here, PostgreSQL serves as a baseline against which we compare our implementation. PostgreSQL implements UDF execution in a manner that incurs significant context-switching overhead \cite{apfel}. As a consequence of this, we expect to observe high function-call overhead in PostgreSQL. In contrast, the benchmark run on NoisePage uses our approach to UDF JIT-compilation that elides any context switching overhead. 
+We run this performance benchmark on two systems: PostgreSQL 12 and NoisePage. Here, PostgreSQL serves as a baseline against which we compare our implementation. PostgreSQL implements UDF execution in a manner that incurs significant context-switching overhead \cite{apfel}. As a consequence of this, we expect to observe high function-call overhead in PostgreSQL. In contrast, the benchmark run on NoisePage uses our approach to UDF JIT-compilation that should avoid context switching overhead by virtue of the fact that all of the logic is expressed as a single program in our internal DSL. 
 
 The results of this benchmark are shown in figure~\ref{fig:bench_pg_call} and figure~\ref{fig:bench_np_call}. The results demonstrate the expected trend: UDF execution in PostgreSQL is slower in absolute terms than UDF execution in NosiePage. More importantly, as the size of the table grows, the overall query runtime for PostgreSQL scales much more poorly that it does for NoisePage. This indicates that our implementation of UDF JIT-compilation does not incur large function call overhead, relative to the "optimal" inlined version of the query.
 
@@ -361,7 +359,7 @@ The results of this benchmark are shown in figure~\ref{fig:bench_pg_call} and fi
     \label{fig:bench_np_call}
 \end{figure}
 
-We construct a second benchmark to evaluate the viability of our approach to UDF JIT-compilation against the PostgreSQL baseline. In this benchmark, we evaluate the total runtime required for the UDF execution engine to execute a tight loop for a specified number of iterations. Like the previous benchmark, this benchmark does not serve as an indicator of performance on production workloads, but rather demonstrates the potential of our approach.
+We construct a second benchmark, \textit{Loop}, to evaluate the viability of our approach to UDF JIT-compilation against the PostgreSQL baseline. In this benchmark, we evaluate the total runtime required for the UDF execution engine to execute a tight loop for a specified number of iterations. Like the previous benchmark, this benchmark does not serve as an indicator of performance on production workloads, but rather demonstrates the potential of our approach to remove software overheads via JIT-compilation of functions.
 
 The definition of the \dbCode{busyLoop} function is provided in listing~\ref{list:udf_loop}. This function is invoked with arguments ranging from 10-100,000,000 specifying the number of iterations of the loop executed within the function's body. The results of the benchmark are shown in figure~\ref{fig:bench_loop}. We see that as the number of iterations grows by a factor of 10, increasing from 10,000,000 to 100,000,000, the total query runtime on PostgreSQL explodes as a result of the relatively-high overhead of individual iterations. In contrast, the growth in runtime for NoisePage is much more modest, suggesting that our approach to UDF JIT-compilation elides much of the overhead imposed by interpreter-based systems like PostgreSQL.
 
@@ -395,7 +393,7 @@ $$ LANGUAGE PLPGSQL;
     \label{fig:bench_loop}
 \end{figure}
 
-Finally, we perform an initial evaluation on a selected functions from the SQL ProcBench \cite{procbench} benchmark. The performance evaluation is performed on the NoisePage systems; results from running the benchmarks against PostgreSQL 12 are also included to provide a point of comparison. Results of the benchmark are shown in figure~\ref{fig:bench_procbench}.
+Finally, we perform an initial evaluation on a selected functions from the SQL ProcBench \cite{procbench} benchmark. The performance evaluation is performed on the NoisePage system. Results from running this benchmark against PostgreSQL 12 are also included to provide a point of comparison. We note that, unlike the previous synthetic benchmarks, this benchmark reflects the complete end-to-end performance characteristics of the tested system, rather than the performance characteristics of the UDF execution subsystem in isolation. Results of this benchmark are shown in figure~\ref{fig:bench_procbench}.
 
 \begin{figure}[t!]
     \centering
@@ -409,7 +407,7 @@ Finally, we perform an initial evaluation on a selected functions from the SQL P
     \label{fig:bench_procbench}
 \end{figure}
 
-Unlike the previous two benchmarks, the results of this benchmark are far from inspiring. NoisePage achieves runtimes similar to PostgreSQL for several of the functions (function identifiers \dbCode{04}, \dbCode{11}, and \dbCode{20a}), but far underperforms PostgreSQL on the remaining functions (function identifiers \dbCode{01} and \dbCode{05}). The distinction between these two sets of functions is that functions in the former group does not interact heavily with the NoisePage storage subsystem, while functions in the latter group do. As a specific example, the definition of the UDF with function identifier \dbCode{05} is shown in listing~\ref{list:udf_procbench_05}. This logic in this function is not complex, but it does involve two aggregations over the result of a three-way \dbCode{JOIN} on three relatively-large tables, implying that most of the work for this query occurs in the storage subsystem as tables are scanned and the \dbCode{JOIN} predicates are applied. The NoisePage storage subsystem has several design deficiencies that render this bottleneck unavoidable.
+Unlike the previous two benchmarks, the results of this benchmark are far from inspiring. NoisePage achieves runtimes similar to PostgreSQL for several of the functions (function identifiers \dbCode{04}, \dbCode{11}, and \dbCode{20a}), but far underperforms PostgreSQL on the remaining functions (function identifiers \dbCode{01} and \dbCode{05}). The distinction between these two sets of functions is that functions in the former group does not interact heavily with the NoisePage storage subsystem, while functions in the latter group do. As a specific example, the definition of the UDF with function identifier \dbCode{05} is shown in listing~\ref{list:udf_procbench_05}. The logic in this function is not complex, but it does involve two aggregations over the result of a three-way \dbCode{JOIN} on three relatively-large tables, implying that most of the work for this query occurs in the storage subsystem as tables are scanned and the \dbCode{JOIN} predicates are applied. The NoisePage storage subsystem has several design deficiencies that render this bottleneck unavoidable.
 
 NoisePage's poor performance on these benchmark functions does not directly influence our ability to complete our evaluation. From the beginning of this project, we have planned to conduct our evaluation within the context of a single research platform in order to neutralize precisely these types of differences among database systems. However, it might preclude our ability to produce results suitable for publication.
 
@@ -459,9 +457,9 @@ The primary point of feedback we received from the Fall update presentation was 
 
 \section{Self-Appraisal}
 
-The performance bottleneck in the NoisePage storage subsystem is well-attested-to within the CMU Database Group - this is a problem that we have known about for a long time but has gone un-addressed because it has not directly hindered our ability to conduct research. However, as noted above, this limitation may indeed hinder our ability to pursue our original publication plans.
+The performance bottleneck in the NoisePage storage subsystem is well-known to developers within the CMU Database Group - this is a problem that we have known about for a long time but has gone un-addressed because it has not directly hindered our ability to conduct research. However, as noted above, this limitation may indeed hinder our ability to pursue our original publication plans.
 
-This is an issue that has only come to light within the past week while running our first round of benchmarks from SQL ProcBench. We should have foreseen this issue long before reaching this point in the project and formulated a plan to either address it or avoid it entirely.
+This is an issue that has only come to light within the past week while running our first round of benchmarks from SQL ProcBench. We should have foreseen this issue long before reaching this point in the project and formulated a plan to either address it or avoid it entirely. 
 
 %% ==================================================================
 %% NEXT STEPS
@@ -497,7 +495,7 @@ Our plan for completing our project is described by the timeline below.
     \end{tabular}
 \end{center}
 
-In our Fall update presentation, we described our plans to pursue a publication as a result of this research. The viability of a publication is now in doubt as a result of the performance limitations of the NoisePage storage subsystem. Results acceptable for publication will likely require require further engineering effort that is outside the scopze of the capstone project. Discussions regarding the appropriate path forward are ongoing.
+In our Fall update presentation, we described our plans to pursue a publication as a result of this research. The viability of a publication is now in doubt as a result of the performance limitations of the NoisePage storage subsystem. Results acceptable for publication will likely require require further engineering effort that is outside the scopze of the capstone project. Discussions regarding the appropriate path forward with respect to publication are ongoing.
 
 %% ==================================================================
 %% BIBLIOGRAPHY
