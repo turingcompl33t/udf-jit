@@ -20,7 +20,7 @@ DEFAULT_DB_USER = "postgres"
 DEFAULT_DB_PASS = "password"
 DEFAULT_DB_NAME = "noisepage"
 DEFAULT_DB_HOST = "localhost"
-DEFAULT_DB_PORT = "5432"
+DEFAULT_DB_PORT = "15721"
 
 # The default number of iterations for each benchmark
 DEFAULT_N_ITERATIONS = 5
@@ -34,7 +34,7 @@ SUBSET_SIZE_STEP = 5
 # The name of the table
 TABLE_NAME = "integers"
 # The number of rows in `integers`
-TABLE_SIZE = 100000
+TABLE_SIZE = 1000
 # The name of the function we are benchmarking
 FUNCTION_NAME = "addOne"
 

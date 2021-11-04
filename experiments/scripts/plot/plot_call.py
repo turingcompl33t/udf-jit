@@ -14,13 +14,13 @@ EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
 
 # The path to the results directory
-RESULTS_PATH = "../bench/results"
+RESULTS_PATH = "./tmp"
 
 # The path to which results are saved
 OUTPUT_PATH = os.path.join(os.getcwd(), "./plots")
 
 # The number of rows in `integers`
-TABLE_SIZE = 100000
+TABLE_SIZE = 1000
 
 
 def read_json(path: str) -> Tuple[List[int], List[float], List[float], List[float]]:
@@ -66,28 +66,33 @@ def make_plot(
     plt.ylabel("Average Query Runtime (ms)", fontsize=20)
     fig.tight_layout()
 
-    # Make the legend
+    # Embedded legend
     handles, labels = ax.get_legend_handles_labels()
-    fig_legend = plt.figure(figsize=(10, 0.5))
-    fig_legend.tight_layout()
-    plt.figlegend(handles, labels, loc="center", ncol=len(handles), frameon=True)
-    fig_legend.savefig(os.path.join(OUTPUT_PATH, f"{prefix}_call_legend.pdf"))
-    plt.close(fig_legend)
+    ax.legend(handles, labels, loc="best", ncol=len(handles), frameon=True)
 
-    plt.savefig(os.path.join(OUTPUT_PATH, f"{prefix}_call.pdf"))
+    # Standalone legend
+    # handles, labels = ax.get_legend_handles_labels()
+    # fig_legend = plt.figure(figsize=(10, 0.5))
+    # fig_legend.tight_layout()
+    # plt.figlegend(handles, labels, loc="center", ncol=len(handles), frameon=True)
+    # fig_legend.savefig(os.path.join(OUTPUT_PATH, f"{prefix}_call_legend.pdf"))
+    # plt.close(fig_legend)
+
+    plt.savefig(os.path.join(OUTPUT_PATH, f"{prefix}_call.png"))
     plt.close(fig)
 
 
 def main() -> int:
-    pg_sizes, pg_baseline, pg_inlined, pg_function = read_json(
-        os.path.join(RESULTS_PATH, "pg_call.json")
-    )
     np_sizes, np_baseline, np_inlined, np_function = read_json(
-        os.path.join(RESULTS_PATH, "np_call.json")
+        os.path.join(RESULTS_PATH, "call_interpreted.json")
     )
 
-    make_plot(pg_sizes, pg_baseline, pg_inlined, pg_function, "pg")
+    tpl_sizes, tpl_baseline, tpl_inlined, tpl_function = read_json(
+        os.path.join(RESULTS_PATH, "call_compiled.json")
+    )
+
     make_plot(np_sizes, np_baseline, np_inlined, np_function, "np")
+    make_plot(tpl_sizes, tpl_baseline, tpl_inlined, tpl_function, "tpl")
 
     return EXIT_SUCCESS
 

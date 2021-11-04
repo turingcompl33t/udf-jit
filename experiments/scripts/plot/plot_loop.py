@@ -15,7 +15,7 @@ EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
 
 # The path to the results directory
-RESULTS_PATH = "../bench/results"
+RESULTS_PATH = "./tmp"
 
 # The path to which results are saved
 OUTPUT_PATH = os.path.join(os.getcwd(), "./plots")
@@ -37,7 +37,7 @@ def read_json(path: str) -> Tuple[List[float], List[float]]:
 
 
 def make_plot(
-    iterations: List[float], pg_runtime: List[float], np_runtime: List[float]
+    iterations: List[float], np_runtime: List[float], tpl_runtime: List[float]
 ):
     """
     Plot benchmark results.
@@ -47,34 +47,42 @@ def make_plot(
     """
 
     fig, ax = plt.subplots()
-    ax.plot(iterations, pg_runtime, label="Postgres", marker="D", zorder=3)
     ax.plot(iterations, np_runtime, label="NoisePage", marker="^", zorder=3)
+    ax.plot(iterations, tpl_runtime, label="TPL", marker="D", zorder=3)
     plt.xlabel("log(Number of Iterations)", fontsize=20)
     plt.ylabel("Average Query Runtime (ms)", fontsize=20)
     fig.tight_layout()
 
-    # Make the legend
+    # Embedded legend
     handles, labels = ax.get_legend_handles_labels()
-    fig_legend = plt.figure(figsize=(10, 0.5))
-    fig_legend.tight_layout()
-    plt.figlegend(handles, labels, loc="center", ncol=len(handles), frameon=True)
-    fig_legend.savefig(os.path.join(OUTPUT_PATH, f"loop_legend.pdf"))
-    plt.close(fig_legend)
+    ax.legend(handles, labels, loc="best", ncol=len(handles), frameon=True)
 
-    plt.savefig(os.path.join(OUTPUT_PATH, f"loop.pdf"))
+    # Standalone legend
+    # handles, labels = ax.get_legend_handles_labels()
+    # fig_legend = plt.figure(figsize=(10, 0.5))
+    # fig_legend.tight_layout()
+    # plt.figlegend(handles, labels, loc="center", ncol=len(handles), frameon=True)
+    # fig_legend.savefig(os.path.join(OUTPUT_PATH, f"loop_legend.pdf"))
+    # plt.close(fig_legend)
+
+    plt.savefig(os.path.join(OUTPUT_PATH, f"loop.png"))
     plt.close(fig)
 
 
 def main() -> int:
-    pg_iterations, pg_runtime = read_json(os.path.join(RESULTS_PATH, "pg_loop.json"))
-    np_iterations, np_runtime = read_json(os.path.join(RESULTS_PATH, "np_loop.json"))
+    np_iterations, np_runtime = read_json(
+        os.path.join(RESULTS_PATH, "loop_interpreted.json")
+    )
+    tpl_iterations, tpl_runtime = read_json(
+        os.path.join(RESULTS_PATH, "loop_compiled.json")
+    )
 
-    assert len(pg_iterations) == len(np_iterations), "Corrupt results data"
+    assert len(tpl_iterations) == len(np_iterations), "Corrupt results data"
     assert all(
-        pg_iterations[i] == np_iterations[i] for i in range(len(pg_iterations))
+        tpl_iterations[i] == np_iterations[i] for i in range(len(np_iterations))
     ), "Corrupt results data"
 
-    make_plot(pg_iterations, pg_runtime, np_runtime)
+    make_plot(np_iterations, np_runtime, tpl_runtime)
 
     return EXIT_SUCCESS
 

@@ -28,7 +28,7 @@ INTEGERS_MIN_VAL = 0
 INTEGERS_MAX_VAL = 100000000
 
 # Number of rows in the `integers` table
-INTEGERS_N_ROWS = 100000000
+INTEGERS_N_ROWS = 1000
 
 # -----------------------------------------------------------------------------
 # Logging
