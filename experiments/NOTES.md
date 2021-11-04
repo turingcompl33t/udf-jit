@@ -20,3 +20,5 @@ It also contains two other queries I have yet to try:
 SELECT COUNT(*) FROM catalog_sales_history WHERE cs_bill_customer_sk = 1 AND cs_sold_date_sk >= 2000 AND cs_sold_date_sk <= 2020;
 SELECT COUNT(*) FROM web_sales_history WHERE ws_bill_customer_sk = 1 AND ws_sold_date_sk >= 2000 AND ws_sold_date_sk <= 2020;
 ```
+### Observations
+

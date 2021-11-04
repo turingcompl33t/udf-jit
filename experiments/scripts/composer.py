@@ -66,7 +66,7 @@ def error(message: str):
 def parse_arguments():
     """Parse commandline arguments."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("noisepage_bin", help="The path to the NoisePage binary")
+    parser.add_argument("noisepage_dir", help="The path to the NoisePage build")
     parser.add_argument(
         "data_dir", help="The path to the data source directory", type=str
     )
@@ -356,7 +356,7 @@ def main() -> int:
         ),
         BenchmarkConfig(
             System.NOISEPAGE,
-            args.noisepage_bin,
+            args.noisepage_dir,
             NOISEPAGE_DB_HOST,
             NOISEPAGE_DB_PORT,
             NOISEPAGE_DB_USER,

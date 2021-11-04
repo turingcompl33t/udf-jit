@@ -1,36 +1,42 @@
 # server.py
 # Class definition for `NoisePageServer` used in JUnit tests.
 
+import os
 import time
 import subprocess
+from enum import Enum
 
 # -----------------------------------------------------------------------------
 # NoisePageServer
 
+class ExecutionMode(Enum):
+    """ExecutionMode enumerates supported NoisePage execution modes."""
+    INTERPRETED = 0
+    COMPILED = 1
 
 class NoisePageServer:
-    """
-    NoisePageServer represents a NoisePage DBMS instance.
-    """
+    """NoisePageServer represents a NoisePage DBMS instance."""
 
-    def __init__(self, binary_path: str, host: str, port: str):
+    def __init__(self, path: str, host: str, port: str, execution_mode: ExecutionMode):
         """
         Initialize a new DBMS server instance.
         :param binary_path The path to the NoisePage binary
         :param host The host on which to run the server
         :param port The port on which to run the server
         """
-        self.binary_path = binary_path
+        self.path = path
+        self.binary_path = os.path.join(path, "noisepage")
         self.db_host = host
         self.db_port = port
+        self.execution_mode = execution_mode
         self.db_process = None
 
     def start(self):
-        """
-        Start the NoisePage server instance.
-        """
+        """Start the NoisePage server instance."""
+        # Provide the compiled query execution argument, if applicable
+        arguments = self.construct_arguments()
         db_process = subprocess.Popen(
-            [f"{self.binary_path}"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            [f"{self.binary_path}{arguments}"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
         check_line = f"NoisePage - Self-Driving Database Management System [port={self.db_port}] [PID={db_process.pid}]"
 
@@ -42,9 +48,7 @@ class NoisePageServer:
             time.sleep(1.0)
 
     def stop(self):
-        """
-        Stop the NoisePage server instance.
-        """
+        """Stop the NoisePage server instance."""
         if self.db_process is None:
             raise RuntimeError("System is in an invalid state.")
 
@@ -67,3 +71,12 @@ class NoisePageServer:
             raise KeyboardInterrupt
 
         return self.db_process.returncode
+
+    def construct_arguments(self):
+        """Construct the program arguments from options passed to NoisePageServer."""
+        if self.execution_mode == ExecutionMode.INTERPRETED:
+            return ""
+        # Execution mode is compiled
+        bytecode_path = os.path.join(self.path, "bytecode_handlers_ir.bc")
+        return f" --compiled_query_execution=true --bytecode_handlers_path={bytecode_path}"
+

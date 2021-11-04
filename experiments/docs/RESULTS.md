@@ -2,7 +2,7 @@
 
 This document contains preliminary results.
 
-### Baseline: PostgreSQL
+### PostgreSQL Baseline
 
 All experiments run on PostgreSQL 12 instance.
 
@@ -42,11 +42,12 @@ TODO: Hardware Stats
 - Function 13 : 24027.222 seconds
 - Function 20a : 23.806 seconds
 
-### NoisePage
+### Initial Benchmarks
 
-Averaged over 5 runs. Run on `dev12`. SQL ProcBench schema SF1.
+Averaged over 5 runs. Run on `dev12`. SQL ProcBench schema SF1. 
 
 System: POSTGRES
+Configuration: Default
 - Function 01 : 0.15 seconds
 - Function 04 : 0.10 seconds
 - Function 05 : 10.5 seconds
@@ -54,8 +55,13 @@ System: POSTGRES
 - Function 20a : 0.10 seconds
 
 System: NOISEPAGE
+Configuration: Release Build, INTERPRETED Execution
 - Function 01 : 52.8 seconds
 - Function 04 : 0.10 seconds
 - Function 05 : 3500.1 seconds
 - Function 11 : 0.15 seconds
 - Function 20a : 0.23 seconds
+
+System: NOISEPAGE
+Configuration: Release Build, COMPILED Execution
+TODO
