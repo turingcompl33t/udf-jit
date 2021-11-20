@@ -131,6 +131,7 @@
 \newcommand{\tpl}{\texttt{TPL}\xspace}
 \newcommand{\tbc}{\texttt{TBC}\xspace}
 \newcommand{\dbCode}[1]{{\sffamily\small \textbf{#1}}\xspace}
+\newcommand{\plpgsql}{PL/pgSQL\xspace}
 
 \newcommand{\tidlist}{\texttt{TupleIdList}\xspace}
 \newcommand{\tidlists}{\texttt{TupleIdLists}\xspace}
@@ -433,26 +434,114 @@ Once the native code is loaded and linked to the DBMS process address space, all
 
 \section{UDF Compilation in NoisePage}
 
-In this section, we describe how we added support for JIT-compilation of user defined functions to the NoisePage DBMS. We partitioned the work of adding support for UDFs to NoisePage into three layers of functionality: a PL\\pgSQL compiler, extension of the \tpl DSL with \textit{closures}, and execution engine integration. We describe each of these three layers in detail below. 
+In this section, we describe how we added support for JIT-compilation of user defined functions to the NoisePage DBMS. We partitioned the work of adding support for UDFs to NoisePage into three layers of functionality: a \plpgsql compiler, extension of the \tpl DSL with \textit{closures}, and execution engine integration. We describe each of these three layers in detail below. 
 
-\subsection{PL\\pgSQL Compiler}
+\subsection{\plpgsql Compiler}
 
-There are many distinct dialects of SQL's procedural extensions - different database systems choose to implement different subsets of the requirements set forth in the standard while simultaneously extending the standard functionality in various ways. In this project, we add support for the the PL\\pgSQL dialect of PL\\SQL. This is the procedural extensions dialect supported by the PostgreSQL database system \cite{postgres}. We select PL\\pgSQL as our target for a number of reasons. PostgreSQL is an open-source system, making it convenient to install and set up. It is a natural choice for performance comparisons because it implements a ``textbook'' database system that does not include many of the complex optimization techniques that other systems might, and makes such optimizations configurable in cases in which they are supported. Finally, PL\\pgSQL is the dialect of PL\\SQL targeted by the \textit{Apfel} framework, one of the targets of our performance comparison.
+There are many distinct dialects of SQL's procedural extensions - different database systems choose to implement different subsets of the requirements set forth in the standard while simultaneously extending the standard functionality in various ways. In this project, we add support for the the \plpgsql dialect of PL\\SQL. This is the procedural extensions dialect supported by the PostgreSQL database system \cite{postgresql}. We select \plpgsql as our target for a number of reasons. PostgreSQL is an open-source system, making it convenient to install and set up. It is a natural choice for performance comparisons because it implements a ``textbook'' database system that does not include many of the complex optimization techniques that other systems might, and makes such optimizations configurable in cases in which they are supported. Finally, \plpgsql is the dialect of PL\\SQL targeted by the \textit{Apfel} framework, one of the targets of our performance comparison.
 
-We implement a PL\\pgSQL compiler in NoisePage. This compiler accepts the textual representation of a PL\\pgSQL function as input and produces the \tpl bytecode program that implements this function as output. The high-level steps involved in PL\\pgSQL compilation are the following:
+We implement a \plpgsql compiler in NoisePage. This compiler accepts the textual representation of a \plpgsql function as input and produces the \tpl bytecode program that implements this function as output. The high-level steps involved in \plpgsql compilation are the following:
 
 \begin{enumerate}
-    \item Parse the textual representation of the PL\\pgSQL function to a parse tree. We utilize existing parser functionality provided by \textit{libpg\_query} for this purpose.
+    \item Parse the textual representation of the \plpgsql function to a parse tree. We utilize existing parser functionality provided by \textit{libpg\_query} for this purpose.
     \item Translate the raw parse tree to an enriched abstract syntax tree. During this phase of compilation, we translate each of the nodes in the raw parse tree from \textit{libpg\_query} to an internal AST representation. This phase translates many of the unsafe components of the parse tree to safe, internal representations, such as replacing non-owning pointers to child nodes with owning C++ smart pointers and replacing string type names with enumerated type identifiers.
     \item Walk the enriched AST to collect function-level metadata. This metdata includes information such as the types of all declared variables and the scopes in which these variables are visible.
-    \item Generate \tpl bytecode from the enriched AST. Code generation from the AST to \tpl occurs in a single step. In comparisong to query code generation, UDF code generation is relatively simple because we lower from an imperative source language (PL\\pgSQL) to an imperative target language (\tpl). The impedance mismatch between SQL and \tpl introduces many challenges that are not present in PL\\SQL to \tpl compilation.
+    \item Generate \tpl bytecode from the enriched AST. Code generation from the AST to \tpl occurs in a single step. In comparisong to query code generation, UDF code generation is relatively simple because we lower from an imperative source language (\plpgsql) to an imperative target language (\tpl). The impedance mismatch between SQL and \tpl introduces many challenges that are not present in PL\\SQL to \tpl compilation.
 \end{enumerate}
 
 \subsection{TPL Closures}
 
+One of the most challenging aspects of integrating UDFs with the existing NoisePage execution engine is handling the interaction between the \tpl code we generate for the \plpgsql function and the associated SQL logic. This dependency manifests in two distinct directions:
+
+\begin{itemize}
+    \item The \plpgsql function is invoked by an enclosing query
+    \item The \plpgsql function contains embedded SQL query logic
+\end{itemize}
+
+In this section we address our approach to solving the latter problem: how to handle SQL query logic that is embedded in the body of a \plpgsql function during code generation. The syntax of the \plpgsql language supports two distinct ways in which embedded query logic may be added to a \plpgsql function. The first of these is a simple embdded query wherein the query produces only a single result row. In this case, we must assign the results of the query to variables within the body of the \plpgsql function. An example of a function that demonstrates this scenario is shown in listing~\ref{list:udf_sql_simple}.
+
+\begin{listing}
+    \begin{minted}[frame=lines]{plpgsql}
+CREATE FUNCTION proc_count(x INTEGER) 
+    RETURNS INTEGER AS $$
+DECLARE 
+    c INTEGER;
+BEGIN
+    c = (SELECT COUNT(*) FROM foo);
+    RETURN c;
+END
+$$ LANGUAGE PLPGSQL;
+    \end{minted}
+    \caption{A UDF with embedded SQL aggregation.}
+    \label{list:udf_sql_simple}
+\end{listing}
+
+Users may also embed SQL logic that returns many result rows into the body of a \plpgsql function. To support such cases, \plpgsql defines a \texttt{for}-loop construct that iterates over query result rows. An example of a function that contains such a construct is shown in listing~\ref{list:udf_sql_loop}.
+
+\begin{listing}
+    \begin{minted}[frame=lines]{plpgsql}
+CREATE FUNCTION proc_forloop(x INTEGER) 
+    RETURNS INTEGER AS $$
+DECLARE 
+    tx INTEGER;
+    ty INTEGER;
+BEGIN
+    FOR x, y in (SELECT x, y FROM points) LOOP
+        tx += x;
+        ty += y;
+    END LOOP;
+    RETURN tx + ty;
+END
+$$ LANGUAGE PLPGSQL;
+    \end{minted}
+    \caption{A UDF with For-S Style \texttt{for}-loop that iterates over query result.}
+    \label{list:udf_sql_loop}
+\end{listing}
+
+Handling embedded query logic is complicated by the fact that we would like to leverge all of the existing NoisePage code generation infrastructure to generate code for embedded queries, rather than rewriting the SQL code generation system from scratch or adding special-cases to handle UDFs. To handle both cases of embedded SQL logic while observing this constraint, we extend the \tpl language with \texttt{closures}. In programming languages, a closure is a generalization of a function that is capable of capturing the environment in which it is constructed. We use closures to bridge the gap between the body of a \plpgsql function and its embedded SQL logic.
+
+In NoisePage, results are typically written to a result buffer that is then either prepared for local output (writing to standard output) or serialization to a network buffer. We generalize this functionality by implementing support for an arbitrary \textit{output callback}. This output callback is invoked by the execution engine for each result row in the query. We combine this output callback functionality with \tpl closures to make query results available to arbitrary imperative logic within the body of a \plpgsql function. 
+
+We model our implemenation of \tpl closures off of their analog in the C++ programming language. In listing~\ref{list:simple_lambda} we provide an example of the interaction between variables declared in the body of the UDF, the closure generated for the query's output callback, and invocation of the query itself. The example is shown in C++ syntax; the generated \tpl bytecode is equivalent. Similarly, in listing~\ref{list:loop_lambda} we demonstrate how a closure is used to implement the \plpgsql \texttt{for}-loop construct over query result rows.
+
+\begin{listing}
+    \begin{minted}[frame=lines]{C++}
+auto udf_body() -> void {
+  int count;
+  auto closure = [&count](int c) -> void {
+      // Assign result to capture variable
+      count = c;
+  };
+  // Invoke query with output callback
+  query(state, closure)
+}
+    \end{minted}
+    \caption{The C++ representation of the closure generated to handle embedded queries with only a single result row.}
+    \label{list:simple_lambda}
+\end{listing}
+
+\begin{listing}
+    \begin{minted}[frame=lines]{C++}
+auto udf_body() -> void {
+  int tx;
+  int ty;
+  auto closure = [&tx, &ty](int x, int y) -> void {
+      // Assign result to capture variable
+      tx += x;
+      ty += y;
+  };
+  // Invoke query with output callback
+  query(state, closure)
+}
+    \end{minted}
+    \caption{The C++ representation of the closure generated to implement a \texttt{for}-loop over embedded query result rows.}
+    \label{list:loop_lambda}
+\end{listing}
+
+
 \subsection{System Integration}
 
-With the implementation of the PL\\pgSQL compiler and the extension of the \tpl language with closures, integrating UDF compilation with the existing NoisePage execution engine is straightforward.
+With the implementation of the \plpgsql compiler and the extension of the \tpl language with closures, integrating UDF compilation with the existing NoisePage execution engine is straightforward.
 
 %% ==================================================================
 %% EVALUATION
