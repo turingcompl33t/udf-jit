@@ -433,11 +433,26 @@ Once the native code is loaded and linked to the DBMS process address space, all
 
 \section{UDF Compilation in NoisePage}
 
-In this section, we describe how we added support for JIT-compilation of user defined functions to the NoisePage DBMS.
+In this section, we describe how we added support for JIT-compilation of user defined functions to the NoisePage DBMS. We partitioned the work of adding support for UDFs to NoisePage into three layers of functionality: a PL\\pgSQL compiler, extension of the \tpl DSL with \textit{closures}, and execution engine integration. We describe each of these three layers in detail below. 
+
+\subsection{PL\\pgSQL Compiler}
+
+There are many distinct dialects of SQL's procedural extensions - different database systems choose to implement different subsets of the requirements set forth in the standard while simultaneously extending the standard functionality in various ways. In this project, we add support for the the PL\\pgSQL dialect of PL\\SQL. This is the procedural extensions dialect supported by the PostgreSQL database system \cite{postgres}. We select PL\\pgSQL as our target for a number of reasons. PostgreSQL is an open-source system, making it convenient to install and set up. It is a natural choice for performance comparisons because it implements a ``textbook'' database system that does not include many of the complex optimization techniques that other systems might, and makes such optimizations configurable in cases in which they are supported. Finally, PL\\pgSQL is the dialect of PL\\SQL targeted by the \textit{Apfel} framework, one of the targets of our performance comparison.
+
+We implement a PL\\pgSQL compiler in NoisePage. This compiler accepts the textual representation of a PL\\pgSQL function as input and produces the \tpl bytecode program that implements this function as output. The high-level steps involved in PL\\pgSQL compilation are the following:
+
+\begin{enumerate}
+    \item Parse the textual representation of the PL\\pgSQL function to a parse tree. We utilize existing parser functionality provided by \textit{libpg\_query} for this purpose.
+    \item Translate the raw parse tree to an enriched abstract syntax tree. During this phase of compilation, we translate each of the nodes in the raw parse tree from \textit{libpg\_query} to an internal AST representation. This phase translates many of the unsafe components of the parse tree to safe, internal representations, such as replacing non-owning pointers to child nodes with owning C++ smart pointers and replacing string type names with enumerated type identifiers.
+    \item Walk the enriched AST to collect function-level metadata. This metdata includes information such as the types of all declared variables and the scopes in which these variables are visible.
+    \item Generate \tpl bytecode from the enriched AST. Code generation from the AST to \tpl occurs in a single step. In comparisong to query code generation, UDF code generation is relatively simple because we lower from an imperative source language (PL\\pgSQL) to an imperative target language (\tpl). The impedance mismatch between SQL and \tpl introduces many challenges that are not present in PL\\SQL to \tpl compilation.
+\end{enumerate}
 
 \subsection{TPL Closures}
 
 \subsection{System Integration}
+
+With the implementation of the PL\\pgSQL compiler and the extension of the \tpl language with closures, integrating UDF compilation with the existing NoisePage execution engine is straightforward.
 
 %% ==================================================================
 %% EVALUATION
