@@ -248,9 +248,47 @@ Outside of the database systems community, the term ``user-defined function'' ha
 
 \section{Related Work}
 
-In this section, we describe alternative approaches to UDF runtime optimization. These alternative approaches are relevant for our discussion because they are the baseline against which we measure the effectiveness of our approach.
+In this section, we describe approaches to UDF runtime optimization. These approaches are relevant for our discussion because they are the baseline against which we measure the effectiveness of our approach.
 
-TODO
+Tradition DBMS execution engines are not equipped to execute arbitrary imperative program logic. For this reason, many systems implement a distinct execution subsystem for procedural extensions to SQL and perform a context-switch from the primary SQL execution engine to this subsystem whenever a UDF must be evaluated \cite{apfel}. An example of this style of UDF evaluation is shown in figure~\ref{fig:overhead_simple}.
+
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=\columnwidth]{img/overhead1.png}
+    \caption{
+        \textbf{Interpreted UDF Execution} --
+        In a traditional DBMS execution engine, the SQL execution engine must context switch to a distinct execution engine for imperative code whenever it encounters a UDF.
+    }
+    \label{fig:overhead_simple}
+\end{figure}
+
+While this approach makes combining the two styles of execution simple to reason about, it often implies significant performance penalties. Frequent context-switching between the SQL engine and the imperative subsystem imposes huge runtime overhead. The situation is made worse by the fact that most UDFs contain embedded SQL queries, leading to further context-switches from the UDF subsystem back to the SQL engine. An example of this situation is shown in figure~\ref{fig:overhead_complex}.
+
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=\columnwidth]{img/overhead2.png}
+    \caption{
+        \textbf{Recursive Context Switching} --
+        Most UDFs found in production workloads contain embedded SQL queries. This exacerbates performance issues because the DBMS now context switches between the SQL engine and the imperative engine repeatedly.
+    }
+    \label{fig:overhead_complex}
+\end{figure}
+
+Despite recent advances in compilation techniques, the most successful approaches to addressing the performance limitations of user-defined functions do not involve native compilation. Instead, most of the attention in this space is currently devoted to the technique of UDF inlining. In UDF inlining, a UDF is translated into a relational algebraic expression that can then be embedded directly into the calling SQL query. Inlining a UDF allows the DBMS's existing query optimization component to optimize the logic of an imperative UDF in the same way it optimizes declarative SQL.
+
+Ramachandra et al. implement this technique's archetype in their \textit{Froid} system within Microsoft SQL Server \cite{sqlserver}. Froid executes UDF inlining by first decomposing an individual UDF into distinct \textit{regions} that it then translates into equivalent relational expressions. The Froid framework then relies on SQL Server's \dbCode{APPLY} operator to compose these relational expressions into a single relational expression that encodes the entirety of the UDF's logic \cite{froid}. Gupta et al. extend this work on Froid with their Aggify framework to add support for cursor loops. Aggify realizes its support for cursor loops by translating them to equivalent custom aggregations \cite{aggify}. An example of the inlining technique used by \textit{Froid} is shown in figure~\ref{fig:inlining}.
+
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=\columnwidth]{img/inlining.png}
+    \caption{
+        \textbf{UDF Inlining in \textit{Froid}} --
+        A simplified example of the UDF-inlining procedure implemented by the \text{Froid} framework in Microsfot SQL Server.
+    }
+    \label{fig:inlining}
+\end{figure}
+
+Duta et al. pursue a distinct approach to UDF inlining in their Apfel framework \cite{apfel}. Where Ramachandra et al. implement Froid as an integrated component of the Microsoft SQL Server DBMS, Duta et al. design their Apfel framework as a standalone system that compiles imperative UDFs written in PL/pgSQL \cite{plpgsql} to standard SQL. Any database system may then process the resulting SQL query in the usual manner. The Apfel framework's defining feature is its use of recursive common table expressions (SQL's \dbCode{WITH RECURSIVE} syntax) to reproduce arbitrary imperative loop logic in SQL.
 
 %% ==================================================================
 %% EXECUTION ENGINE

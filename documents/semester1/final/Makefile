@@ -37,7 +37,7 @@ define run-latex
 	  egrep -i "(Reference|Citation).*undefined" $(<:%.tex=%.log) ; true
 endef
 
-$(TRG)	: %.pdf : %.tex $(DEP) $(PDFPICS) $(BIBFILE)
+$(TRG)	: %.pdf : %.tex $(DEP) $(BIBFILE)
 	  @$(run-latex)
 
 clean	:
