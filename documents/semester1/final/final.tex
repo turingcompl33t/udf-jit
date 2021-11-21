@@ -241,7 +241,11 @@ Carnegie Mellon Database Group's NoisePage system implements an approach to quer
 
 \subsection{UDF Compilation for Analytics}
 
-Outside of the database systems community, the term ``user-defined function'' has a more general definition. In general analytical applications, a user-defined function is any functionality that is not built into the processing engine itself, and is instead written by an end-user.
+Outside of the database systems community, the term ``user-defined function'' has a more general definition. In general analytical applications, a user-defined function is any functionality that is not built into the processing engine itself, and is instead written by an end-user. In recent years, interest in improving the performance of user-defined functions in analytics engines has grown substantially, likely as a consequence of the growing volume of data that must be processed efficiently.
+
+One of the earliest distributed analytics engines to adopt JIT-compilation is Apache Spark \cite{spark}. The Databricks team introduced JIT-compilation to Spark in 2016 with their Tungsten 2.0 engine \cite{spark16}. This engine generates special-purpose Java Virtual Machine (JVM) bytecode for select operators in the Spark execution plan. A team of academics from Purdue University improved upon this design in 2018 with their \textit{Flare} extension to Spark \cite{flare}. Instead of compiling Spark operators to JVM bytecode, \textit{Flare} emits native machine code for even greater savings in instruction counts and overall runtime.
+
+The \textit{Tupleware} system targets a different set of users by scaling down Spark for ``medium-size'' datasets and analytics workloads. Where Spark targets the JVM, \textit{Tupleware} provides a Python interface for analytics applications. The system is implemented as a Python library that allows clients to express user-defined functions in terms of a limited, functional-style API \cite{tupleware}. Under the hood, the system JIT-compiles these Python functions to machine code with LLVM. This system was later extended to support a wider-range of user-defined functions in the \textit{Tuplex} system \cite{tuplex}. \textit{Tuplex} improves on \textit{Tupleware} by first profiling the dataset to collect a distribution of the types used in the workload and subsequently optimizing for the common case. At runtime, input data that does not match this expected common case falls through to a slow-path that executes on the Python interpreter.
 
 %% ==================================================================
 %% RELATED WORK
@@ -684,7 +688,7 @@ NoisePage's poor performance on these benchmark functions does not directly infl
 
 \begin{listing}
     \begin{minted}[frame=lines]{plpgsql}
-CREATE OR REPLACE FUNCTION morningToEveRatio(dep INT) 
+CREATE FUNCTION morningToEveRatio(dep INT) 
     RETURNS INT AS $$
 DECLARE
     morningSale INT;
@@ -692,14 +696,18 @@ DECLARE
     totalSale INT;
 BEGIN
     morningSale := (SELECT COUNT(*)
-        FROM web_sales, time_dim, customer_demographics
+        FROM web_sales, 
+             time_dim, 
+             customer_demographics
         WHERE ws_sold_time_sk = t_time_sk 
             AND ws_bill_customer_sk = cd_demo_sk
             AND t_hour >= 8 AND t_hour <= 9
             AND cd_dep_count = dep);
 
     eveningSale := (SELECT COUNT(*)
-        FROM web_sales, time_dim, customer_demographics 
+        FROM web_sales, 
+             time_dim, 
+             customer_demographics 
         WHERE ws_sold_time_sk = t_time_sk 
             AND ws_bill_customer_sk = cd_demo_sk
             AND t_hour >= 19 AND t_hour <= 20
@@ -720,11 +728,11 @@ $$ LANGUAGE PLPGSQL;
 
 \section{Future Work}
 
-While we completed our intended evaluation in this project, many promising directions for future work remain. 
+While we completed our intended evaluation in this project, many promising directions for future work remain. We explore several of these areas in the following section.
 
 \subsection{Removing Serial Bottlenecks}
 
-Our use of \tpl closures to bridge the gap between the code generation systems for \plpgsql and SQL is general and parsimonious. This design enabled us to quickly solve this engineering problem and continue working on other components required for UDF support. However, this design also imposes a major performance limitation on the system.
+Our use of \tpl closures to bridge the gap between the code generation systems for \plpgsql and SQL is general and parsimonious. This design enabled us to quickly solve this engineering problem and continue working on other components required for UDF support. However, this design also imposes a major performance limitation on the system. This design inherently serializes invocation of embedded query logic and disables many of the performance optimizations present in the remainder of the NoisePage execution engine that rely on parallelization. A more general solution to this problem might remove this serial bottleneck and allow distinct invocations of embedded query logic to proceed in parallel.
 
 \subsection{Non-Inlinable Constructs}
 
@@ -732,7 +740,10 @@ Our \plpgsql compiler supports roughly the same set of \plpgsql language constru
 
 \begin{listing}
     \begin{minted}[frame=lines]{plpgsql}
-CREATE FUNCTION proc_exception(table VARCHAR, c_user INT, c_date DATE) 
+CREATE FUNCTION proc_exception(
+        table  VARCHAR, 
+        c_user INT, 
+        c_date DATE) 
     RETURNS INT AS $$
 DECLARE
     x INT;
@@ -740,7 +751,8 @@ DECLARE
 BEGIN
     INSERT INTO person(first, last) VALUES('Tom', 'Jones');
     BEGIN
-        UPDATE person SET first = 'Joe' WHERE last = 'Jones';
+        UPDATE person SET first = 'Joe' 
+            WHERE last = 'Jones';
         x := 1;
         y := x / 0;
     EXCEPTION
@@ -759,14 +771,17 @@ $$ LANGUAGE PLPGSQL;
 
 \begin{listing}
     \begin{minted}[frame=lines]{plpgsql}
-CREATE FUNCTION proc_dynamic(table VARCHAR, c_user INT, c_date DATE) 
+CREATE FUNCTION proc_dynamic(
+        table  VARCHAR, 
+        c_user INT, 
+        c_date DATE) 
     RETURNS INT AS $$
 DECLARE
     c INT;
 BEGIN
     EXECUTE 'SELECT COUNT(*) FROM '
         || quote_ident(table)
-        || ' WHERE inserted_by = $1 AND inserted <= $2'
+        || ' WHERE istd_by = $1 AND istd <= $2'
     INTO c
     USING checked_user, checked_date;
     RETURN c;
@@ -779,7 +794,17 @@ $$ LANGUAGE PLPGSQL;
 
 \subsection{Decoupling Inlining from Execution}
 
-Throughout much of this project, we conceived of our approach to UDF runtime optimization as fundamentally distinct from the inlining approach used in the \textit{Apfel} and \textit{Froid} project. However, the primary difference between these two approaches is the level of abstraction at which the inlining is performed. Both \textit{Apfel} and \textit{Froid} perform UDF inlining at the SQL level, producing a query that implements the logic of both the inlined function and the original invoking query. In NoisePage, we compile both the function and the invoking query to our own internal intermediate representation, \tpl bytecode, and combine these TODO.
+Throughout much of this project, we conceived of our approach to UDF runtime optimization as fundamentally distinct from the inlining approach used in the \textit{Apfel} and \textit{Froid} project. However, the primary difference between these two approaches is the level of abstraction at which the inlining is performed. Both \textit{Apfel} and \textit{Froid} perform UDF inlining at the SQL level, producing a query that implements the logic of both the inlined function and the original invoking query. In NoisePage, we compile both the function and the invoking query to our own internal intermediate representation, \tpl bytecode, and combine the AST representation of this bytecode to produce a unified program that implements the query. Both approaches solve the UDF runtime overhead problem by inlining the logic the UDF and removing the necessity of performing a context switch to execute imperative logic.
+
+We find in our evaluation that inlining at the SQL level and inlining at the level of the \tpl DSL result in similar performance characteristics. However, SQL inlining does present some additional benefits beyond \tpl inlining.
+
+The first of these benefits is the engineering cost of the solution. The authors of \textit{Froid} claim that the original version of the framework was implemented in just 1,500 lines of code within Microsoft SQL Server \cite{froid} In contrast, our \plpgsql compiler, extensions to the \tpl language, and integration with the rest of the NoisePage execution engine required the addition of some 10,000 lines of code. The \textit{Froid} engineers were able to implement their solution with far fewer additions because the system operates at a much higher level of abstraction.
+
+Beyond engineering overhead, SQL inlining also provides portability. The \textit{Froid} framework is implemented within Microsoft SQL Server. Currently it does not provide an interface through which inlined queries can be extracted directly from the system \cite{froid}, but it is possible to determine the structure of the inlined query plans produced by \textit{Froid} with the help of SQL's \dbSQL{EXPLAIN} command. The \textit{Apfel} framework is implemented as standalone compiler \cite{apfel}. The authors even provide a web interface through which arbitrary users may submit \plpgsql functions and invoking queries and observe how the framework performs inlining \cite{apfelweb}. In contrast, our implementation of UDF inlining with NoisePage is tightly coupled to the remainder of the NoisePage execution engine. The fact that our representation of the unified query plan utilizes our internal DSL renders the technique non-portable.
+
+Finally, SQL inlining presents the opportunity to leverage decades of work on query optimization to produce efficient inlined query plans. Both \textit{Froid} and \textit{Apfel} are capable of producing pure-SQL representations of the inlined query, and this representation may subsequently be run through a standard SQL query optimizer to improve its performance. In NoisePage, we perform inlining \textit{after} query optimization is applied to the invoking SQL query. This prevents us from capturing the benefits of optimization that may only become visible to the optimizer after the query has been inlined.
+
+To account for the strengths and limitations of both approaches, we propose decoupling UDF inlining from the execution environment. This would allow us to take advantage of all of the aforementioned benefits of SQL inlining within the context of a compiled query engine like NoisePage. 
 
 %% ==================================================================
 %% CONCLUSION
@@ -787,7 +812,9 @@ Throughout much of this project, we conceived of our approach to UDF runtime opt
 
 \section{Conclusion}
 
-In this paper, we present a new approach to UDF runtime optimization through integration with an existing query compilation engine.
+UDFs allow us express SQL queries more efficiently and in a manner that encourages modularization and reuse. They make data management in production more safer and more efficient. However, their use in production systems is often discouraged because of their poor performance characteristics. This poor performance is a result of the impedance mismatch between declarative SQL and imperative PL/SQL which often necessitates frequent, expensive context-switches during query execution.
+
+In this paper, we address this problem using a novel approach to UDF runtime optimization that integrates with a query compilation engine. In our research system, NoisePage, we implement a compiler for \plpgsql UDFs that targets the same intermediate representation as our existing execution engine architecture. We combine the code generated for both the UDF and its invoking query into a complete program and JIT-compile this program to native machine code with LLVM. In an experimental evaluation we find that our approach yields performance that is competitive with state-of-the-art approaches to UDF optimization through inlining.
 
 %% ==================================================================
 %% ACKNOWLEDGEMENTS
@@ -795,7 +822,13 @@ In this paper, we present a new approach to UDF runtime optimization through int
 
 \section{Acknowledgements}
 
-I would like to thank Karthik Ramachandra from Microsoft for providing insights on the \textit{Froid} framework and its approach to UDF-inlining. I would also like to thank Surabhi Gupta for her work on the SQL ProcBench benchmark. I would also like to thank Torsten Grust and Denis Hirn from the University of Tubingen for providing insights on their \textit{Apfel} framework and providing the means to inline selected queries for our evaluation. I would like to thank my Capstone advisor Andrew Pavlo for his consistent feedback and enthusiasm for this project. Finally, I would like to thank all of my colleagues in the Carnegie Mellon Database Group for constantly inspiring me to strive for database-greatness.
+I would like to thank Karthik Ramachandra from Microsoft. His pioneering work on \textit{Froid} and consistent willingness to discuss its inner workings enabled me to complete my evaluation in this project.
+
+I would also like to thank Torsten Grust and Denis Hirn from the University of Tubingen. This project would not have been possible were it not for their willingness to provide insights on their \textit{Apfel} framework and the means utilize it with a custom configuration. 
+
+I would like to thank my Capstone advisor Andrew Pavlo for his consistent feedback and enthusiasm for this project. There were many times over the course of this project that I felt discouraged by new challenges and slow progress. Andy always managed to reignite my passion for this work.
+
+Finally, I would like to thank all of my colleagues in the Carnegie Mellon Database Group for constantly inspiring me to strive for database-greatness. Specifically, I must thank former member Tanuj Nayak. Tanuj's work on \plpgsql compilation forms the foundation for this project; I would not have been able to complete it were it not for his example.
 
 %% ==================================================================
 %% BIBLIOGRAPHY
