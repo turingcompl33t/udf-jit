@@ -547,6 +547,40 @@ auto udf_body() -> void {
 
 With the implementation of the \plpgsql compiler and the extension of the \tpl language with closures, integrating UDF compilation with the existing NoisePage execution engine is straightforward.
 
+As an example consider the UDF definition shown in listing~\ref{list:udf_example_definition} and the associated invocation in the SQL query shown in listing~\ref{list:udf_example_invocation}. To compile and execute this query, we perform the following steps:
+
+\begin{enumerate}
+    \item Compile the \plpgsql function \dbCode{procCount} to \tpl byetcode with our \plpgsql compiler. Store the compiled bytecode in the system catalog with a unique identifier.
+    \item Bind the invocation of \dbCode{procCount} in the body of the invoking query to the bytecode object stored in the system catalog.
+    \item Generate \tpl bytecode for the invoking query.
+    \item Clone the AST of the \tpl bytecode for the function \dbCode{procCount} into the bytecode module for the invoking query.
+    \item Pass this unified bytecode program to the LLVM engine for native JIT-compilation.
+\end{enumerate}
+
+\begin{listing}
+    \begin{minted}[frame=lines]{plpgsql}
+CREATE FUNCTION procCount() 
+    RETURNS INTEGER AS $$
+DECLARE 
+    c INTEGER;
+BEGIN
+    c := (SELECT COUNT(*) FROM foo);
+    RETURN c;
+END
+$$ LANGUAGE PLPGSQL;
+    \end{minted}
+    \caption{Defintion of UDF \dbCode{procCount}.}
+    \label{list:udf_example_definition}
+\end{listing}
+
+\begin{listing}
+    \begin{minted}[frame=lines]{sql}
+SELECT procCount();
+    \end{minted}
+    \caption{The invocation of UDF \dbCode{procCount}.}
+    \label{list:udf_example_invocation}
+\end{listing}
+
 %% ==================================================================
 %% EVALUATION
 %% ==================================================================
