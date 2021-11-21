@@ -587,18 +587,18 @@ SELECT procCount();
 
 \section{Evaluation}
 
-We now present the results of our evaluation of UDF runtime optimization techniques. We compare our approach to UDF JIT-compilation with several baselines, including interpretation-based UDF execution in PostgreSQL and the inlined SQL queries produced by the \textit{Apfel} framework.
+We now present the results of our evaluation of UDF runtime optimization techniques. We compare UDF JIT-compilation with several baselines, including interpretation-based UDF execution in PostgreSQL and the inlined SQL queries produced by the \textit{Apfel} framework. For our experiments, all benchmark systems are run on Ubuntu Server 18.04. The machine was equipped with Intel(R) Xeon(R) Bronze 3104 CPU @ 1.70GHz (1 processor, 6 cores), 16 GB of RAM and SSD-backed storage.
 
 \subsection{Function Call Overhead}
 
-The first aspect of our implementation we intend to evaluate is the overhead imposed by individual function calls. While this does not reflect performance improvements or degregations on production workloads, it does allow us to quickly evaluate the viability of our approach to UDF optimization via JIT compilation.
+The first aspect of our implementation we evaluate is the overhead imposed by individual function calls. While this does not reflect performance improvements or degregations on production workloads, it does allow us to quickly estimate the viability of our approach to UDF optimization via JIT compilation.
 
 In order to measure the runtime overhead imposed by an individual function call, we design a simple synthetic benchmark \textit{Call}. This benchmark consists of three queries:
 
 \begin{itemize}
-    \item A baseline query that simply performs a sequential scan over a single integer column of a table. This query is shown in listing~\ref{list:udf_call_baseline}. 
+    \item A baseline query that performs a sequential scan over a single integer column of a table. The complete text of this query is shown in listing~\ref{list:udf_call_baseline}. 
     \item A query that invokes the UDF \dbCode{addOne} to increment this integer column by the constant value one. The definition of \dbCode{addOne} is shown in listing~\ref{list:udf_call_functiondef} and the associated invocation is shown in listing~\ref{list:udf_call_function}.
-    \item A query that represents a "perfectly-inlined" version of the call to UDf \dbCode{addOne}. In this query, the logic to increment the integer column is completely inlined into the top-level query, eliding the function call entirely. This query is shown in figure~\ref{list:udf_call_inlined}.
+    \item A query that represents a "perfectly-inlined" version of the call to UDf \dbCode{addOne}. In this query, the logic to increment the integer column is completely inlined into the top-level query, eliding the function call entirely. The complete text of this query is shown in figure~\ref{list:udf_call_inlined}.
 \end{itemize}
 
 \begin{listing}
@@ -638,9 +638,9 @@ SELECT x, x + 1 FROM integers;
     \label{list:udf_call_inlined}
 \end{listing}
 
-We run this performance benchmark on two systems: PostgreSQL 12 and NoisePage. Here, PostgreSQL serves as a baseline against which we compare our implementation. PostgreSQL implements UDF execution in a manner that incurs significant context-switching overhead \cite{apfel}. As a consequence of this, we expect to observe high function-call overhead in PostgreSQL. In contrast, the benchmark run on NoisePage uses our approach to UDF JIT-compilation that should avoid context switching overhead by virtue of the fact that all of the logic is expressed as a single program in our internal DSL. 
+We run this performance benchmark on two systems: PostgreSQL 12 and NoisePage. Here, PostgreSQL serves as a baseline against which we compare our implementation. PostgreSQL implements UDF execution in a manner that incurs significant context-switching overhead \cite{apfel}. As a consequence of this, we expect to observe high function-call overhead in PostgreSQL. In contrast, the benchmark run on NoisePage uses our approach to UDF JIT-compilation that avoids context switching overhead by virtue of the fact that all of the logic is expressed as a single program in our internal DSL. 
 
-The results of this benchmark are shown in figure~\ref{fig:bench_pg_call} and figure~\ref{fig:bench_np_call}. The results demonstrate the expected trend: UDF execution in PostgreSQL is slower in absolute terms than UDF execution in NosiePage. More importantly, as the size of the table grows, the overall query runtime for PostgreSQL scales much more poorly that it does for NoisePage. This indicates that our implementation of UDF JIT-compilation does not incur large function call overhead, relative to the "optimal" inlined version of the query.
+The results of this benchmark are shown in figure~\ref{fig:bench_pg_call} and figure~\ref{fig:bench_np_call}. The results demonstrate the expected trend: UDF execution in PostgreSQL is slower in absolute terms than UDF execution in NosiePage. More importantly, as the size of the table grows, the overall query runtime for PostgreSQL scales much more poorly than it does in NoisePage. This indicates that our implementation of UDF JIT-compilation does not incur large function call overhead, relative to the "optimal" inlined version of the query.
 
 \begin{figure}[t!]
     \centering
@@ -702,7 +702,11 @@ $$ LANGUAGE PLPGSQL;
     \label{fig:bench_loop}
 \end{figure}
 
-Finally, we perform an initial evaluation on a selected functions from the SQL ProcBench \cite{procbench} benchmark. The performance evaluation is performed on the NoisePage system. Results from running this benchmark against PostgreSQL 12 are also included to provide a point of comparison. We note that, unlike the previous synthetic benchmarks, this benchmark reflects the complete end-to-end performance characteristics of the tested system, rather than the performance characteristics of the UDF execution subsystem in isolation. Results of this benchmark are shown in figure~\ref{fig:bench_procbench}.
+\subsection{Production Simulation}
+
+Finally, we perform an evaluation on selected functions from the SQL ProcBench \cite{procbench} benchmark. SQL ProcBench is a new benchmark designed to emulate the use of SQL procedural extensions (PL/SQL) in production workloads. The benchmark consists of 28 scalar user-defined functions. We select five of these functions to evaluate because they contain constructs that NoisePage is capable of compiling and that the \textit{Apfel} framework is able to inline. Benchmarks are run on a database with the complete ProcBench schema at scale factor 1.
+
+The first evluation we perform measures the total time required to execute each of functions in the benchmark. We execute each of the five benchmark functions on NoisePage and compare the total runtime against equivalent evaluations on PostgreSQL 12. Unlike the synthetic benchmarks, this benchmark reflects the complete end-to-end performance characteristics of the tested system, rather than the performance characteristics of the UDF execution subsystem in isolation. Results of this benchmark are shown in figure~\ref{fig:bench_procbench_postgres}.
 
 \begin{figure}[t!]
     \centering
@@ -710,15 +714,13 @@ Finally, we perform an initial evaluation on a selected functions from the SQL P
     \\
     \includegraphics[width=\columnwidth]{plots/procbench.pdf}
     \caption{
-        \textbf{End-to-End Benchmark Performance} --
+        \textbf{ProcBench Results - PostgreSQL Baseline} --
         Comparison of query runtime on PostgreSQL and NoisePage during execution of select functions from the SQL ProcBench benchmark.
     }
-    \label{fig:bench_procbench}
+    \label{fig:bench_procbench_postgres}
 \end{figure}
 
-Unlike the previous two benchmarks, the results of this benchmark are far from inspiring. NoisePage achieves runtimes similar to PostgreSQL for several of the functions (function identifiers \dbCode{04}, \dbCode{11}, and \dbCode{20a}), but far underperforms PostgreSQL on the remaining functions (function identifiers \dbCode{01} and \dbCode{05}). The distinction between these two sets of functions is that functions in the former group does not interact heavily with the NoisePage storage subsystem, while functions in the latter group do. As a specific example, the definition of the UDF with function identifier \dbCode{05} is shown in listing~\ref{list:udf_procbench_05}. The logic in this function is not complex, but it does involve two aggregations over the result of a three-way \dbCode{JOIN} on three relatively-large tables, implying that most of the work for this query occurs in the storage subsystem as tables are scanned and the \dbCode{JOIN} predicates are applied. The NoisePage storage subsystem has several design deficiencies that render this bottleneck unavoidable.
-
-NoisePage's poor performance on these benchmark functions does not directly influence our ability to complete our evaluation. From the beginning of this project, we have planned to conduct our evaluation within the context of a single research platform in order to neutralize precisely these types of differences among database systems. However, it might preclude our ability to produce results suitable for publication.
+Unlike the previous two benchmarks, the results of this benchmark are far from inspiring. NoisePage achieves runtimes similar to PostgreSQL for several of the functions (function identifiers \dbCode{04}, \dbCode{11}, and \dbCode{20a}), but far underperforms PostgreSQL on the remaining functions (function identifiers \dbCode{01} and \dbCode{05}). The distinction between these two sets of functions is that functions in the former group do not interact heavily with the NoisePage storage subsystem, while functions in the latter group do. As a specific example, the definition of the UDF with function identifier \dbCode{05} is shown in listing~\ref{list:udf_procbench_05}. The logic in this function is not complex, but it does involve two aggregations over the result of a three-way \dbCode{JOIN} on three relatively-large tables, implying that most of the work for this query occurs in the storage subsystem as tables are scanned and the \dbCode{JOIN} predicates are applied. The NoisePage storage subsystem has several design deficiencies that render this bottleneck unavoidable.
 
 \begin{listing}
     \begin{minted}[frame=lines]{plpgsql}
@@ -755,6 +757,24 @@ $$ LANGUAGE PLPGSQL;
     \caption{The definition of ProcBench UDF \dbCode{05}.}
     \label{list:udf_procbench_05}
 \end{listing}
+
+NoisePage's poor performance on these benchmark functions demonstrates the necessity of conducting our final evaluation within the context of a single system. Doing so controls for many of the differences among systems so that we may isolate the performance characteristics of UDF optimization strategies. 
+
+To this end, we run a second evaluation on the SQL ProcBench benchmark functions. This time, we compare the performance of UDF JIT-compilation in NoisePage with the inlined versions of the benchmark queries produced by the \textit{Apfel} framework. To produce these inlined queries, we compile the original ProcBench functions and their invoking queries with the \textit{Apfel} framework. We then transcribe the SQL queries produced by the framework into query plans that are executed on NoisePage. We must construct each of these query plans by hand because NoisePage does not support some of the SQL constructs that appear in the queries produced by \textit{Apfel}. The results of this evaluation are shown in figure~\ref{fig:bench_procbench_final}.
+
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=\columnwidth]{plots/procbench_apfel_legend.pdf}
+    \\
+    \includegraphics[width=\columnwidth]{plots/procbench_apfel.pdf}
+    \caption{
+        \textbf{ProcBench Results - \plpgsql Compilation vs Inlining} --
+        Comparison of query runtime on NoisePage during execution of select functions from the SQL ProcBench benchmark.
+    }
+    \label{fig:bench_procbench_final}
+\end{figure}
+
+The results of this evaluation are inconclusive. For simpler queries, direct \plpgsql compilation provides better performance. This is unsurprising considering that the inlined queries from \textit{Apfel} must model even simple control flow with SQL \dbCode{JOIN} operations and common table expressions. The NoisePage optimizer is not able to optimize away some of these inefficiencies because the query plans are input directly. For more complex queries (function identifiers \dbCode{01} and \dbCode{05}) any performance differences between the two approaches are hidden by the inefficiencies in the NoisePage storage engine.  
 
 %% ==================================================================
 %% FUTURE WORK
