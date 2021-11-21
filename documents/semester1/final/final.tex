@@ -724,7 +724,62 @@ While we completed our intended evaluation in this project, many promising direc
 
 \subsection{Removing Serial Bottlenecks}
 
-\subsection{Other}
+Our use of \tpl closures to bridge the gap between the code generation systems for \plpgsql and SQL is general and parsimonious. This design enabled us to quickly solve this engineering problem and continue working on other components required for UDF support. However, this design also imposes a major performance limitation on the system.
+
+\subsection{Non-Inlinable Constructs}
+
+Our \plpgsql compiler supports roughly the same set of \plpgsql language constructs as the \textit{Apfel} and \textit{Froid} frameworks. There remain some \plpgsql constructs, however, that these mature frameworks do not support. Examples of such unsupported constructs include table modifications, exceptional control flow (listing~\ref{list:udf_exception}) and dynamic SQL (listing~\ref{list:udf_dynamic_sql}). Adding support for these constructs may be difficult or even impossible for \textit{Froid} and \textit{Apfel} because of the limitations imposed by inlining at the SQL level. We foresee no such limitations in our approach.
+
+\begin{listing}
+    \begin{minted}[frame=lines]{plpgsql}
+CREATE FUNCTION proc_exception(table VARCHAR, c_user INT, c_date DATE) 
+    RETURNS INT AS $$
+DECLARE
+    x INT;
+    y INT;
+BEGIN
+    INSERT INTO person(first, last) VALUES('Tom', 'Jones');
+    BEGIN
+        UPDATE person SET first = 'Joe' WHERE last = 'Jones';
+        x := 1;
+        y := x / 0;
+    EXCEPTION
+        WHEN division_by_zero THEN
+            RAISE NOTICE 'caught division_by_zero';
+            RETURN x;
+        END;
+    END;
+    RETURN 0;
+END;
+$$ LANGUAGE PLPGSQL;
+    \end{minted}
+    \caption{An example of a UDF containing exceptional control flow.}
+    \label{list:udf_exception}
+\end{listing}
+
+\begin{listing}
+    \begin{minted}[frame=lines]{plpgsql}
+CREATE FUNCTION proc_dynamic(table VARCHAR, c_user INT, c_date DATE) 
+    RETURNS INT AS $$
+DECLARE
+    c INT;
+BEGIN
+    EXECUTE 'SELECT COUNT(*) FROM '
+        || quote_ident(table)
+        || ' WHERE inserted_by = $1 AND inserted <= $2'
+    INTO c
+    USING checked_user, checked_date;
+    RETURN c;
+END; 
+$$ LANGUAGE PLPGSQL;
+    \end{minted}
+    \caption{An example of a UDF containing dynamic SQL.}
+    \label{list:udf_dynamic_sql}
+\end{listing}
+
+\subsection{Decoupling Inlining from Execution}
+
+Throughout much of this project, we conceived of our approach to UDF runtime optimization as fundamentally distinct from the inlining approach used in the \textit{Apfel} and \textit{Froid} project. However, the primary difference between these two approaches is the level of abstraction at which the inlining is performed. Both \textit{Apfel} and \textit{Froid} perform UDF inlining at the SQL level, producing a query that implements the logic of both the inlined function and the original invoking query. In NoisePage, we compile both the function and the invoking query to our own internal intermediate representation, \tpl bytecode, and combine these TODO.
 
 %% ==================================================================
 %% CONCLUSION
@@ -732,7 +787,7 @@ While we completed our intended evaluation in this project, many promising direc
 
 \section{Conclusion}
 
-TODO
+In this paper, we present a new approach to UDF runtime optimization through integration with an existing query compilation engine.
 
 %% ==================================================================
 %% ACKNOWLEDGEMENTS
