@@ -37,13 +37,17 @@ def make_plot():
     plt.xticks(np.arange(N) + 0.4 / 2, RESULTS_APFEL.keys())
     fig.tight_layout()
 
-    # Make the legend
+    # Embedded legend
     handles, labels = ax.get_legend_handles_labels()
-    fig_legend = plt.figure(figsize=(10, 0.5))
-    fig_legend.tight_layout()
-    plt.figlegend(handles, labels, loc="center", ncol=len(handles), frameon=True)
-    fig_legend.savefig(os.path.join(OUTPUT_PATH, "procbench_apfel_legend.pdf"))
-    plt.close(fig_legend)
+    ax.legend(handles, labels, loc="best", ncol=len(handles), frameon=True)
+
+    # Standalone legend
+    # handles, labels = ax.get_legend_handles_labels()
+    # fig_legend = plt.figure(figsize=(10, 0.5))
+    # fig_legend.tight_layout()
+    # plt.figlegend(handles, labels, loc="center", ncol=len(handles), frameon=True)
+    # fig_legend.savefig(os.path.join(OUTPUT_PATH, "procbench_apfel_legend.pdf"))
+    # plt.close(fig_legend)
 
     plt.savefig(os.path.join(OUTPUT_PATH, "procbench_apfel.pdf"))
     plt.close(fig)
