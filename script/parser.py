@@ -17,6 +17,7 @@
 #                         The path to the procedure parser binary
 #   -v, --verbose         Enable verbose debugging output
 
+from json.decoder import JSONDecodeError
 import os
 import sys
 import json
@@ -128,11 +129,14 @@ def parse_procedure(proc: str, bin_path: str) -> Dict:
     # Write the procedure and terminating EOF
     stdout, stderr = process.communicate(input=proc.encode())
     if len(stderr) != 0:
-        print(stderr)
         return None
 
     # Load the JSON output
-    parse_tree = json.loads(stdout)
+    parse_tree = None
+    try:
+        parse_tree = json.loads(stdout)
+    except JSONDecodeError:
+        return None
 
     # We only expect to parse a single procedure
     return None if len(parse_tree) == 0 else parse_tree[0]

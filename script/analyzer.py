@@ -97,6 +97,15 @@ def parse_arguments():
 # -----------------------------------------------------------------------------
 
 
+def read_from_text(text: str) -> Dict:
+    """
+    Read the JSON-formatted parse tree from text.
+    :param text The text of the parse tree
+    :return The in-memory JSON representation of the parse tree
+    """
+    return json.loads(text)
+
+
 def read_from_file(path: str) -> Dict:
     """
     Read the JSON-formatted parse tree from `path`.
@@ -252,6 +261,36 @@ def analyze_queries(parse_tree: Dict) -> FrozenSet:
     for q in queries:
         statements = statements | extract_statements(q)
     return frozenset(statements)
+
+
+# -----------------------------------------------------------------------------
+# Feature Extraction
+# -----------------------------------------------------------------------------
+
+
+def get_features(text: str) -> Dict[str, int]:
+    """
+    Extract features from a UDF parse tree.
+    :param text The text
+    :return The dictionary representation of extracted features
+    """
+    # Read the parse tree from text
+    parse_tree = read_from_text(text)
+    if parse_tree is None:
+        return None
+
+    # Get all of the raw features
+    features = analyze_features(parse_tree)
+    # Get the embedded queries
+    queries = analyze_queries(parse_tree)
+
+    # Combine the results of analysis
+    unified = features | queries
+    results = {
+        k: v
+        for k, v in zip(FEATURE_KEYS, [1 if x in unified else 0 for x in FEATURE_KEYS])
+    }
+    return {FEATURE_KEYS[k]: v for k, v in results.items()}
 
 
 # -----------------------------------------------------------------------------
