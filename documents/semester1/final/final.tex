@@ -174,11 +174,11 @@ User-defined functions (UDFs) are a powerful tool for expressing complex applica
 
 \section{Introduction}
 
-User-defined functions (UDFs) are a powerful tool for encapsulating complex application logic that may subsequently be embedded into SQL queries. Consider a scenario in which we would like to write a query that computes the "reward level" for each customer in a table of retail transactions based on the total amount spent by each customer. Expressing such a query in pure SQL is certainly possible, but non-trivial. In contrast, with the help of SQL's procedural extensions, the definition of a UDF that implements this logic is straightforward, as shown in figure~\ref{fig:cust_level_def}.
+User-defined functions (UDFs) are a powerful tool for encapsulating complex application logic that may subsequently be embedded into SQL queries. Consider a scenario in which we would like to write a query that computes the "reward level" for each customer in a table of retail transactions based on the total amount spent by each customer. Expressing such a query in pure SQL is possible, but non-trivial. In contrast, with the help of SQL's procedural extensions, the definition of a UDF that implements this logic is straightforward, as shown in figure~\ref{fig:cust_level_def}.
 
 \begin{listing}[H]
     \begin{minted}[frame=lines]{plpgsql}
-CREATE FUNCTION cust_level(ckey int)
+CREATE FUNCTION cust_level(ckey INT)
     RETURNS CHAR(10) AS $$
     DECLARE total FLOAT;
     DECLARE level CHAR(10);
@@ -209,7 +209,7 @@ SELECT c_custkey, cust_level(c_custkey)
     \label{fig:cust_level_call}
 \end{listing}
 
-This simple example demonstrates the power of user-defined functions. UDFs allow us express SQL queries more efficiently and in a manner that encourages modularization and reuse. However, UDFs present one major limitation that often precludes their use in production systems: they introduce an intolerable amount of runtime overhead. One study from Microsoft Research found that introducing UDFs to express portions of query logic can increase total execution time by over 46,000x its baseline value when expressed in pure SQL \cite{froid}. The underlying reason for this massive performance degradation is the fundamental mismatch between declarative SQL and the imperative language of UDFs. Because the source languages are so different, most database systems rely on a distinct subsystem to implement UDF execution, and the context switching between these subsystems combined with the lack of optimization applied within the UDF engine produces this impressively-poor performance \cite{froid, apfel}.
+This simple example demonstrates the power of user-defined functions. UDFs allow us express SQL queries more efficiently and in a manner that encourages modularization and reuse. However, UDFs present one major limitation that often precludes their use in production systems: they introduce an intolerable amount of runtime overhead. One study from Microsoft found that introducing UDFs to express portions of query logic can increase total execution time by over 46,000x its baseline value when expressed in pure SQL \cite{froid}. The underlying reason for this massive performance degradation is the fundamental mismatch between declarative SQL and the imperative language of UDFs. Because the source languages are so different, most database systems rely on a distinct subsystem to implement UDF execution, and the context switching between these subsystems combined with the lack of optimization applied within the UDF engine produces this impressively-poor performance \cite{froid, apfel}.
 
 Various approaches to addressing this problem have been proposed. The most promising existing strategies for improving UDF execution performance may be approximately grouped under the term \textit{UDF inlining}. In UDF inlining, the imperative code that implements the UDF is translated to SQL, and the resulting SQL is then inserted into the calling query at the invocation site of the UDF. In this project, we propose a new approach to UDF execution that operates by leveraging an existing code generation system to JIT compile the UDF to native machine code and subsequently execute it. We implement this technique in the NoisePage \cite{noisepage} DBMS.
 
@@ -231,9 +231,9 @@ In this strategy, the DBMS implements its execution engine in terms of high-leve
 
 Query compilation is one such query execution strategy that is growing in popularity. At a high level, query compilation aims to reduce the number of instructions executed by generating specialized code for each query that the system encounters. 
 
-There are many approaches to implementing query compilation, and the techniques for doing so have evolved rapidly in the last decade. One of the earliest implementations of query compilation in the modern era was accomplished by the HIQUE system \cite{systemr}. In HIQUE, the execution engine first translates an input query to C++ code. It subsequently compiles this C++ code to native code by spawning an external process (GCC \cite{gcc}) \cite{krikellas10}. It is important to note here, however, that HIQUE does not implement translation for arbitrary SQL queries but instead relies on pre-defined C++ templates that it applies to a limited subset of input queries.
+There are many approaches to implementing query compilation, and the techniques for doing so have evolved rapidly in the last decade. One of the earliest implementations of query compilation in the modern era was accomplished by the HIQUE system \cite{systemr}. In HIQUE, the execution engine first translates an input query to C++ code. It subsequently compiles this C++ code to native code by spawning an external process (the C/C++ compiler, GCC \cite{gcc}) \cite{krikellas10}. It is important to note here, however, that HIQUE does not implement translation for arbitrary SQL queries but instead relies on pre-defined C++ templates that it applies to a limited subset of input queries.
 
-More advanced systems eschew using an external compiler to avoid the high costs associated with compilation under this model. Spawning an external compilation process introduces the latency associated with operating system process management into the critical path of query execution. Furthermore, utilizing an external compiler like GCC to compile specialized query code discards much of the information that the DBMS has already `learned' about the query while constructing its query plan and forces the compiler's frontend to repeat much of this work. The HyPer main memory DBMS \cite{hyper} is one example of a system that avoids these issues by implementing query compilation without using an external compiler. HyPer generates LLVM \cite{llvm} intermediate representation from the input query and subsequently utilizes the existing LLVM infrastructure to JIT-compile the IR to native machine code that implements the query \cite{neumann11, kemper11}.
+More advanced systems eschew use of an external compiler to avoid the high costs associated with compilation under this model. Spawning an external compilation process introduces the latency associated with operating system process management into the critical path of query execution. Furthermore, utilizing an external compiler like GCC to compile specialized query code discards much of the information that the DBMS has already `learned' about the query while constructing its query plan and forces the compiler's frontend to repeat much of this work. The HyPer main memory DBMS \cite{hyper} is one example of a system that avoids these issues by implementing query compilation without using an external compiler. HyPer generates LLVM \cite{llvm} intermediate representation from the input query and subsequently utilizes the existing LLVM infrastructure to JIT-compile the IR to native machine code that implements the query \cite{neumann11, kemper11}. HyPer also adds support for \textit{adaptive query compilation} to further reduce query execution latency. Query execution is initiated on an interpreter while fragments of the query are JIT-compiled asynchronously in the background; when compilation completes the compiled fragments are dynamically swapped with their interpreted counterparts to increase steady-state throughput.
 
 The SingleStore \cite{singlestore} execution engine represents a more advanced approach to compilation. It first translates SQL queries to an internal domain-specific language (DSL) that then undergoes a second stage of translation to LLVM intermediate representation. The execution engine then JIT-compiles this intermediate representation to native code \cite{paroski16}. This additional step in the query compilation process facilitates greater developer productivity by making it easier to reason about the code generated by the execution engine's upper layers.
 
@@ -241,7 +241,7 @@ Carnegie Mellon Database Group's NoisePage system implements an approach to quer
 
 \subsection{UDF Compilation for Analytics}
 
-Outside of the database systems community, the term ``user-defined function'' has a more general definition. In general analytical applications, a user-defined function is any functionality that is not built into the processing engine itself, and is instead written by an end-user. In recent years, interest in improving the performance of user-defined functions in analytics engines has grown substantially, likely as a consequence of the growing volume of data that must be processed efficiently.
+Outside of the database systems community, the term ``user-defined function'' has a more general definition. In analytical applications, a user-defined function is any functionality that is not built into the processing engine itself, and is instead written by an end-user. In recent years, interest in improving the performance of user-defined functions in analytics engines has grown substantially, likely as a consequence of the growing volume of data that must be processed efficiently.
 
 One of the earliest distributed analytics engines to adopt JIT-compilation is Apache Spark \cite{spark}. The Databricks team introduced JIT-compilation to Spark in 2016 with their Tungsten 2.0 engine \cite{spark16}. This engine generates special-purpose Java Virtual Machine (JVM) bytecode for select operators in the Spark execution plan. A team of academics from Purdue University improved upon this design in 2018 with their \textit{Flare} extension to Spark \cite{flare}. Instead of compiling Spark operators to JVM bytecode, \textit{Flare} emits native machine code for even greater savings in instruction counts and overall runtime.
 
@@ -255,7 +255,7 @@ The \textit{Tupleware} system targets a different set of users by scaling down S
 
 In this section, we describe approaches to UDF runtime optimization. These approaches are relevant for our discussion because they are the baseline against which we measure the effectiveness of our approach.
 
-Tradition DBMS execution engines are not equipped to execute arbitrary imperative program logic. For this reason, many systems implement a distinct execution subsystem for procedural extensions to SQL and perform a context-switch from the primary SQL execution engine to this subsystem whenever a UDF must be evaluated \cite{apfel}. An example of this style of UDF evaluation is shown in figure~\ref{fig:overhead_simple}.
+Traditional DBMS execution engines are not equipped to execute arbitrary imperative program logic. For this reason, many systems implement a distinct execution subsystem for procedural extensions to SQL and perform a context-switch from the primary SQL execution engine to this subsystem whenever a UDF must be evaluated \cite{apfel}. An example of this style of UDF evaluation is shown in figure~\ref{fig:overhead_simple}.
 
 \begin{figure}[t!]
     \centering
@@ -281,7 +281,7 @@ While this approach makes combining the two styles of execution simple to reason
 
 Despite recent advances in compilation techniques, the most successful approaches to addressing the performance limitations of user-defined functions do not involve native compilation. Instead, most of the attention in this space is currently devoted to the technique of UDF inlining. In UDF inlining, a UDF is translated into a relational algebraic expression that can then be embedded directly into the calling SQL query. Inlining a UDF allows the DBMS's existing query optimization component to optimize the logic of an imperative UDF in the same way it optimizes declarative SQL.
 
-Ramachandra et al. implement this technique's archetype in their \textit{Froid} system within Microsoft SQL Server \cite{sqlserver}. Froid executes UDF inlining by first decomposing an individual UDF into distinct \textit{regions} that it then translates into equivalent relational expressions. The Froid framework then relies on SQL Server's \dbCode{APPLY} operator to compose these relational expressions into a single relational expression that encodes the entirety of the UDF's logic \cite{froid}. Gupta et al. extend this work on Froid with their Aggify framework to add support for cursor loops. Aggify realizes its support for cursor loops by translating them to equivalent custom aggregations \cite{aggify}. An example of the inlining technique used by \textit{Froid} is shown in figure~\ref{fig:inlining}.
+Ramachandra et al. implement this technique's archetype in their \textit{Froid} system within Microsoft SQL Server \cite{sqlserver}. \textit{Froid} executes UDF inlining by first decomposing an individual UDF into distinct \textit{regions} that it then translates into equivalent relational expressions. The \textit{Froid} framework then relies on SQL Server's \dbCode{APPLY} operator to compose these relational expressions into a single relational expression that encodes the entirety of the UDF's logic \cite{froid}. Gupta et al. extend this work on Froid with their \textit{Aggify} framework to add support for iterative control-flow and cursor loops. \textit{Aggify} enables new control flow constructs by translating loops to equivalent custom aggregations \cite{aggify}. An example of the inlining technique used by \textit{Froid} is shown in figure~\ref{fig:inlining}.
 
 \begin{figure}[t!]
     \centering
@@ -293,7 +293,7 @@ Ramachandra et al. implement this technique's archetype in their \textit{Froid} 
     \label{fig:inlining}
 \end{figure}
 
-Duta et al. pursue a distinct approach to UDF inlining in their Apfel framework \cite{apfel}. Where Ramachandra et al. implement Froid as an integrated component of the Microsoft SQL Server DBMS, Duta et al. design their Apfel framework as a standalone system that compiles imperative UDFs written in PL/pgSQL \cite{plpgsql} to standard SQL. Any database system may then process the resulting SQL query in the usual manner. The Apfel framework's defining feature is its use of recursive common table expressions (SQL's \dbCode{WITH RECURSIVE} syntax) to reproduce arbitrary imperative loop logic in SQL.
+Duta et al. pursue a distinct approach to UDF inlining in their \textit{Apfel} framework \cite{apfel}. Where Ramachandra et al. implement \textit{Froid} as an integrated component of the Microsoft SQL Server DBMS, Duta et al. design their \textit{Apfel} framework as a standalone system that compiles imperative UDFs written in PL/pgSQL \cite{plpgsql} to standard SQL. Any database system may then process the resulting SQL query in the usual manner. Where \textit{Froid} relies on the \dbCode{APPLY} operator, \textit{Apfel} relies on nested subqueries combined by lateral joins (\dbCode{LATERAL}) to recreate PL/SQL logic. \textit{Apfel} leverages recursive common table expressions (SQL's \dbCode{WITH RECURSIVE} syntax) to reproduce arbitrary imperative loop logic in SQL.
 
 %% ==================================================================
 %% EXECUTION ENGINE
@@ -374,7 +374,7 @@ We implement \tpl compiler as a standalone bytecode compiler. The \tpl compiler 
     \item Module Generation: A TPL module is constructed that assumes ownership for the raw bytecode produced in the previous step.
 \end{enumerate}
 
-There is a one-to-one mapping between code and data defined in the input AST and the code and data that appears in the completed \tpl module. There is no fundamental change to the abstraction that occurs at this stage of code generation. Instead, \tpl module generation represents both an important lowering step (a \tpl module is the fundamental unit of execution for interpreted execution) as well as a unification point between the more general \tpl ecosystem and the NoisePage execution engine. The \tpl compiler can handle both raw \tpl programs in a textual representation as well as a previously-constructed \tpl AST (the intermediary form produced in the previous phase of code generation). Implementing the \tpl ecosystem in a manner that is agnostic of the NoisePage execution engine itself makes the system more amenable to development.
+There is a one-to-one mapping between code and data defined in the input AST and the code and data that appears in the completed \tpl module. There is no fundamental change to the abstraction that occurs at this stage of code generation. Instead, \tpl module generation represents both an important lowering step (a \tpl module is the fundamental unit of execution for interpreted execution) as well as a unification point between the more general \tpl ecosystem and the NoisePage execution engine. The \tpl compiler can handle both raw \tpl programs in a textual representation as well as a previously-constructed \tpl AST (the intermediate form produced in the previous phase of code generation). Implementing the \tpl ecosystem in a manner that is agnostic of the NoisePage execution engine itself makes the system more amenable to development.
 
 \subsubsection{Executable Query Construction} 
 
@@ -403,7 +403,7 @@ We now examine the internals of each of the available execution modes.
 
 \subsubsection{Interpreted Execution}
 
-In interpreted execution, the function object returned by the \tpl module call wraps an invocation that jumps to the entry point of the NoisePage bytecode interpeter. The implementation of the NoisePage virtual machine is nicely self-contained. The VM implementation in `vm.cpp` may appear daunting at first (the file is nearly 3,000 lines long as of this writing, consisting almost entirely of preprocessor macros) but the actual mechanics of how the VM interprets a query are relatively straightforward.
+In interpreted execution, the function object returned by the \tpl module call wraps an invocation that jumps to the entry point of the NoisePage bytecode interpeter. The implementation of the NoisePage virtual machine is nicely self-contained. The VM implementation appears daunting at first (the file is nearly 3,000 lines long as of this writing, consisting almost entirely of preprocessor macros) but the actual mechanics of how the VM interprets a query are relatively straightforward.
 
 A single function (\texttt{VM::Interpret()}) implements the core interpreter loop within NoisePage. We implement the \tpl interpreter as a register-based virtual machine (VM). The VM uses indirect threaded interpretation; each bytecode handler's label is statically generated and stored in a predefined location at server compile time. Interpretation of a \tpl program proceeds by reading the first instruction from the bytecode stream, executing it, and returning to the next instruction in the bytecode stream. This process may be influenced by explicit control-flow instructions.
 
@@ -442,7 +442,7 @@ In this section, we describe how we added support for JIT-compilation of user de
 
 \subsection{\plpgsql Compiler}
 
-There are many distinct dialects of SQL's procedural extensions - different database systems choose to implement different subsets of the requirements set forth in the standard while simultaneously extending the standard functionality in various ways. In this project, we add support for the the \plpgsql dialect of PL\\SQL. This is the procedural extensions dialect supported by the PostgreSQL database system \cite{postgresql}. We select \plpgsql as our target for a number of reasons. PostgreSQL is an open-source system, making it convenient to install and set up. It is a natural choice for performance comparisons because it implements a ``textbook'' database system that does not include many of the complex optimization techniques that other systems might, and makes such optimizations configurable in cases in which they are supported. Finally, \plpgsql is the dialect of PL\\SQL targeted by the \textit{Apfel} framework, one of the targets of our performance comparison.
+There are many distinct dialects of SQL's procedural extensions - different database systems choose to implement different subsets of the requirements set forth in the standard while simultaneously extending the standard functionality in various ways. In this project, we add support for the the \plpgsql dialect of PL/SQL. This is the procedural extensions dialect supported by the PostgreSQL database system \cite{postgresql}. We select \plpgsql as our target for a number of reasons. PostgreSQL is an open-source system, making it convenient to install and set up. It is a natural choice for performance comparisons because it implements a ``textbook'' database system that does not include many of the complex optimization techniques that other systems might, and makes such optimizations configurable in cases in which they are supported. Finally, \plpgsql is the dialect of PL\\SQL targeted by the \textit{Apfel} framework, one of the targets of our performance comparison.
 
 We implement a \plpgsql compiler in NoisePage. This compiler accepts the textual representation of a \plpgsql function as input and produces the \tpl bytecode program that implements this function as output. The high-level steps involved in \plpgsql compilation are the following:
 
@@ -450,7 +450,7 @@ We implement a \plpgsql compiler in NoisePage. This compiler accepts the textual
     \item Parse the textual representation of the \plpgsql function to a parse tree. We utilize existing parser functionality provided by \textit{libpg\_query} for this purpose.
     \item Translate the raw parse tree to an enriched abstract syntax tree. During this phase of compilation, we translate each of the nodes in the raw parse tree from \textit{libpg\_query} to an internal AST representation. This phase translates many of the unsafe components of the parse tree to safe, internal representations, such as replacing non-owning pointers to child nodes with owning C++ smart pointers and replacing string type names with enumerated type identifiers.
     \item Walk the enriched AST to collect function-level metadata. This metdata includes information such as the types of all declared variables and the scopes in which these variables are visible.
-    \item Generate \tpl bytecode from the enriched AST. Code generation from the AST to \tpl occurs in a single step. In comparisong to query code generation, UDF code generation is relatively simple because we lower from an imperative source language (\plpgsql) to an imperative target language (\tpl). The impedance mismatch between SQL and \tpl introduces many challenges that are not present in PL\\SQL to \tpl compilation.
+    \item Generate \tpl bytecode from the enriched AST. Code generation from the AST to \tpl occurs in a single step. In comparison to query code generation, UDF code generation is relatively simple because we lower from an imperative source language (\plpgsql) to an imperative target language (\tpl). The impedance mismatch between SQL and \tpl introduces many challenges that are not present in \plpgsql to \tpl compilation.
 \end{enumerate}
 
 \subsection{TPL Closures}
@@ -557,6 +557,8 @@ As an example consider the UDF definition shown in listing~\ref{list:udf_example
     \item Pass this unified bytecode program to the LLVM engine for native JIT-compilation.
 \end{enumerate}
 
+System integration brings compilation and execution of \plpgsql UDFs to NoisePage.
+
 \begin{listing}
     \begin{minted}[frame=lines]{plpgsql}
 CREATE FUNCTION procCount() 
@@ -591,7 +593,7 @@ We now present the results of our evaluation of UDF runtime optimization techniq
 
 \subsection{Function Call Overhead}
 
-The first aspect of our implementation we evaluate is the overhead imposed by individual function calls. While this does not reflect performance improvements or degregations on production workloads, it does allow us to quickly estimate the viability of our approach to UDF optimization via JIT compilation.
+The first aspect of our implementation we evaluate is the overhead imposed by individual function calls. While this does not reflect performance improvement or degradation on production workloads, it does allow us to quickly estimate the viability of our approach to UDF optimization via JIT compilation.
 
 In order to measure the runtime overhead imposed by an individual function call, we design a simple synthetic benchmark \textit{Call}. This benchmark consists of three queries:
 
@@ -644,7 +646,7 @@ The results of this benchmark are shown in figure~\ref{fig:bench_pg_call} and fi
 
 \begin{figure}[t!]
     \centering
-    \includegraphics[width=\columnwidth]{plots/pg_call_legend.pdf}
+    \includegraphics[width=\columnwidth]{plots/pg_call_legend.jpg}
     \\
     \includegraphics[width=\columnwidth]{plots/pg_call.pdf}
     \caption{
@@ -656,7 +658,7 @@ The results of this benchmark are shown in figure~\ref{fig:bench_pg_call} and fi
 
 \begin{figure}[t!]
     \centering
-    \includegraphics[width=\columnwidth]{plots/np_call_legend.pdf}
+    \includegraphics[width=\columnwidth]{plots/np_call_legend.jpg}
     \\
     \includegraphics[width=\columnwidth]{plots/np_call.pdf}
     \caption{
@@ -710,7 +712,7 @@ The first evluation we perform measures the total time required to execute each 
 
 \begin{figure}[t!]
     \centering
-    \includegraphics[width=\columnwidth]{plots/procbench_legend.pdf}
+    \includegraphics[width=\columnwidth]{plots/procbench_legend.jpg}
     \\
     \includegraphics[width=\columnwidth]{plots/procbench.pdf}
     \caption{
@@ -720,9 +722,21 @@ The first evluation we perform measures the total time required to execute each 
     \label{fig:bench_procbench_postgres}
 \end{figure}
 
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=\columnwidth]{plots/procbench_apfel_legend.jpg}
+    \\
+    \includegraphics[width=\columnwidth]{plots/procbench_apfel.pdf}
+    \caption{
+        \textbf{ProcBench Results - \plpgsql Compilation vs Inlining} --
+        Comparison of query runtime on NoisePage during execution of select functions from the SQL ProcBench benchmark.
+    }
+    \label{fig:bench_procbench_final}
+\end{figure}
+
 Unlike the previous two benchmarks, the results of this benchmark are far from inspiring. NoisePage achieves runtimes similar to PostgreSQL for several of the functions (function identifiers \dbCode{04}, \dbCode{11}, and \dbCode{20a}), but far underperforms PostgreSQL on the remaining functions (function identifiers \dbCode{01} and \dbCode{05}). The distinction between these two sets of functions is that functions in the former group do not interact heavily with the NoisePage storage subsystem, while functions in the latter group do. As a specific example, the definition of the UDF with function identifier \dbCode{05} is shown in listing~\ref{list:udf_procbench_05}. The logic in this function is not complex, but it does involve two aggregations over the result of a three-way \dbCode{JOIN} on three relatively-large tables, implying that most of the work for this query occurs in the storage subsystem as tables are scanned and the \dbCode{JOIN} predicates are applied. The NoisePage storage subsystem has several design deficiencies that render this bottleneck unavoidable.
 
-\begin{listing}
+\begin{listing}[h]
     \begin{minted}[frame=lines]{plpgsql}
 CREATE FUNCTION morningToEveRatio(dep INT) 
     RETURNS INT AS $$
@@ -762,19 +776,7 @@ NoisePage's poor performance on these benchmark functions demonstrates the neces
 
 To this end, we run a second evaluation on the SQL ProcBench benchmark functions. This time, we compare the performance of UDF JIT-compilation in NoisePage with the inlined versions of the benchmark queries produced by the \textit{Apfel} framework. To produce these inlined queries, we compile the original ProcBench functions and their invoking queries with the \textit{Apfel} framework. We then transcribe the SQL queries produced by the framework into query plans that are executed on NoisePage. We must construct each of these query plans by hand because NoisePage does not support some of the SQL constructs that appear in the queries produced by \textit{Apfel}. The results of this evaluation are shown in figure~\ref{fig:bench_procbench_final}.
 
-\begin{figure}[t!]
-    \centering
-    \includegraphics[width=\columnwidth]{plots/procbench_apfel_legend.pdf}
-    \\
-    \includegraphics[width=\columnwidth]{plots/procbench_apfel.pdf}
-    \caption{
-        \textbf{ProcBench Results - \plpgsql Compilation vs Inlining} --
-        Comparison of query runtime on NoisePage during execution of select functions from the SQL ProcBench benchmark.
-    }
-    \label{fig:bench_procbench_final}
-\end{figure}
-
-The results of this evaluation are inconclusive. For simpler queries, direct \plpgsql compilation provides better performance. This is unsurprising considering that the inlined queries from \textit{Apfel} must model even simple control flow with SQL \dbCode{JOIN} operations and common table expressions. The NoisePage optimizer is not able to optimize away some of these inefficiencies because the query plans are input directly. For more complex queries (function identifiers \dbCode{01} and \dbCode{05}) any performance differences between the two approaches are hidden by the inefficiencies in the NoisePage storage engine.  
+The results of this evaluation are inconclusive. For simpler queries, direct \plpgsql compilation provides better performance. This is unsurprising considering that the inlined queries from \textit{Apfel} must model even simple control flow with SQL \dbCode{JOIN} operations and common table expressions. The NoisePage optimizer is not able to optimize away some of these inefficiencies because the query plans are input directly. For more complex queries (function identifiers \dbCode{01} and \dbCode{05}) any performance differences between the two approaches are hidden by the inefficiencies in the NoisePage storage engine. 
 
 %% ==================================================================
 %% FUTURE WORK
@@ -866,7 +868,7 @@ To account for the strengths and limitations of both approaches, we propose deco
 
 \section{Conclusion}
 
-UDFs allow us express SQL queries more efficiently and in a manner that encourages modularization and reuse. They make data management in production more safer and more efficient. However, their use in production systems is often discouraged because of their poor performance characteristics. This poor performance is a result of the impedance mismatch between declarative SQL and imperative PL/SQL which often necessitates frequent, expensive context-switches during query execution.
+UDFs allow us express SQL queries more efficiently and in a manner that encourages modularization and reuse. They make data management in production safer and more efficient. However, their use in production systems is often discouraged because of their poor performance characteristics. This poor performance is a result of the impedance mismatch between declarative SQL and imperative PL/SQL which often necessitates frequent, expensive context-switches during query execution.
 
 In this paper, we address this problem using a novel approach to UDF runtime optimization that integrates with a query compilation engine. In our research system, NoisePage, we implement a compiler for \plpgsql UDFs that targets the same intermediate representation as our existing execution engine architecture. We combine the code generated for both the UDF and its invoking query into a complete program and JIT-compile this program to native machine code with LLVM. In an experimental evaluation we find that our approach yields performance that is competitive with state-of-the-art approaches to UDF optimization through inlining.
 
@@ -878,7 +880,7 @@ In this paper, we address this problem using a novel approach to UDF runtime opt
 
 I would like to thank Karthik Ramachandra from Microsoft. His pioneering work on \textit{Froid} and consistent willingness to discuss its inner workings enabled me to complete my evaluation in this project.
 
-I would also like to thank Torsten Grust and Denis Hirn from the University of Tubingen. This project would not have been possible were it not for their willingness to provide insights on their \textit{Apfel} framework and the means utilize it with a custom configuration. 
+I would also like to thank Torsten Grust and Denis Hirn from the University of Tubingen. This project would not have been possible were it not for their willingness to provide insights on their \textit{Apfel} framework and the means to utilize it with a custom configuration. 
 
 I would like to thank my Capstone advisor Andrew Pavlo for his consistent feedback and enthusiasm for this project. There were many times over the course of this project that I felt discouraged by new challenges and slow progress. Andy always managed to reignite my passion for this work.
 
